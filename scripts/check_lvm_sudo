@@ -1,0 +1,38 @@
+#!/bin/bash
+
+PATH=$PATH:/sbin:/usr/sbin:/usr/local/sbin
+
+# Return the greatest snapshot allocation
+snapshot_max_alloc(){
+    MAX_PERCENT=0
+    for PERCENT in $(lvdisplay | grep % | sed -e 's/  Allocated to snapshot  //g' -e 's/%//g'); do
+        if [[ "$PERCENT" > "$MAX_PERCENT" ]]; then
+            MAX_PERCENT=$PERCENT
+        fi
+    done
+    echo "$MAX_PERCENT"
+}
+
+# Number of active snapshots
+snapshots(){
+    echo $(lvdisplay | grep % | wc -l)
+}
+
+# Number of logical volumes
+lv(){
+    echo $(lvdisplay  | grep 'LV Name' | wc -l)
+}
+
+# Number of volume group
+vg(){
+    echo $(vgdisplay  | grep 'VG Name' | wc -l)
+}
+
+case $1 in 
+    snapshot_max_alloc|snapshots|lv|vg)
+        $1
+    ;;
+    *)
+        echo 'ZBX_NOTSUPPORTED'
+esac
+
