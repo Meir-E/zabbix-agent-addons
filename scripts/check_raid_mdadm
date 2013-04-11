@@ -1,0 +1,140 @@
+#!/usr/bin/env perl
+
+# Get status of Linux software RAID for SNMP / Nagios
+# Author: Michal Ludvig <michal@logix.cz>
+#         http://www.logix.cz/michal/devel/nagios
+# Slightly modified by Daniel B. for integration on SME Server / Zabbix
+
+# 
+# Simple parser for /proc/mdstat that outputs status of all
+# or some RAID devices. Possible results are
+# - OK: all arrays are optimal
+# - WARNING: Array rebuilding
+# - CRITICAL: Array degraded
+
+use strict;
+use Getopt::Long;
+
+# Sample /proc/mdstat output:
+# 
+# Personalities : [raid1] [raid5]
+# md0 : active (read-only) raid1 sdc1[1]
+#       2096384 blocks [2/1] [_U]
+# 
+# md1 : active raid5 sdb3[2] sdb4[3] sdb2[4](F) sdb1[0] sdb5[5](S)
+#       995712 blocks level 5, 64k chunk, algorithm 2 [3/2] [U_U]
+#       [=================>...]  recovery = 86.0% (429796/497856) finish=0.0min speed=23877K/sec
+# 
+# unused devices: <none>
+
+my $file = "/proc/mdstat";
+my $device = "all";
+
+# Get command line options.
+GetOptions ('file=s' => \$file,
+	'device=s' => \$device,
+	'help' => sub { &usage() } );
+
+## Strip leading "/dev/" from --device in case it has been given
+$device =~ s/^\/dev\///;
+
+## Return codes for Nagios
+my %ERRORS=('OK'=>0,'WARNING'=>1,'CRITICAL'=>2,'UNKNOWN'=>3,'DEPENDENT'=>4);
+
+## This is a global return value - set to the worst result we get overall
+my $retval = 0;
+
+my (%active_devs, %failed_devs, %spare_devs, %devs_total, %level, %size, %status);
+my @raids;
+my $result = 'OK';
+
+open FILE, "< $file" or die "Can't open $file : $!";
+while (<FILE>) {
+	next if ! /^(md\d+)+\s*:/;
+	next if $device ne "all" and $device ne $1;
+	my $dev = $1;
+	push @raids, $dev;
+
+	my @array = split(/ /);
+	$devs_total{$dev} = 0;
+	my $devs_up = 0;
+	my $missing = 0;
+	for $_ (@array) {
+		$level{$dev} = $1 if /^(raid\d+)$/;
+		next if ! /(\w+)\[\d+\](\(.\))*/;
+		$devs_total{$dev}++;
+		if ($2 eq "(F)") {
+			$failed_devs{$dev} .= "$1,";
+		}
+		elsif ($2 eq "(S)") {
+			$spare_devs{$dev} .= "$1,";
+		}
+		else {
+			$active_devs{$dev} .= "$1,";
+			$devs_up++;
+		}
+	}
+	if (! defined($active_devs{$dev})) { $active_devs{$dev} = "none"; }
+		else { $active_devs{$dev} =~ s/,$//; }
+	if (! defined($spare_devs{$dev}))  { $spare_devs{$dev}  = "none"; }
+		else { $spare_devs{$dev} =~ s/,$//; }
+	if (! defined($failed_devs{$dev})) { $failed_devs{$dev} = "none"; }
+		else { $failed_devs{$dev} =~ s/,$//; }
+	
+	$_ = <FILE>;
+	/(\d+)\ blocks\ (.*)(\[.*\])\s?$/;
+        $size{$dev} = int($1/1024);
+	#print "$3\n";
+	$missing = 1 if ($3 =~ m/_/);
+	if ($size{$dev} > 1024){
+		$size{$dev} = int($size{$dev}/1024)."GB";
+	}
+	else{
+		$size{$dev} .= "MB";
+	}
+	$_ = <FILE>;
+	if (($devs_total{$dev} > $devs_up) || ($failed_devs{$dev} ne "none") || (($missing) && (!/recovery/))) {
+		$status{$dev} = "Degraded";
+		$result = "CRITICAL";
+		$retval = $ERRORS{"CRITICAL"};
+	}
+	else {  
+                $status{$dev} = "Optimal";
+        }
+	if (/recovery/){
+		$status{$dev} = "Rebuilding";
+		if ($result eq "OK"){
+			$result = "WARNING";
+	                $retval = $ERRORS{"WARNING"};
+		}
+	}
+	
+
+}
+print "$result: ";
+foreach my $raid (@raids){
+    print "$raid:$level{$raid}:$devs_total{$raid} drives:$size{$raid}:$status{$raid} ";
+}
+print "\n";
+close FILE;
+exit $retval;
+
+# =====
+sub usage()
+{
+	printf("
+Check status of Linux SW RAID
+
+Author: Michal Ludvig <michal\@logix.cz> (c) 2006
+        http://www.logix.cz/michal/devel/nagios
+Modified by Daniel B. <daniel\@firewall-services.com>:
+
+Usage: $0 [options]
+
+  --file=<filename>    Name of file to parse. Default is /proc/mdstat
+  --device=<device>    Name of MD device, e.g. md0. Default is \"all\"
+
+");
+	exit(1);
+}
+
