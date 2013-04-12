@@ -1,9 +1,10 @@
-#!/bin/bash
+#!/bin/sh
 
 echo -e "{\n\t\"data\":[\n\n"
 for DISK in $(smartctl --scan-open | cut -d' ' -f1); do
     smartctl -A $DISK >/dev/null 2>&1
     if [ $? -eq 0 ]; then
+        DISK=$(echo $DISK | sed -e 's|/|\\/|g')
         echo -e "\t{\n"
         echo -e "\t\t\"{#SMARTDRIVE}\":\"$DISK\""
         echo -e "\t}"
