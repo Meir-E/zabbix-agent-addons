@@ -1,0 +1,22 @@
+#!/usr/bin/perl -w
+
+use JSON;
+
+opendir(my $dh, "/sys/block") or die "Couldn't open /sys/block: $!";
+my @blocks = grep { $_ !~ m/^\./ } readdir($dh);
+closedir($dh);
+my $json;
+foreach my $block (@blocks){
+    my $remouvable = 0;
+    if ( -e "/sys/block/$block/remouvable"){
+        open REMOUVABLE, "/sys/block/$block/remouvable";
+        $remouvable = join "", <REMOUVABLE>;
+        close REMOUVABLE;
+        chomp($remouvable);
+        next if ($remouvable eq '1');
+    }
+    my $dev = '/dev/' . $block;
+    push @{$json->{data}}, { "{#BLOCKDEVICE}" => $dev };
+}
+print to_json($json);
+exit(0);
