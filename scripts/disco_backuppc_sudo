@@ -17,18 +17,18 @@ my $bpc = BackupPC::Lib->new();
 my $hosts = $bpc->HostInfoRead();
 my $mainConf = $bpc->ConfigDataRead();
 
-my $data;
+my $json;
 foreach my $host (keys %$hosts){
    my $hostConf = $bpc->ConfigDataRead($host);
    my $conf = { %$mainConf, %$hostConf };
    my $period = ($conf->{FullPeriod} >= $conf->{IncrPeriod}) ? $conf->{IncrPeriod} : $conf->{FullPeriod};
    my $status = ($conf->{BackupsDisable} eq 1) ? 'disabled':'enabled';
-   push @{$data->{data}},
+   push @{$json->{data}},
        {  
            "{#BPCHOST}" => $host,
            "{#BPCPERIOD}" => $period,
            "{#BPCSTATUS}" => $status,
        };
 }
-print to_json($data, {pretty => 1});
+print to_json($json);
 exit(0);
