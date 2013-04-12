@@ -1,0 +1,2 @@
+#!/bin/sh
+/usr/sbin/smartctl -A $1 | grep $2 | tail -1| cut -c 88- | cut -f1 -d' '

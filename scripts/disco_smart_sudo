@@ -1,0 +1,12 @@
+#!/bin/bash
+
+echo -e "{\n\t\"data\":[\n\n"
+for DISK in $(smartctl --scan-open | cut -d' ' -f1); do
+    smartctl -A $DISK >/dev/null 2>&1
+    if [ $? -eq 0 ]; then
+        echo -e "\t{\n"
+        echo -e "\t\t\"{#SMARTDRIVE}\":\"$DISK\""
+        echo -e "\t}"
+    fi
+done
+echo -e "\n\t]\n}\n"
