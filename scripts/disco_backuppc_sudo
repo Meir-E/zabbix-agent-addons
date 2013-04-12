@@ -1,0 +1,34 @@
+#!/usr/bin/perl -w
+
+use lib "/usr/share/BackupPC/lib";
+use BackupPC::Lib;
+use BackupPC::CGI::Lib;
+use POSIX;
+use JSON;
+
+# We need to switch to backuppc UID/GID
+my $uid = getuid();
+my $gid = getgid();
+my (undef,undef,$bkpuid,$bkpgid) = getpwnam('backuppc');
+setuid($bkpuid) if ($uid ne $bkpuid);
+setgid($bkpgid) if ($gid ne $bkpgid);
+
+my $bpc = BackupPC::Lib->new();
+my $hosts = $bpc->HostInfoRead();
+my $mainConf = $bpc->ConfigDataRead();
+
+my $data;
+foreach my $host (keys %$hosts){
+   my $hostConf = $bpc->ConfigDataRead($host);
+   my $conf = { %$mainConf, %$hostConf };
+   my $period = ($conf->{FullPeriod} >= $conf->{IncrPeriod}) ? $conf->{IncrPeriod} : $conf->{FullPeriod};
+   my $status = ($conf->{BackupsDisable} eq 1) ? 'disabled':'enabled';
+   push @{$data->{data}},
+       {  
+           "{#BPCHOST}" => $host,
+           "{#BPCPERIOD}" => $period,
+           "{#BPCSTATUS}" => $status,
+       };
+}
+print to_json($data, {pretty => 1});
+exit(0);
