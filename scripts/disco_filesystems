@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+ 
+$first = 1;
+ 
+print "{\n";
+print "\t\"data\":[\n\n";
+
+my $cmd;
+my $re;
+# On Linux, parse /proc/mounts
+if (-e "/proc/mounts"){
+    $cmd = 'cat /proc/mounts';
+    $re = qr/\S+ (\S+) (\S+)/;
+}
+# On BSD (at least pfsense), there's no /proc/mounts
+# parse the mount output
+else{
+    $cmd = '/sbin/mount';
+    $re = qr/on (\S+) \((\S+), /;
+}
+for (`$cmd`){
+    ($fsname, $fstype) = m/$re/;
+    $fsname =~ s!/!\\/!g;
+ 
+    print "\t,\n" if not $first;
+    $first = 0;
+ 
+    print "\t{\n";
+    print "\t\t\"{#FSNAME}\":\"$fsname\",\n";
+    print "\t\t\"{#FSTYPE}\":\"$fstype\"\n";
+    print "\t}\n";
+}
+ 
+print "\n\t]\n";
+print "}\n";
