@@ -10,16 +10,32 @@ my $re;
 # On Linux, parse /proc/mounts
 if (-e "/proc/mounts"){
     $cmd = 'cat /proc/mounts';
-    $re = qr/\S+ (\S+) (\S+)/;
+    $re = qr/(\S+) (\S+) (\S+)/;
 }
 # On BSD (at least pfsense), there's no /proc/mounts
 # parse the mount output
 else{
     $cmd = '/sbin/mount';
-    $re = qr/on (\S+) \((\S+), /;
+    $re = qr/(\S+) on (\S+) \((\S+), /;
 }
 for (`$cmd`){
-    ($fsname, $fstype) = m/$re/;
+    ($block, $fsname, $fstype) = m/$re/;
+    # Default warning and critical level (%)
+    my $warning = 85;
+    my $critical = 95;
+    my $t;
+    if (open WARN, "$fsname/.zbx_warning"){
+       $t = join "", <WARN>;
+       close WARN;
+       chomp($t);
+       $warning = $t if ($t =~ m/^\d+$/);
+    }
+    if (open CRIT, "$fsname/.zbx_critical"){
+       $t = join "", <CRIT>;
+       close CRIT;
+       chomp($t);
+       $critical = $t if ($t =~ m/^\d+$/);
+    }
     $fsname =~ s!/!\\/!g;
  
     print "\t,\n" if not $first;
@@ -28,6 +44,9 @@ for (`$cmd`){
     print "\t{\n";
     print "\t\t\"{#FSNAME}\":\"$fsname\",\n";
     print "\t\t\"{#FSTYPE}\":\"$fstype\"\n";
+    print "\t\t\"{#FSDEVICE}\":\"$block\"\n";
+    print "\t\t\"{#FSWARNTHRES}\":\"$warning\"\n";
+    print "\t\t\"{#FSCRITTHRES}\":\"$critical\"\n";
     print "\t}\n";
 }
  
