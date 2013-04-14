@@ -24,6 +24,7 @@ my $conf = { %$mainConf, %$hostConf };
 my $fullCnt = $incrCnt = 0;
 my $fullAge = $incrAge = $lastAge = -1;
 my $lastXferErrors = 0;
+my $maxErrors = 0;
 
 for ( my $i = 0 ; $i < @backups ; $i++ ) {
     if ( $backups[$i]{type} eq "full" ) {
@@ -54,9 +55,13 @@ else {
     $lastAge = sprintf("%.1f", (time - $lastAge) / (24 * 3600));
 }
 $lastXferErrors = $backups[@backups-1]{xferErrs} if ( @backups );
+$maxErrors = $conf->{MaxXferError} if (defined $conf->{MaxXferError});
 
 if ($what eq 'errors'){
     print $lastXferErrors;
+}
+elsif ($what eq 'max_errors'){
+    print $maxErrors;
 }
 elsif ($what eq 'age'){
     print $lastAge;
