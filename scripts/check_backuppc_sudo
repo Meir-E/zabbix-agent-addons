@@ -18,6 +18,9 @@ my $what = $ARGV[1];
 
 my $bpc = BackupPC::Lib->new();
 my @backups = $bpc->BackupInfoRead($host);
+my $mainConf = $bpc->ConfigDataRead();
+my $hostConf = $bpc->ConfigDataRead($host);
+my $conf = { %$mainConf, %$hostConf };
 my $fullCnt = $incrCnt = 0;
 my $fullAge = $incrAge = $lastAge = -1;
 my $lastXferErrors = 0;
@@ -63,6 +66,9 @@ elsif ($what eq 'size'){
 }
 elsif ($what eq 'duration'){
     print $fullDur;
+}
+elsif ($what eq 'notify'){
+    print $conf->{EMailNotifyOldBackupDays};
 }
 else{
   print<<"EOF";
