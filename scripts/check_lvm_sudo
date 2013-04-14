@@ -1,38 +1,39 @@
-#!/bin/bash
+#!/usr/bin/perl -w
 
-PATH=$PATH:/sbin:/usr/sbin:/usr/local/sbin
+use Linux::LVM;
 
-# Return the greatest snapshot allocation
-snapshot_max_alloc(){
-    MAX_PERCENT=0
-    for PERCENT in $(lvdisplay | grep % | sed -e 's/  Allocated to snapshot  //g' -e 's/%//g'); do
-        if [[ "$PERCENT" > "$MAX_PERCENT" ]]; then
-            MAX_PERCENT=$PERCENT
-        fi
-    done
-    echo "$MAX_PERCENT"
+Linux::LVM->units(B);
+
+if (@ARGV < 2){
+    usage();
+    exit(1);
 }
 
-# Number of active snapshots
-snapshots(){
-    echo $(lvdisplay | grep % | wc -l)
+my $vol = $ARGV[0];
+my $what = $ARGV[1];
+
+sub usage {
+    print<<"EOF";
+
+Usage: $0 <logical volume> [size|allocation|status]
+
+EOF
 }
 
-# Number of logical volumes
-lv(){
-    echo $(lvdisplay  | grep 'LV Name' | wc -l)
+my %info = get_lv_info($vol);
+
+if ($what eq 'size'){
+    print $info{size};
 }
-
-# Number of volume group
-vg(){
-    echo $(vgdisplay  | grep 'VG Name' | wc -l)
+elsif ($what eq 'allocation'){
+    my $ret = (defined $info{allocated_to_snapshot}) ? $info{allocated_to_snapshot} : "ZBX_NOTSUPPORTED";
+    $ret =~ s/,/\./;
+    print $ret;
 }
-
-case $1 in 
-    snapshot_max_alloc|snapshots|lv|vg)
-        $1
-    ;;
-    *)
-        echo 'ZBX_NOTSUPPORTED'
-esac
-
+elsif ($what eq 'status'){
+    print $info{status};
+}
+else{
+    usage();
+}
+exit(0);
