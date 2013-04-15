@@ -1,0 +1,21 @@
+#!/usr/bin/perl -w
+
+use JSON;
+my $json;
+
+open SENSORS, ('</etc/zabbix/sensors.conf') ||
+    die "Couldn't open /etc/zabbix/sensors.conf: $!\n";
+
+
+foreach (<SENSORS>){
+    next unless (/^(\w+)(\s+)?=(\s+)?(.*)!(\-?\d+)!(\-?\d+)$/);
+    my ($sensor,$threshigh,$threslow) = ($1,$5,$6);
+    push @{$json->{data}}, {
+        "{#SENSORNAME}" => $sensor,
+        "{#SENSORTHRESHIGH}" => $threshigh,
+        "{#SENSORTHRESLOW}" => $threslow
+    };
+}
+close SENSORS;
+print to_json($json, { pretty => 1 });
+exit(0);

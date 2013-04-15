@@ -39,6 +39,8 @@ LVM, RAID status, S.M.A.R.T. drives, BackupPC etc...
 # Install Zabbix conf
 %{__install} -d $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/zabbix_agentd.conf.d/
 %{__install} -m 0755 zabbix_conf/* $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/zabbix_agentd.conf.d/
+# Install sensors conf
+%{__install} -m 0755 conf/sensors.conf $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/
 # Install sudo conf
 %{__install} -d 750 $RPM_BUILD_ROOT%{_sysconfdir}/sudoers.d
 %{__install} -m 600 conf/sudo.conf $RPM_BUILD_ROOT%{_sysconfdir}/sudoers.d/zabbix_agent
@@ -57,6 +59,7 @@ LVM, RAID status, S.M.A.R.T. drives, BackupPC etc...
 %doc README CHANGELOG.git
 %dir %attr(0750,zabbix,zabbix) %{_localstatedir}/lib/zabbix/bin
 %{_localstatedir}/lib/zabbix/bin/*
+%config(noreplace) %attr(0644,root,root) %{_sysconfdir}/zabbix/sensors.conf
 %{_sysconfdir}/zabbix/zabbix_agentd.conf.d/*
 %{_sysconfdir}/sudoers.d/*
 

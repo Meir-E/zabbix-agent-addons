@@ -1,0 +1,25 @@
+#!/usr/bin/perl -w
+
+my $what = $ARGV[0];
+
+unless (defined $what){
+    print <<"EOF";
+
+Usage: $0 sensor_name
+
+EOF 
+    exit(1);
+}
+
+open SENSORS, ('</etc/zabbix/sensors.conf') ||
+    die "Couldn't open /etc/zabbix/sensors.conf: $!\n";
+
+my $ret = 'ZBX_NOTSUPPORTED';
+
+foreach (<SENSORS>){
+    next unless (/^$what(\s+)?=(\s+)?(.*)!(\-?\d+)!(\-?\d+)$/);
+    my $cmd = $3;
+    $ret = `$cmd`;
+}
+print $ret;
+exit(0);
