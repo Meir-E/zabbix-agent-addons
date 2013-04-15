@@ -1,7 +1,7 @@
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
 Version: 0.0.1
-Release: 1.beta0
+Release: 1.beta1
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
 
@@ -10,6 +10,13 @@ Group: Virtualization
 BuildRoot: %{_tmppath}/%{name}-buildroot
 Prefix: %{_prefix}
 Requires: zabbix-agent
+Requires: perl(Getopt::Long)
+Requires: perl(Getopt::Std)
+Requires: perl(JSON)
+Requires: perl(Linux::LVM)
+Requires: perl(POSIX)
+
+AutoReqProv: no
 
 %description
 This package contains some usefull script to monitor
@@ -27,14 +34,14 @@ LVM, RAID status, S.M.A.R.T. drives, BackupPC etc...
 %{__rm} -rf $RPM_BUILD_ROOT
 
 # Install zabbix scripts
-%{__install} -d -m 750 -o zabbix -g zabbix $RPM_BUILD_ROOT%{_localstatedir}/lib/zabbix/bin
+%{__install} -d -m 750 $RPM_BUILD_ROOT%{_localstatedir}/lib/zabbix/bin
 %{__install} -m 0755 zabbix_scripts/* $RPM_BUILD_ROOT%{_localstatedir}/lib/zabbix/bin
 # Install Zabbix conf
 %{__install} -d $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/zabbix_agentd.conf.d/
 %{__install} -m 0755 zabbix_conf/* $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/zabbix_agentd.conf.d/
 # Install sudo conf
 %{__install} -d 750 $RPM_BUILD_ROOT%{_sysconfdir}/sudoers.d
-%{__install} conf/suydo.conf $RPM_BUILD_ROOT%{_sysconfdir}/sudoers.d
+%{__install} -m 600 conf/sudo.conf $RPM_BUILD_ROOT%{_sysconfdir}/sudoers.d/zabbix_agent
 
 %clean
 %{__rm} -rf $RPM_BUILD_ROOT
@@ -48,9 +55,10 @@ LVM, RAID status, S.M.A.R.T. drives, BackupPC etc...
 %files
 %defattr(-,root,root,-)
 %doc README CHANGELOG.git
-%{_localstatedir}/lib/zabbix/bin
-%{_sysconfdir}/zabbix/zabbix_agentd.conf.d/
-%{_sysconfdir}/sudoers.d
+%dir %attr(0750,zabbix,zabbix) %{_localstatedir}/lib/zabbix/bin
+%{_localstatedir}/lib/zabbix/bin/*
+%{_sysconfdir}/zabbix/zabbix_agentd.conf.d/*
+%{_sysconfdir}/sudoers.d/*
 
 %changelog
 * Mon Apr 15 2013 Daniel B. <daniel@firewall-services.com> - 0.0.1-1
