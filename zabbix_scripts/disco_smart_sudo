@@ -7,7 +7,7 @@ for DISK in $(smartctl --scan-open | cut -d' ' -f1); do
         DISK=$(echo $DISK | sed -e 's|/|\\/|g')
         echo -e "\t{\n"
         echo -e "\t\t\"{#SMARTDRIVE}\":\"$DISK\""
-        echo -e "\t}"
+        echo -e "\t},"
     fi
 done
 echo -e "\n\t]\n}\n"
