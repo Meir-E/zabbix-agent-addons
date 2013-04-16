@@ -8,6 +8,7 @@ closedir($dh);
 my $json;
 foreach my $block (@blocks){
     my $removable = 0;
+    my $size = 1;
     if ( -e "/sys/block/$block/removable"){
         open REMOVABLE, "/sys/block/$block/removable";
         $removable = join "", <REMOVABLE>;
@@ -15,8 +16,15 @@ foreach my $block (@blocks){
         chomp($removable);
         next if ($removable eq '1');
     }
+    if ( -e "/sys/block/$block/size"){
+        open SIZE, "/sys/block/$block/size";
+        $size = join "", <SIZE>;
+        close SIZE;
+        chomp($size);
+        next if ($size eq '0');
+    }
     my $dev = '/dev/' . $block;
-    push @{$json->{data}}, { "{#BLOCKDEVICE}" => $dev };
+    push @{$json->{data}}, { "{#BLOCKDEVICE}" => $dev, "{#BLOCKSIZE}" => $size };
 }
 print to_json($json);
 exit(0);
