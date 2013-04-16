@@ -17,5 +17,5 @@ foreach (<SENSORS>){
     };
 }
 close SENSORS;
-print to_json($json);
+print to_json($json) if (defined $json->{data});
 exit(0);
