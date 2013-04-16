@@ -59,9 +59,9 @@ LVM, RAID status, S.M.A.R.T. drives, BackupPC etc...
 %doc README CHANGELOG.git
 %dir %attr(0750,zabbix,zabbix) %{_localstatedir}/lib/zabbix/bin
 %{_localstatedir}/lib/zabbix/bin/*
-%config(noreplace) %attr(0644,root,root) %{_sysconfdir}/zabbix/sensors.conf
-%{_sysconfdir}/zabbix/zabbix_agentd.conf.d/*
-%{_sysconfdir}/sudoers.d/*
+%config(noreplace) %attr(0640,root,zabbix) %{_sysconfdir}/zabbix/sensors.conf
+%config(noreplace) %attr(0640,root,zabbix) %{_sysconfdir}/zabbix/zabbix_agentd.conf.d/*
+%attr(0600,root,root) %{_sysconfdir}/sudoers.d/*
 
 %changelog
 * Mon Apr 15 2013 Daniel B. <daniel@firewall-services.com> - 0.0.1-1
