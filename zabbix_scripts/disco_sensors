@@ -17,5 +17,5 @@ foreach (<SENSORS>){
     };
 }
 close SENSORS;
-print to_json($json, { pretty => 1 });
+print to_json($json);
 exit(0);

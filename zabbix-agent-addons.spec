@@ -1,7 +1,7 @@
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
 Version: 0.0.1
-Release: 1.beta1
+Release: 1.beta2
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
 
