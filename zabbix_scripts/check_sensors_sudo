@@ -1,13 +1,10 @@
 #!/usr/bin/perl -w
 
 my $what = $ARGV[0];
+my $thres = $ARGV[1];
 
 unless (defined $what){
-    print <<"EOF";
-
-Usage: $0 sensor_name
-
-EOF 
+    usage();
     exit(1);
 }
 
@@ -19,7 +16,29 @@ my $ret = 'ZBX_NOTSUPPORTED';
 foreach (<SENSORS>){
     next unless (/^$what(\s+)?=(\s+)?(.*)!(\-?\d+)!(\-?\d+)$/);
     my $cmd = $3;
-    $ret = `$cmd`;
+    my $high = $4;
+    my $low = $5;
+    if (!defined $thres){
+        $ret = `$cmd`;
+    }
+    elsif ($thres eq 'high'){
+        $ret = $high
+    }
+    elsif ($thres eq 'low'){
+        $ret = $low;
+    }
+    else {
+        usage();
+        exit(1);
+    }
 }
 print $ret;
 exit(0);
+
+sub usage {
+    print <<"EOF";
+
+Usage: $0 sensor_name [high|low]
+
+EOF
+}
