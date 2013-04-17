@@ -1,6 +1,6 @@
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.1.0
+Version: 0.1.1
 Release: 1
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -64,6 +64,9 @@ LVM, RAID status, S.M.A.R.T. drives, BackupPC etc...
 %attr(0600,root,root) %{_sysconfdir}/sudoers.d/*
 
 %changelog
+* Wed Apr 17 2013 Daniel B. <daniel@firewall-services.com> - 0.1.1-1
+- Fix a typo in smart.conf
+
 * Wed Apr 17 2013 Daniel B. <daniel@firewall-services.com> - 0.1.0-1
 - Initial release
 
