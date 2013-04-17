@@ -1,0 +1,20 @@
+#!/usr/bin/perl -w
+
+use JSON;
+
+opendir(my $dh, "/sys/class/net") or die "Couldn't open /sys/class/net: $!";
+my @nics = grep { $_ !~ m/^\./ } readdir($dh);
+closedir($dh);
+my $json;
+foreach my $nic (@nics){
+    # Untaint $nic and makes sure the name looks OK
+    next unless ($nic =~ m/^(\w+[\.:]?\d+)$/);
+    $nic = $1;
+    next if (
+        # skip non links
+        !-l "/sys/class/net/$nic"
+    );
+    push @{$json->{data}}, { "{#IFNAME}" => $nic};
+}
+print to_json($json) if (defined $json->{data});
+exit(0);
