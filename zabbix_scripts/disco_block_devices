@@ -23,8 +23,7 @@ foreach my $block (@blocks){
         chomp($size);
         next if ($size eq '0');
     }
-    my $dev = '/dev/' . $block;
-    push @{$json->{data}}, { "{#BLOCKDEVICE}" => $dev, "{#BLOCKSIZE}" => $size };
+    push @{$json->{data}}, { "{#BLOCKDEVICE}" => $block, "{#BLOCKSIZE}" => $size };
 }
 print to_json($json);
 exit(0);
