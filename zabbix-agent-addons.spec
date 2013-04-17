@@ -1,7 +1,7 @@
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.0.1
-Release: 1.beta3
+Version: 0.1.0
+Release: 1
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
 
@@ -38,7 +38,7 @@ LVM, RAID status, S.M.A.R.T. drives, BackupPC etc...
 %{__install} -m 0755 zabbix_scripts/* $RPM_BUILD_ROOT%{_localstatedir}/lib/zabbix/bin
 # Install Zabbix conf
 %{__install} -d $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/zabbix_agentd.conf.d/
-%{__install} -m 0755 zabbix_conf/* $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/zabbix_agentd.conf.d/
+%{__install} -m 0644 zabbix_conf/* $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/zabbix_agentd.conf.d/
 # Install sensors conf
 %{__install} -m 0755 conf/sensors.conf $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/
 # Install sudo conf
@@ -64,6 +64,6 @@ LVM, RAID status, S.M.A.R.T. drives, BackupPC etc...
 %attr(0600,root,root) %{_sysconfdir}/sudoers.d/*
 
 %changelog
-* Mon Apr 15 2013 Daniel B. <daniel@firewall-services.com> - 0.0.1-1
+* Wed Apr 17 2013 Daniel B. <daniel@firewall-services.com> - 0.1.0-1
 - Initial release
 
