@@ -6,12 +6,18 @@ use BackupPC::CGI::Lib;
 use POSIX;
 use JSON;
 use Getopt::Long;
+use MIME::Base64 qw( decode_base64 );
 
 my $regex = '.*';
+my $base64 = 0;
 
 GetOptions(
-    "regex=s" => \$regex
+    "regex=s" => \$regex,
+    "base64"  => \$base64
 );
+
+$regex = decode_base64($regex) if ($base64);
+$regex = qr($regex);
 
 # We need to switch to backuppc UID/GID
 my $uid = getuid();
