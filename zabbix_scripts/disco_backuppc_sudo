@@ -5,6 +5,13 @@ use BackupPC::Lib;
 use BackupPC::CGI::Lib;
 use POSIX;
 use JSON;
+use Getopt::Long;
+
+my $regex = '.*';
+
+GetOptions(
+    "regex=s" => \$regex
+);
 
 # We need to switch to backuppc UID/GID
 my $uid = getuid();
@@ -19,6 +26,7 @@ my $mainConf = $bpc->ConfigDataRead();
 
 my $json;
 foreach my $host (keys %$hosts){
+   next unless ($host =~ m!$regex!);
    my $hostConf = $bpc->ConfigDataRead($host);
    my $conf = { %$mainConf, %$hostConf };
    my $period = ($conf->{FullPeriod} >= $conf->{IncrPeriod}) ? $conf->{IncrPeriod} : $conf->{FullPeriod};
