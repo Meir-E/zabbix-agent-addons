@@ -13,7 +13,8 @@ if ($what eq "volumes"){
     foreach my $group (get_volume_group_list()){
         my %lvs = get_logical_volume_information($group);
         foreach my $lv (keys %lvs){
-            push @{$json->{data}}, { "{#LVMVOL}" => "/dev/$group/$lv" };
+            $lv = ($lv =~ m!^/dev/$group!) ? $lv : "/dev/$group/$lv";
+            push @{$json->{data}}, { "{#LVMVOL}" => "$lv" };
         }
     }
 }
@@ -22,7 +23,8 @@ elsif ($what eq "snapshots"){
         my %lvs = get_logical_volume_information($group);
         foreach my $lv (keys %lvs){
             if (defined $lvs{$lv}->{allocated_to_snapshot}){
-                push @{$json->{data}}, { "{#LVMSNAP}" => "/dev/$group/$lv" };
+                $lv = ($lv =~ m!^/dev/$group!) ? $lv : "/dev/$group/$lv";
+                push @{$json->{data}}, { "{#LVMSNAP}" => "$lv" };
             }
         }
     }
