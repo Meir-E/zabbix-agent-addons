@@ -1,0 +1,17 @@
+#!/usr/bin/perl -w
+
+use JSON;
+
+my $json;
+
+if (system("upsc -l >/dev/null 2>&1") == 0){
+    foreach my $ups (`upsc -l`){
+        chomp($ups);
+        push @{$json->{data}}, {"{#UPSNAME}" => $ups};
+    }
+    print to_json($json) if (defined $json->{data});
+}
+else{
+    print 'ZBX_NOTSUPPORTED';
+}
+exit(0);
