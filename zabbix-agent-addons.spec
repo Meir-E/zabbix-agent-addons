@@ -1,6 +1,6 @@
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.1.1
+Version: 0.1.2
 Release: 1
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -64,6 +64,10 @@ LVM, RAID status, S.M.A.R.T. drives, BackupPC etc...
 %attr(0600,root,root) %{_sysconfdir}/sudoers.d/*
 
 %changelog
+* Thu Apr 18 2013 Daniel B. <daniel@firewall-services.com> - 0.1.2-1
+- Add network interface discovery scripts
+- do not prepend /dev to block devices (not supported on older Zabbix agent)
+
 * Wed Apr 17 2013 Daniel B. <daniel@firewall-services.com> - 0.1.1-1
 - Fix a typo in smart.conf
 
