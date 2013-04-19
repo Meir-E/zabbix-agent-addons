@@ -2,6 +2,7 @@
 
 use JSON;
 my $json;
+@{$json->{data}} = ();
 
 open SENSORS, ('</etc/zabbix/sensors.conf') ||
     die "Couldn't open /etc/zabbix/sensors.conf: $!\n";
@@ -17,5 +18,5 @@ foreach (<SENSORS>){
     };
 }
 close SENSORS;
-print to_json($json) if (defined $json->{data});
+print to_json($json);
 exit(0);
