@@ -3,15 +3,13 @@
 use JSON;
 
 my $json;
+@{$json->{data}} = ();
 
 if (system("upsc -l >/dev/null 2>&1") == 0){
     foreach my $ups (`upsc -l`){
         chomp($ups);
         push @{$json->{data}}, {"{#UPSNAME}" => $ups};
     }
-    print to_json($json) if (defined $json->{data});
 }
-else{
-    print 'ZBX_NOTSUPPORTED';
-}
+print to_json($json);
 exit(0);
