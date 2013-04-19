@@ -1,6 +1,6 @@
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.1.2
+Version: 0.1.4
 Release: 1
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -15,6 +15,7 @@ Requires: perl(Getopt::Std)
 Requires: perl(JSON)
 Requires: perl(Linux::LVM)
 Requires: perl(POSIX)
+Requires: perl(MIME::Base64)
 
 AutoReqProv: no
 
@@ -64,6 +65,14 @@ LVM, RAID status, S.M.A.R.T. drives, BackupPC etc...
 %attr(0600,root,root) %{_sysconfdir}/sudoers.d/*
 
 %changelog
+* Thu Apr 18 2013 Daniel B. <daniel@firewall-services.com> - 0.1.4-1
+- Possibility to pass a (base64 encoded) regex for backuppc hosts discovery
+- Add nut ups scripts
+- Fix lvm discovery on some systems
+
+* Thu Apr 18 2013 Daniel B. <daniel@firewall-services.com> - 0.1.3-1
+- Comment the manual net.if.discovery key
+
 * Thu Apr 18 2013 Daniel B. <daniel@firewall-services.com> - 0.1.2-1
 - Add network interface discovery scripts
 - do not prepend /dev to block devices (not supported on older Zabbix agent)
