@@ -8,6 +8,7 @@ my $what = $ARGV[0];
 open STDERR, '>/dev/null';
 
 my $json;
+@{$json->{data}} = ();
 
 if ($what eq "volumes"){
     foreach my $group (get_volume_group_list()){
