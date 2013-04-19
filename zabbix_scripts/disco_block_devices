@@ -6,6 +6,7 @@ opendir(my $dh, "/sys/block") or die "Couldn't open /sys/block: $!";
 my @blocks = grep { $_ !~ m/^\./ } readdir($dh);
 closedir($dh);
 my $json;
+@{$json->{data}} = ();
 foreach my $block (@blocks){
     my $removable = 0;
     my $size = 1;
