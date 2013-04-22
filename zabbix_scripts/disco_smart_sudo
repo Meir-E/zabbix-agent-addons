@@ -1,13 +1,34 @@
-#!/bin/sh
+#!/usr/bin/perl -w
 
-echo -e "{\n\t\"data\":[\n\n"
-for DISK in $(smartctl --scan-open | cut -d' ' -f1); do
-    smartctl -A $DISK >/dev/null 2>&1
-    if [ $? -eq 0 ]; then
-        DISK=$(echo $DISK | sed -e 's|/|\\/|g')
-        echo -e "\t{\n"
-        echo -e "\t\t\"{#SMARTDRIVE}\":\"$DISK\""
-        echo -e "\t},"
-    fi
-done
-echo -e "\n\t]\n}\n"
+use warnings;
+use strict;
+use JSON;
+
+my $json;
+@{$json->{data}} = ();
+
+opendir(my $dh, "/sys/block") or die "Couldn't open /sys/block: $!";
+my @blocks = grep { $_ !~ m/^\./ } readdir($dh);
+closedir($dh);
+foreach my $block (@blocks){
+    my $removable = 0;
+    my $size = 1;
+    if ( -e "/sys/block/$block/removable"){
+        open REMOVABLE, "/sys/block/$block/removable";
+        $removable = join "", <REMOVABLE>;
+        close REMOVABLE;
+        chomp($removable);
+        next if ($removable eq '1');
+    }
+    if ( -e "/sys/block/$block/size"){
+        open SIZE, "/sys/block/$block/size";
+        $size = join "", <SIZE>;
+        close SIZE;
+        chomp($size);
+        next if ($size eq '0');
+    }
+    next unless (system("smartctl -A /dev/$block >/dev/null 2>&1") == 0);
+    push @{$json->{data}}, { "{#SMARTDRIVE}" => "/dev/$block" };
+}
+print to_json($json);
+exit(0);
