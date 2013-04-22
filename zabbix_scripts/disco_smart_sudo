@@ -27,7 +27,7 @@ foreach my $block (@blocks){
         chomp($size);
         next if ($size eq '0');
     }
-    next unless (system("smartctl -A /dev/$block >/dev/null 2>&1") == 0);
+    next unless (system("/usr/sbin/smartctl -A /dev/$block >/dev/null 2>&1") == 0);
     push @{$json->{data}}, { "{#SMARTDRIVE}" => "/dev/$block" };
 }
 print to_json($json);
