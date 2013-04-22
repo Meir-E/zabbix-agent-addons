@@ -13,6 +13,8 @@ closedir($dh);
 foreach my $block (@blocks){
     my $removable = 0;
     my $size = 1;
+    # Skip block we already know they won't support SMART
+    next if ($block =~ m/^(ram|loop|md|dm\-)\d+/);
     if ( -e "/sys/block/$block/removable"){
         open REMOVABLE, "/sys/block/$block/removable";
         $removable = join "", <REMOVABLE>;
