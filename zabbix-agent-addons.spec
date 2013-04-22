@@ -1,6 +1,6 @@
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.1.4
+Version: 0.1.5
 Release: 1
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -65,6 +65,9 @@ LVM, RAID status, S.M.A.R.T. drives, BackupPC etc...
 %attr(0600,root,root) %{_sysconfdir}/sudoers.d/*
 
 %changelog
+* Mon Apr 22 2013 Daniel B. <daniel@firewall-services.com> - 0.1.5-1
+- Rewrite disco_smart_sudo in perl
+
 * Thu Apr 18 2013 Daniel B. <daniel@firewall-services.com> - 0.1.4-1
 - Possibility to pass a (base64 encoded) regex for backuppc hosts discovery
 - Add nut ups scripts
