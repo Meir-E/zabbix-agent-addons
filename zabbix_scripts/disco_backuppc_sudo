@@ -31,6 +31,7 @@ my $hosts = $bpc->HostInfoRead();
 my $mainConf = $bpc->ConfigDataRead();
 
 my $json;
+@{$json->{data}} = ();
 foreach my $host (keys %$hosts){
    next unless ($host =~ m!$regex!);
    my $hostConf = $bpc->ConfigDataRead($host);
