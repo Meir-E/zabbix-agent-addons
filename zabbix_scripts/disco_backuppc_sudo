@@ -36,12 +36,14 @@ foreach my $host (keys %$hosts){
    next unless ($host =~ m!$regex!);
    my $hostConf = $bpc->ConfigDataRead($host);
    my $conf = { %$mainConf, %$hostConf };
-   my $period = ($conf->{FullPeriod} >= $conf->{IncrPeriod}) ? $conf->{IncrPeriod} : $conf->{FullPeriod};
+   my $warning = $conf->{EMailNotifyOldBackupDays};
+   my $errors = (defined $conf->{MaxXferError}) ? $conf->{MaxXferError}: '0';
    my $status = ($conf->{BackupsDisable} eq 1) ? 'disabled':'enabled';
    push @{$json->{data}},
        {  
            "{#BPCHOST}" => $host,
-           "{#BPCPERIOD}" => $period,
+           "{#BPCNOBACKUPWARNING}" => $warning,
+           "{#BPCMAXERROR}" => $errors,
            "{#BPCSTATUS}" => $status,
        };
 }
