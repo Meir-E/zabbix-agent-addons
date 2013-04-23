@@ -1,6 +1,6 @@
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.1.6
+Version: 0.1.7
 Release: 1
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -65,6 +65,11 @@ LVM, RAID status, S.M.A.R.T. drives, BackupPC etc...
 %attr(0440,root,root) %{_sysconfdir}/sudoers.d/*
 
 %changelog
+* Tue Apr 23 2013 Daniel B. <daniel@firewall-services.com> - 0.1.7-1
+- Initialize an empty array in disco_backuppc_sudo
+- Return more usefull macros in disco_backuppc_sudo
+- Skip some blocks (loop, ram, dm) in disco_smart_sudo
+
 * Mon Apr 22 2013 Daniel B. <daniel@firewall-services.com> - 0.1.6-1
 - Fix permissions on sudoers fragment
 - Use full path to smartctl binary
