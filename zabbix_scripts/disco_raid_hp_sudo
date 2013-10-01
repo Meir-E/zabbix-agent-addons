@@ -22,7 +22,7 @@ foreach my $line (<HPACUCLI>){
         die "Another instance of hpacucli is running\n";
     }
     elsif ( $line =~  m/(.*) in Slot (\d+)/i ) {
-        push @{$json->{data}}, {"#MODEL" => $1, "#SLOT" => $2};
+        push @{$json->{data}}, {"{#MODEL}" => $1, "{#SLOT}" => $2};
     }
 }
 close HPACUCLI;
