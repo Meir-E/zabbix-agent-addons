@@ -1,6 +1,6 @@
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.1.7
+Version: 0.1.8
 Release: 1
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -65,6 +65,9 @@ LVM, RAID status, S.M.A.R.T. drives, BackupPC etc...
 %attr(0440,root,root) %{_sysconfdir}/sudoers.d/*
 
 %changelog
+* Tue Oct 1 2013 Daniel B. <daniel@firewall-services.com> - 0.1.8-1
+- Add simple scripts to monitor HP Smart Arrays
+
 * Tue Apr 23 2013 Daniel B. <daniel@firewall-services.com> - 0.1.7-1
 - Initialize an empty array in disco_backuppc_sudo
 - Return more usefull macros in disco_backuppc_sudo
