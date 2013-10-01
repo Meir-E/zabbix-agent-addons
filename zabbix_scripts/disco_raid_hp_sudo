@@ -1,0 +1,30 @@
+#!/usr/bin/perl -w
+
+use strict;
+use JSON;
+
+my $json;
+@{$json->{data}} = ();
+
+my $hpacucli = '/usr/sbin/hpacucli';
+
+# the hpacucli utility is needed
+unless (-x $hpacucli){
+    print to_json($json);
+    exit(0);
+}
+
+open( HPACUCLI, "$hpacucli controller all show status|" )
+  or die "An error occured while running $hpacucli: $!";
+
+foreach my $line (<HPACUCLI>){
+    if ( $line =~ m/Another instance of hpacucli is running! Stop it first\./i ){
+        die "Another instance of hpacucli is running\n";
+    }
+    elsif ( $line =~  m/(.*) in Slot (\d+)/i ) {
+        push @{$json->{data}}, {"#MODEL" => $1, "#SLOT" => $2};
+    }
+}
+close HPACUCLI;
+print to_json($json);
+exit(0);

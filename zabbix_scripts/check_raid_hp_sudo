@@ -1,0 +1,81 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Getopt::Long;
+
+my $slot = '';
+my $hpacucli = '/usr/sbin/hpacucli';
+my @validchecks = qw/controller array logicaldrive physicaldrive/;
+my $check = join ',', @validchecks;
+
+GetOptions ('slot=s'  => \$slot,
+            'check=s' => \$check,
+            'help'    => sub { &usage() }
+);
+
+sub usage(){
+    print <<"EOF";
+$0 --slot=<slot number> --check=<what to check>
+
+  * slot must be a number. You can find on which slot you have controllers with the command:
+
+$hpacucli controller all show status
+
+  * check is a comma separated list of item to check. Default values (without --check option) will check everything
+    Valid values are:
+
+EOF
+
+    print "$_\n" foreach (@validchecks);
+    exit(0);
+}
+
+if ($slot !~ /^\d+$/){
+    usage();
+}
+
+unless (-x $hpacucli){
+    die "Cannot run $hpacucli\n";
+}
+
+my @checks = split /\s?,\s?/, $check;
+foreach my $check (@checks){
+    usage() unless (grep { $_ eq $check} @validchecks);
+}
+
+foreach my $param (@checks){
+    # Global controller checks
+    if ($param eq 'controller'){
+        open HPACUCLI, "$hpacucli controller slot=$slot show status|" ||
+          die "An error occured while running $hpacucli: $!";
+        foreach my $line (<HPACUCLI>){
+            if ( $line =~ /Status\:\s*([\w\s]+)$/ ) {
+                my $res = $1;
+                chomp($res);
+                if ($res ne 'OK'){
+                    print "CRITICAL: $line\n";
+                    exit(0);
+                }
+            }
+        }
+        close HPACUCLI;
+    }
+    else{
+        open HPACUCLI, "$hpacucli controller slot=$slot $param all show status|" ||
+          die "An error occured while running $hpacucli: $!";
+        foreach my $line (<HPACUCLI>){
+            if ( $line =~ /^\s*$param.*:\s*(\w+[\w\s]*)$/i ) {
+                my $res = $1;
+                chomp($res);
+                if ($res ne 'OK'){
+                    print "CRITICAL: $line\n";
+                    exit(0);
+                }
+            }
+        }
+        close HPACUCLI;
+    }
+}
+
+print 'OK';
+exit(0);
