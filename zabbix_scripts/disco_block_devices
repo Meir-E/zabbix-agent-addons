@@ -8,15 +8,7 @@ closedir($dh);
 my $json;
 @{$json->{data}} = ();
 foreach my $block (@blocks){
-    my $removable = 0;
     my $size = 1;
-    if ( -e "/sys/block/$block/removable"){
-        open REMOVABLE, "/sys/block/$block/removable";
-        $removable = join "", <REMOVABLE>;
-        close REMOVABLE;
-        chomp($removable);
-        next if ($removable eq '1');
-    }
     if ( -e "/sys/block/$block/size"){
         open SIZE, "/sys/block/$block/size";
         $size = join "", <SIZE>;
