@@ -38,7 +38,7 @@ foreach my $host (keys %$hosts){
    my $conf = { %$mainConf, %$hostConf };
    my $warning = $conf->{EMailNotifyOldBackupDays};
    my $errors = (defined $conf->{MaxXferError}) ? $conf->{MaxXferError}: '0';
-   my $status = ($conf->{BackupsDisable} eq 1) ? 'disabled':'enabled';
+   my $status = ($conf->{BackupsDisable} eq '1') ? 'disabled':(($conf->{ZabbixMonitoring} eq '0') ? 'disabled':'enabled');
    push @{$json->{data}},
        {  
            "{#BPCHOST}" => $host,
