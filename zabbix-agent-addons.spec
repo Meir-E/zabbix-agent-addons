@@ -1,6 +1,6 @@
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.1.11
+Version: 0.1.12
 Release: 1
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -65,6 +65,9 @@ LVM, RAID status, S.M.A.R.T. drives, BackupPC etc...
 %attr(0440,root,root) %{_sysconfdir}/sudoers.d/*
 
 %changelog
+* Tue Feb 18 2014 Daniel B. <daniel@firewall-services.com> - 0.1.12-1
+- Add scripts to discover and monitor certificates (design to work with PHPki)
+
 * Fri Nov 29 2013 Daniel B. <daniel@firewall-services.com> - 0.1.11-1
 - Possibility to disable hosts monitoring in BackupPC by adding
   $Conf{ZabbixMonitoring} = 0 in the conf file
