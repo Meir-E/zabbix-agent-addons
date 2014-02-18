@@ -1,0 +1,33 @@
+#!/usr/bin/perl -w
+
+# Check a PEM certificate
+# --what: what to monitor. Only expire is supported for now, and returns the number of day before expiration
+# --cert: the path to the certificate you want to check
+
+use strict;
+use warnings;
+use Crypt::OpenSSL::X509;
+use Date::Parse;
+use Getopt::Long;
+
+my $what = 'expire';
+my $cert = '';
+
+GetOptions(
+    "cert=s" => \$cert,
+    "what=s"  => \$what
+);
+
+die "Usage: $0 --what=status --cert=/path/to/pem/certificate\n" unless
+    (-f $cert);
+
+$cert = Crypt::OpenSSL::X509->new_from_file( "$cert" );
+my $expire_in = int ((str2time($cert->notAfter())-time())/(3600*24));
+
+if ($what eq 'expire'){
+    print $expire_in;
+}
+else{
+    die "Only expire is supported for now";
+}
+
