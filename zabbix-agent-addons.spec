@@ -1,6 +1,6 @@
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.1.13
+Version: 0.1.14
 Release: 1
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -65,6 +65,10 @@ LVM, RAID status, S.M.A.R.T. drives, BackupPC etc...
 %attr(0440,root,root) %{_sysconfdir}/sudoers.d/*
 
 %changelog
+* Wed Feb 19 2014 Daniel B. <daniel@firewall-services.com> - 0.1.14-1
+- remove scripts to discover and monitor certificates, they too specific
+  and are now in smeserver-zabbix-agent
+
 * Tue Feb 18 2014 Daniel B. <daniel@firewall-services.com> - 0.1.13-1
 - Move phpki conf to the correct location
 
