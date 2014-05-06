@@ -1,6 +1,6 @@
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.1.14
+Version: 0.1.15
 Release: 1
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -65,6 +65,9 @@ LVM, RAID status, S.M.A.R.T. drives, BackupPC etc...
 %attr(0440,root,root) %{_sysconfdir}/sudoers.d/*
 
 %changelog
+* Tue May 6 2014 Daniel B. <daniel@firewall-services.com> - 0.1.15-1
+- Add a simple script to check nmb lookups
+
 * Wed Feb 19 2014 Daniel B. <daniel@firewall-services.com> - 0.1.14-1
 - remove scripts to discover and monitor certificates, they too specific
   and are now in smeserver-zabbix-agent
