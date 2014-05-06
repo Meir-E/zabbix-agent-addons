@@ -1,0 +1,29 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Getopt::Long;
+
+my %opts;
+$opts{server} = '127.0.0.1';
+
+GetOptions(
+  "server=s"     => \$opts{server},
+  "host=s"       => \$opts{host}
+);
+
+if (!$opts{host}){
+  print "You have to specify a hostname to lookup with the --host argument\n";
+  exit(1);
+}
+
+my $res = qx(/usr/bin/nmblookup -U $opts{server} $opts{host});
+my @lines = split /\n/, $res;
+# Look at the last line
+my $resp = $lines[$#lines];
+my $status = 0;
+
+if ($resp =~ m/^\d+\.\d+\.\d+\.\d+ $opts{host}/){
+  $status = 1;
+}
+
+print $status . "\n";
