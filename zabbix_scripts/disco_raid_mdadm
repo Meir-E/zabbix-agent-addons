@@ -1,0 +1,16 @@
+#!/usr/bin/perl -w
+
+use strict;
+use JSON;
+
+my $json;
+@{$json->{data}} = ();
+
+open FILE, "< /proc/mdstat" or die "Can't open /proc/mdadm : $!";
+foreach my $line (<FILE>) {
+  next unless ($line =~ m/^(md\d+)+\s*:/);
+  my ($md,undef,$status,$level) = split(/\ /, $line);
+  push @{$json->{data}}, {"{#DEVICE}" => $md, "{#STATUS}" => $status, "{#LEVEL}" => $level};
+}
+print to_json($json);
+exit(0);
