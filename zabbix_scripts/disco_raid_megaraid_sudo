@@ -1,0 +1,40 @@
+#!/usr/bin/perl -w
+
+use strict;
+use JSON;
+
+my $json;
+@{$json->{data}} = ();
+
+my $megacli = undef;
+
+if (-x '/opt/MegaRAID/MegaCli/MegaCli64'){
+  $megacli = '/opt/MegaRAID/MegaCli/MegaCli64';
+}
+elsif (-x '/opt/MegaRAID/MegaCli/MegaCli'){
+  $megacli = '/opt/MegaRAID/MegaCli/MegaCli';
+}
+
+unless($megacli){
+  print to_json($json);
+  exit(0);
+}
+
+my $adapters = 0;
+open (ADPCOUNT, "$megacli -adpCount -NoLog |")
+        || die "error: Could not execute MegaCli -adpCount";
+
+while (<ADPCOUNT>) {
+  if ( m/Controller Count:\s*(\d+)/ ) {
+    $adapters = $1;
+    last;
+  }
+}
+close ADPCOUNT;
+
+if ($adapters > 0){
+  push @{$json->{data}}, {"{#CONTROLLERNO}" => $adapters};
+}
+
+print to_json($json);
+exit(0);
