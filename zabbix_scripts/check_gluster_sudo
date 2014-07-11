@@ -45,21 +45,21 @@ if ($what eq 'volume'){
   open (VOLUMEINFO, "$gluster vol status $volume |")
         || die "error: Could not execute gluster vol status $volume";
   my $bricksfound = 0;
-  my $status = 1;
+  my $status = 'OK';
   foreach my $line (<VOLUMEINFO>){
     # Check that all bricks are online
-    if ($line =~ m/^Brick\ [\w\.]+:\/[\w\.\/]+\s+\d+\s+(Y|N)/){
+    if ($line =~ m/^Brick\ ([\w\.]+:\/[\w\.\/]+)\s+\d+\s+(Y|N)/){
       $bricksfound++;
-      $status = 0 if ($1 ne 'Y');
+      $status = "CRITICAL: brick status ($1)" if ($2 ne 'Y');
     }
     # Check the Self-Heal daemons are up and running
-    elsif ($line =~ m/^Self-heal\ Daemon\ on\ [\w\.]+\s+N\/A\\s+(Y|N)/){
-      $status = 0 if ($1 ne 'Y');
+    elsif ($line =~ m/^Self-heal\ Daemon\ on\ ([\w\.]+)\s+N\/A\\s+(Y|N)/){
+      $status = "CRITICAL: self-heal daemon ($1)" if ($2 ne 'Y');
     }
   }
   # Check the number of bricks is the one we expect
   if ($bricks && $bricks != $bricksfound){
-    $status = 0;
+    $status = 'CRITICAL: bricks count mismatch';
   }
   close VOLUMEINFO;
   open (VOLUMEINFO, "$gluster vol heal $volume info heal-failed |")
@@ -67,7 +67,7 @@ if ($what eq 'volume'){
   foreach my $line (<VOLUMEINFO>){
     # Now, check we don't have any file which the Self-Heal daemon couldn't sync
     if ($line =~ m/^Number\ of\ entries:\s+(\d+)$/){
-      $status = 0 if ($1 gt 0);
+      $status = "CRITICAL: self-heal error ($1)" if ($1 gt 0);
     }
   }
   close VOLUMEINFO;
@@ -76,7 +76,7 @@ if ($what eq 'volume'){
   foreach my $line (<VOLUMEINFO>){
     # Now, check we don't have any file in a split-brain situation
     if ($line =~ m/^Number\ of\ entries:\s+(\d+)$/){
-      $status = 0 if ($1 gt 0);
+      $status = "CRITICAL: split-bran ($1)" if ($1 gt 0);
     }
   }
   close VOLUMEINFO;
@@ -85,7 +85,7 @@ if ($what eq 'volume'){
   foreach my $line (<VOLUMEINFO>){
     # Check the volume is started
     if ($line =~ m/^Status:\s+(\w+)$/){
-      $status = 0 unless ($1 eq 'Started');
+      $status = 'CRITICAL: The volume is not started' unless ($1 eq 'Started');
     }
   }
   close VOLUMEINFO;
@@ -95,12 +95,11 @@ elsif ($what eq 'peer'){
   open (PEERLIST, "$gluster pool list |")
         || die "error: Could not execute gluster pool list";
 
-  my $status = 0;
+  my $status = 'unknown';
   foreach my $line (<PEERLIST>){
     if (($line =~ m/^$peer\s+/) ||
         ($line =~ m/^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}\s+$peer\s+/)){
-      my (undef,undef,$state) = split(/\s+/, $line);
-      $status = 1 if ($state eq 'Connected');
+      (undef,undef,$status) = split(/\s+/, $line);
     }
   }
   close PEERLIST;
