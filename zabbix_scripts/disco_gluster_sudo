@@ -1,0 +1,106 @@
+#!/usr/bin/perl -w
+
+use strict;
+use File::Which;
+use Getopt::Long;
+use JSON;
+
+my $json;
+@{$json->{data}} = ();
+
+my $gluster = which('gluster');
+
+unless($gluster){
+  # Gluster is not installed, just return an empty JSON object
+  print to_json($json);
+  exit(0);
+}
+
+my $what = 'volumes';
+GetOptions(
+  "what=s" => \$what,
+);
+
+sub usage (){
+  print <<"EOF";
+
+Usage: $0 --what=[volumes|peers]
+
+EOF
+}
+
+if ($what eq 'volumes'){
+  open (VOLUMES, "$gluster vol info all |")
+        || die "error: Could not execute gluster vol info all";
+
+  foreach my $line (<VOLUMES>){
+    if ($line =~ m/^Volume\ Name:\ (\w+)$/){
+      my $vol = $1;
+      my ($type,$bricks,$uuid,$status,$transport) = ('unknown');
+      open (VOLUMEINFO, "$gluster vol info $vol |")
+          || die "error: Could not execute gluster vol info $vol";
+      foreach my $info (<VOLUMEINFO>){
+        if ($info =~ m/^Type:\ (.*)$/){
+          $type = $1;
+        }
+        elsif ($info =~ m/^Volume\ ID:\ ([0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12})$/){
+          $uuid = $1;
+        }
+        elsif ($info =~ m/^Status:\ (\w+)$/){
+          $status = $1;
+        }
+        elsif ($info =~ m/^Transport-type:\ (\w+)$/){
+          $transport = $1;
+        }
+        elsif ($info =~ m/^Number\ of\ Bricks:\ \d+\ x\ \d+\ =\ (\d+)$/){
+          $bricks = $1;
+        }
+      }
+      close VOLUMEINFO;
+      push @{$json->{data}}, {
+        "{#GLUSTER_VOL_NAME}"      => $vol,
+        "{#GLUSTER_VOL_TYPE}"      => $type,
+        "{#GLUSTER_VOL_UUID}"      => $uuid,
+        "{#GLUSTER_VOL_STATUS}"    => $status,
+        "{#GLUSTER_VOL_TRANSPORT}" => $transport,
+        "{#GLUSTER_VOL_BRICKS}"    => $bricks
+      };
+    }
+  }
+  close VOLUMES;
+}
+elsif ($what eq 'peers'){
+  open (PEERS, "$gluster peer status |")
+        || die "error: Could not execute gluster peer status";
+
+  my $peerno = 0;
+  my ($host,$uuid,$status) = ('unknown');
+  foreach my $line (<PEERS>){
+    if ($line =~ m/^Number of Peers:\ (\d+)$/){
+      $peerno = $1;
+    }
+    elsif ($line =~ m/^Hostname:\ ([\w\.]+)$/){
+      $host = $1;
+    }
+    elsif ($line =~ m/Uuid:\ ([0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12})$/){
+      $uuid = $1;
+    }
+    elsif ($line =~ m/State:\ [\w\s]+\((\w+)\)$/){
+      $status = $1;
+      push @{$json->{data}}, {
+        "{#GLUSTER_PEER_HOST}"   => $host,
+        "{#GLUSTER_PEER_UUID}"   => $uuid,
+        "{#GLUSTER_PEER_STATUS}" => $status
+      };
+    }
+  }
+  close PEERS;
+}
+else{
+  usage();
+  exit(1);
+}
+
+print to_json($json);
+exit(0);
+

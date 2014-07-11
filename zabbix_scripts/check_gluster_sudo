@@ -1,0 +1,109 @@
+#!/usr/bin/perl -w
+
+use strict;
+use File::Which;
+use Getopt::Long;
+
+my $what = 'volume';
+my $volume = undef;
+my $peer = undef;
+my $bricks = undef;
+
+my $gluster = which('gluster');
+
+unless($gluster){
+  # Gluster is not installed, exit with an error
+  die "gluster command not found";
+}
+
+
+GetOptions(
+  "what=s"   => \$what,
+  "volume=s" => \$volume,
+  "bricks=i" => \$bricks,
+  "peer=s"   => \$peer
+);
+
+sub usage(){
+  print <<"EOF";
+
+usage: $0 --what=[peer|volume]
+
+If --what=volume you need to pass --volume=<volname>. The optional --bricks arg can be used to pass the number of expected bricks
+If --what=peer you need to pass --peer=<host>
+
+EOF
+}
+
+if (($what eq 'volume' && !$volume) ||
+    ($what eq 'peer' && !$peer) ||
+    ($what ne 'volume' && $what ne 'peer')){
+  usage();
+}
+
+if ($what eq 'volume'){
+  open (VOLUMEINFO, "$gluster vol status $volume |")
+        || die "error: Could not execute gluster vol status $volume";
+  my $bricksfound = 0;
+  my $status = 1;
+  foreach my $line (<VOLUMEINFO>){
+    # Check that all bricks are online
+    if ($line =~ m/^Brick\ [\w\.]+:\/[\w\.\/]+\s+\d+\s+(Y|N)/){
+      $bricksfound++;
+      $status = 0 if ($1 ne 'Y');
+    }
+    # Check the Self-Heal daemons are up and running
+    elsif ($line =~ m/^Self-heal\ Daemon\ on\ [\w\.]+\s+N\/A\\s+(Y|N)/){
+      $status = 0 if ($1 ne 'Y');
+    }
+  }
+  # Check the number of bricks is the one we expect
+  if ($bricks && $bricks != $bricksfound){
+    $status = 0;
+  }
+  close VOLUMEINFO;
+  open (VOLUMEINFO, "$gluster vol heal $volume info heal-failed |")
+        || die "error: Could not execute gluster vol heal $volume info heal-failed";
+  foreach my $line (<VOLUMEINFO>){
+    # Now, check we don't have any file which the Self-Heal daemon couldn't sync
+    if ($line =~ m/^Number\ of\ entries:\s+(\d+)$/){
+      $status = 0 if ($1 gt 0);
+    }
+  }
+  close VOLUMEINFO;
+  open (VOLUMEINFO, "$gluster vol heal $volume info split-brain |")
+        || die "error: Could not execute gluster vol heal $volume info split-brain";
+  foreach my $line (<VOLUMEINFO>){
+    # Now, check we don't have any file in a split-brain situation
+    if ($line =~ m/^Number\ of\ entries:\s+(\d+)$/){
+      $status = 0 if ($1 gt 0);
+    }
+  }
+  close VOLUMEINFO;
+  open (VOLUMEINFO, "$gluster vol info $volume |")
+        || die "error: Could not execute gluster vol info $volume";
+  foreach my $line (<VOLUMEINFO>){
+    # Check the volume is started
+    if ($line =~ m/^Status:\s+(\w+)$/){
+      $status = 0 unless ($1 eq 'Started');
+    }
+  }
+  close VOLUMEINFO;
+  print $status;
+}
+elsif ($what eq 'peer'){
+  open (PEERLIST, "$gluster pool list |")
+        || die "error: Could not execute gluster pool list";
+
+  my $status = 0;
+  foreach my $line (<PEERLIST>){
+    if (($line =~ m/^$peer\s+/) ||
+        ($line =~ m/^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}\s+$peer\s+/)){
+      my (undef,undef,$state) = split(/\s+/, $line);
+      $status = 1 if ($state eq 'Connected');
+    }
+  }
+  close PEERLIST;
+  print $status;
+}
+
