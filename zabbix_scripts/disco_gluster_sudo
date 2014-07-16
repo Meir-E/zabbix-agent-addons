@@ -29,11 +29,25 @@ Usage: $0 --what=[volumes|peers]
 EOF
 }
 
-if ($what eq 'volumes'){
-  open (VOLUMES, "$gluster vol info all |")
-        || die "error: Could not execute gluster vol info all";
+sub gluster($){
+  my $cmd = shift;
+  my $code = 256;
+  my @result = ();
+  # Loop to run gluster cmd as it can fail if two run at the same time
+  for (my $i = 0; ($code != 0 && $i < 10); $i++){
+    open (RES, "$cmd |")
+          || die "error: Could not execute $cmd";
+    @result = <RES>;
+    close RES;
+    $code = $?;
+    sleep(1) unless ($code == 0);
+  }
+  die "error: Could not execute $cmd" unless ($code == 0);
+  return @result;
+}
 
-  foreach my $line (<VOLUMES>){
+if ($what eq 'volumes'){
+  foreach my $line (gluster("$gluster vol info all")){
     if ($line =~ m/^Volume\ Name:\ (\w+)$/){
       my $vol = $1;
       my ($type,$bricks,$uuid,$status,$transport) = ('unknown');
@@ -56,7 +70,6 @@ if ($what eq 'volumes'){
           $bricks = $1;
         }
       }
-      close VOLUMEINFO;
       push @{$json->{data}}, {
         "{#GLUSTER_VOL_NAME}"      => $vol,
         "{#GLUSTER_VOL_TYPE}"      => $type,
@@ -67,15 +80,12 @@ if ($what eq 'volumes'){
       };
     }
   }
-  close VOLUMES;
 }
-elsif ($what eq 'peers'){
-  open (PEERS, "$gluster peer status |")
-        || die "error: Could not execute gluster peer status";
 
+elsif ($what eq 'peers'){
   my $peerno = 0;
   my ($host,$uuid,$status) = ('unknown');
-  foreach my $line (<PEERS>){
+  foreach my $line (gluster("$gluster peer status")){
     if ($line =~ m/^Number of Peers:\ (\d+)$/){
       $peerno = $1;
     }
@@ -94,7 +104,6 @@ elsif ($what eq 'peers'){
       };
     }
   }
-  close PEERS;
 }
 else{
   usage();
