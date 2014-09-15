@@ -1,6 +1,6 @@
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.1.18
+Version: 0.1.19
 Release: 1
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -66,6 +66,9 @@ LVM, RAID status, S.M.A.R.T. drives, BackupPC etc...
 %attr(0440,root,root) %{_sysconfdir}/sudoers.d/*
 
 %changelog
+* Sun Sep 14 2014 Daniel B. <daniel@firewall-services.com> - 0.1.19-1
+- Adapt squidclient commands to work with squid 3.1
+
 * Wed Jul 16 2014 Daniel B. <daniel@firewall-services.com> - 0.1.18-1
 - Add simple discovery and status check for GlusterFS
 
