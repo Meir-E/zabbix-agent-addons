@@ -30,6 +30,17 @@ elsif ($what eq "snapshots"){
         }
     }
 }
+elsif ($what eq "thin_pools"){
+    foreach my $group (get_volume_group_list()){
+        my %lvs = get_logical_volume_information($group);
+        foreach my $lv (keys %lvs){
+            if (defined $lvs{$lv}->{allocated_pool_data}){
+                $lv = ($lv =~ m!^/dev/$group!) ? $lv : "/dev/$group/$lv";
+                push @{$json->{data}}, { "{#LVMTHINP}" => "$lv" };
+            }
+        }
+    }
+}
 elsif ($what eq "groups"){
     foreach my $group (get_volume_group_list()){
         push @{$json->{data}}, { "{#LVMGRP}" => $group };

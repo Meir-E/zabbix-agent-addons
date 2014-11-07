@@ -15,7 +15,7 @@ my $what = $ARGV[1];
 sub usage {
     print<<"EOF";
 
-Usage: $0 <logical volume> [size|allocation|status]
+Usage: $0 <logical volume> [size|allocation|allocation_pool_data|allocation_metadata|status]
 
 EOF
 }
@@ -27,6 +27,16 @@ if ($what eq 'size'){
 }
 elsif ($what eq 'allocation'){
     my $ret = (defined $info{allocated_to_snapshot}) ? $info{allocated_to_snapshot} : "ZBX_NOTSUPPORTED";
+    $ret =~ s/,/\./;
+    print $ret;
+}
+elsif ($what eq 'allocation_pool_data'){
+    my $ret = (defined $info{allocated_pool_data}) ? $info{allocated_pool_data} : "ZBX_NOTSUPPORTED";
+    $ret =~ s/,/\./;
+    print $ret;
+}
+elsif ($what eq 'allocation_metadata'){
+    my $ret = (defined $info{allocated_meta_data}) ? $info{allocated_meta_data} : "ZBX_NOTSUPPORTED";
     $ret =~ s/,/\./;
     print $ret;
 }
