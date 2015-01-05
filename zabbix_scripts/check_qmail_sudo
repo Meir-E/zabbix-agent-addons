@@ -1,0 +1,16 @@
+#!/bin/bash
+
+case $1 in
+  queue_local)
+    /usr/bin/qmqtool -QL
+  ;;
+  queue_remote)
+    /usr/bin/qmqtool -QR
+  ;;
+  queue_total)
+    /usr/bin/qmqtool -Ql
+  ;;
+  *)
+    echo 'ZBX_NOTSUPPORTED'
+  ;;
+esac
