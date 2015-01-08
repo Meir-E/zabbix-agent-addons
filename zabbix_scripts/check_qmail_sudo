@@ -2,13 +2,13 @@
 
 case $1 in
   queue_local)
-    /usr/bin/qmqtool -QL
+    /usr/bin/qmqtool -s | perl -ne 'm/^Messages with local recipients: (\d+)/ && print $1'
   ;;
   queue_remote)
-    /usr/bin/qmqtool -QR
+    /usr/bin/qmqtool -s | perl -ne 'm/^Messages with remote recipients: (\d+)/ && print $1'
   ;;
   queue_total)
-    /usr/bin/qmqtool -Ql
+    /usr/bin/qmqtool -s | perl -ne 'm/^Total messages in queue: (\d+)/ && print $1'
   ;;
   *)
     echo 'ZBX_NOTSUPPORTED'
