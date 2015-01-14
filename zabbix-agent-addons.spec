@@ -1,6 +1,6 @@
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.1.21
+Version: 0.1.22
 Release: 1
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -66,6 +66,9 @@ LVM, RAID status, S.M.A.R.T. drives, BackupPC etc...
 %attr(0440,root,root) %{_sysconfdir}/sudoers.d/*
 
 %changelog
+* Thu Jan 8 2015 Daniel B. <daniel@firewall-services.com> - 0.1.22-1
+- Fix check_qmail_sudo
+
 * Mon Jan 5 2015 Daniel B. <daniel@firewall-services.com> - 0.1.21-1
 - Add scripts to check qmail (requires qmqtool)
 
