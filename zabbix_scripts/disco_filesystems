@@ -1,9 +1,8 @@
 #!/usr/bin/perl
- 
-$first = 1;
- 
-print "{\n";
-print "\t\"data\":[\n\n";
+
+use JSON;
+my $json;
+@{$json->{data}} = ();
 
 my $cmd;
 my $re;
@@ -36,19 +35,15 @@ for (`$cmd`){
        chomp($t);
        $critical = $t if ($t =~ m/^\d+$/);
     }
-    $fsname =~ s!/!\\/!g;
- 
-    print "\t,\n" if not $first;
-    $first = 0;
- 
-    print "\t{\n";
-    print "\t\t\"{#FSNAME}\":\"$fsname\",\n";
-    print "\t\t\"{#FSTYPE}\":\"$fstype\"\n";
-    print "\t\t\"{#FSDEVICE}\":\"$block\"\n";
-    print "\t\t\"{#FSWARNTHRES}\":\"$warning\"\n";
-    print "\t\t\"{#FSCRITTHRES}\":\"$critical\"\n";
-    print "\t}\n";
+
+    push @{$json->{data}}, {
+      "{#FSNAME}"      => $fsname,
+      "{#FSTYPE}"      => $fstype,
+      "{#FSDEVICE}"    => $block,
+      "{#FSWARNTHRES}" => $warning,
+      "{#FSCRITTHRES}" => $critical
+    };
 }
- 
-print "\n\t]\n";
-print "}\n";
+
+print to_json($json);
+exit(0);
