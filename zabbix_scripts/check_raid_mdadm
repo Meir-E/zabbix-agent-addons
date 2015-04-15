@@ -101,7 +101,7 @@ while (<FILE>) {
 	else {  
                 $status{$dev} = "Optimal";
         }
-	if (/recovery/){
+	if (/recovery|resync/){
 		$status{$dev} = "Rebuilding";
 		if ($result eq "OK"){
 			$result = "WARNING";
