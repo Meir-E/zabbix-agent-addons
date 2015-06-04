@@ -59,7 +59,6 @@ if (($what eq 'volume' && !$volume) ||
 
 if ($what eq 'volume'){
   my $bricksfound = 0;
-  my $status = 'OK';
   my @volinfo = gluster("$gluster vol status $volume");
   unless (scalar @volinfo){
     die "Error occurred while trying to get volume status for $volume";
@@ -68,24 +67,40 @@ if ($what eq 'volume'){
     # Check that all bricks are online
     if ($line =~ m/^Brick\ ([\w\.]+:\/[\w\.\/]+)\s+\d+\s+([A-Z])/){
       $bricksfound++;
-      $status = "CRITICAL: brick status (reported $2 on $1)" if ($2 ne 'Y');
+      if ($2 ne 'Y') {
+        print "CRITICAL: brick status (reported $2 on $1)";
+        exit 1;
+      }
     }
     # Check the Self-Heal daemons are up and running
-    elsif ($line =~ m/^Self-heal\ Daemon\ on\ ([\w\.]+)\s+N\/A\\s+([A-Z])/){
-      $status = "CRITICAL: self-heal daemon (reported $2 on $1)" if ($2 ne 'Y');
+    elsif ($line =~ m/^Self-heal\ Daemon\ on\ ([\w\.]+)\s+N\/A\\s+([A-Z])/ && $2 ne 'Y'){
+      print "CRITICAL: self-heal daemon (reported $2 on $1)";
+      exit 1;
     }
   }
   # Check the number of bricks is the one we expect
   if ($bricks && $bricks != $bricksfound){
-    $status = "CRITICAL: bricks count mismatch (found $bricksfound while expecting $bricks)";
+    print "CRITICAL: bricks count mismatch (found $bricksfound while expecting $bricks)";
+    exit 1;
+  }
+  @volinfo = gluster("$gluster vol heal $volume info");
+  unless (scalar @volinfo){
+    die "Error occurred while trying to get volume heal info for $volume";
+  }
+  foreach my $line (@volinfo){
+    if ($line =~ m/^Number\ of\ entries:\s+(\d+)$/ && $1 gt 0){
+      print "CRITICAL: self-heal in progress ($1)";
+      exit 1;
+    }
   }
   @volinfo = gluster("$gluster vol heal $volume info heal-failed");
   # the heal-failed command isn't supported on all version of GlusterFS
   if (scalar @volinfo){
     foreach my $line (@volinfo){
       # Now, check we don't have any file which the Self-Heal daemon couldn't sync
-      if ($line =~ m/^Number\ of\ entries:\s+(\d+)$/){
-        $status = "CRITICAL: self-heal error ($1)" if ($1 gt 0);
+      if ($line =~ m/^Number\ of\ entries:\s+(\d+)$/ && $1 gt 0){
+        print "CRITICAL: self-heal error ($1)";
+        exit 1;
       }
     }
   }
@@ -95,8 +110,9 @@ if ($what eq 'volume'){
   }
   foreach my $line (@volinfo){
     # Now, check we don't have any file in a split-brain situation
-    if ($line =~ m/^Number\ of\ entries:\s+(\d+)$/){
-      $status = "CRITICAL: split-bran ($1)" if ($1 gt 0);
+    if ($line =~ m/^Number\ of\ entries:\s+(\d+)$/ && $1 gt 0){
+      print "CRITICAL: split-bran ($1)";
+      exit 1;
     }
   }
   @volinfo = gluster("$gluster vol info $volume");
@@ -105,11 +121,12 @@ if ($what eq 'volume'){
   }
   foreach my $line (@volinfo){
     # Check the volume is started
-    if ($line =~ m/^Status:\s+(\w+)$/){
-      $status = 'CRITICAL: The volume is not started' unless ($1 eq 'Started');
+    if ($line =~ m/^Status:\s+(\w+)$/ && $1 ne 'Started'){
+      print 'CRITICAL: The volume is not started';
+      exit 1;
     }
   }
-  print $status;
+  print 'OK';
 }
 elsif ($what eq 'peer'){
   my @peers = gluster("$gluster pool list");
