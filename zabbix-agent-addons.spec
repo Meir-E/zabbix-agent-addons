@@ -1,6 +1,6 @@
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.1.25
+Version: 0.1.26
 Release: 1
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -66,6 +66,9 @@ LVM, RAID status, S.M.A.R.T. drives, BackupPC etc...
 %attr(0440,root,root) %{_sysconfdir}/sudoers.d/*
 
 %changelog
+* Thu Jun 4 2015 Daniel B. <daniel@firewall-services.com> - 0.1.26-1
+- Alert if a self heal is in progress on a glusterfs vol
+
 * Thu Jun 4 2015 Daniel B. <daniel@firewall-services.com> - 0.1.25-1
 - Fix gluster checks if info heal-failed is not supported
 
