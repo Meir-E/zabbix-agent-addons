@@ -40,15 +40,14 @@ sub gluster($){
   my $code = 256;
   my @result = ();
   # Loop to run gluster cmd as it can fail if two run at the same time
-  for (my $i = 0; ($code != 0 && $i < 10); $i++){
-    open (RES, "$cmd |")
+  for (my $i = 0; ($code != 0 && $i < 3); $i++){
+    open (RES, "$cmd 2>/dev/null |")
           || die "error: Could not execute $cmd";
     @result = <RES>;
     close RES;
     $code = $?;
     sleep(1) unless ($code == 0);
   }
-  die "error: Could not execute $cmd" unless ($code == 0);
   return @result;
 }
 
@@ -59,9 +58,12 @@ if (($what eq 'volume' && !$volume) ||
 }
 
 if ($what eq 'volume'){
-  my @volinfo = gluster("$gluster vol status $volume");
   my $bricksfound = 0;
   my $status = 'OK';
+  my @volinfo = gluster("$gluster vol status $volume");
+  unless (scalar @volinfo){
+    die "Error occurred while trying to get volume status for $volume";
+  }
   foreach my $line (@volinfo){
     # Check that all bricks are online
     if ($line =~ m/^Brick\ ([\w\.]+:\/[\w\.\/]+)\s+\d+\s+([A-Z])/){
@@ -78,13 +80,19 @@ if ($what eq 'volume'){
     $status = "CRITICAL: bricks count mismatch (found $bricksfound while expecting $bricks)";
   }
   @volinfo = gluster("$gluster vol heal $volume info heal-failed");
-  foreach my $line (@volinfo){
-    # Now, check we don't have any file which the Self-Heal daemon couldn't sync
-    if ($line =~ m/^Number\ of\ entries:\s+(\d+)$/){
-      $status = "CRITICAL: self-heal error ($1)" if ($1 gt 0);
+  # the heal-failed command isn't supported on all version of GlusterFS
+  if (scalar @volinfo){
+    foreach my $line (@volinfo){
+      # Now, check we don't have any file which the Self-Heal daemon couldn't sync
+      if ($line =~ m/^Number\ of\ entries:\s+(\d+)$/){
+        $status = "CRITICAL: self-heal error ($1)" if ($1 gt 0);
+      }
     }
   }
   @volinfo = gluster("$gluster vol heal $volume info split-brain");
+  unless (scalar @volinfo){
+    die "Error occurred while trying to get split-brain info for $volume";
+  }
   foreach my $line (@volinfo){
     # Now, check we don't have any file in a split-brain situation
     if ($line =~ m/^Number\ of\ entries:\s+(\d+)$/){
@@ -92,6 +100,9 @@ if ($what eq 'volume'){
     }
   }
   @volinfo = gluster("$gluster vol info $volume");
+  unless (scalar @volinfo){
+    die "Error occurred while trying to get volume info for $volume";
+  }
   foreach my $line (@volinfo){
     # Check the volume is started
     if ($line =~ m/^Status:\s+(\w+)$/){
