@@ -1,6 +1,16 @@
 #!/usr/bin/perl -w
 
 use JSON;
+use Getopt::Long;
+
+my $sensor_type = 'temp';
+GetOptions(
+  "type:s"   => \$sensor_type
+);
+
+# empty means temp
+$sensor_type = ($sensor_type eq '') ? 'temp' : $sensor_type;
+
 my $json;
 @{$json->{data}} = ();
 
@@ -9,14 +19,18 @@ open SENSORS, ('</etc/zabbix/sensors.conf') ||
 
 
 foreach (<SENSORS>){
-    next unless (/^(\w+)(\s+)?=(\s+)?(.*)!(\-?\d+)!(\-?\d+)$/);
-    my ($sensor,$threshigh,$threslow) = ($1,$5,$6);
+    next unless (/^(\w+)(\s+)?=(\s+)?(.*)!(\-?\d+)!(\-?\d+)(!(\w+))?$/);
+    my ($sensor,$threshigh,$threslow,$type) = ($1,$5,$6,$8);
+    $type ||= 'temp';
+    next if ($sensor_type ne 'all' && $type ne $sensor_type);
     push @{$json->{data}}, {
-        "{#SENSORNAME}" => $sensor,
+        "{#SENSORNAME}"      => $sensor,
         "{#SENSORTHRESHIGH}" => $threshigh,
-        "{#SENSORTHRESLOW}" => $threslow
+        "{#SENSORTHRESLOW}"  => $threslow,
+        "{#SENSORTYPE}"      => $type
     };
 }
 close SENSORS;
 print to_json($json);
 exit(0);
+

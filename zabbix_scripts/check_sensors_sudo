@@ -1,7 +1,6 @@
 #!/usr/bin/perl -w
 
 my $what = $ARGV[0];
-my $thres = $ARGV[1];
 
 unless (defined $what){
     usage();
@@ -14,23 +13,9 @@ open SENSORS, ('</etc/zabbix/sensors.conf') ||
 my $ret = 'ZBX_NOTSUPPORTED';
 
 foreach (<SENSORS>){
-    next unless (/^$what(\s+)?=(\s+)?(.*)!(\-?\d+)!(\-?\d+)$/);
+    next unless (/^$what(\s+)?=(\s+)?(.*)!(\-?\d+)!(\-?\d+)(!(\w+))?$/);
     my $cmd = $3;
-    my $high = $4;
-    my $low = $5;
-    if (!defined $thres){
-        $ret = `$cmd`;
-    }
-    elsif ($thres eq 'high'){
-        $ret = $high
-    }
-    elsif ($thres eq 'low'){
-        $ret = $low;
-    }
-    else {
-        usage();
-        exit(1);
-    }
+    $ret = `$cmd`;
 }
 print $ret;
 exit(0);
