@@ -1,0 +1,211 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use Config::Simple '-strict';
+use Getopt::Long;
+use File::Basename;
+
+# Output file
+my $output = undef;
+# When a threshold can be automatically detected,
+# you may want to be notified before it's reached, so you can 
+# set a margin which will be substracted from the real threshold
+my $temp_margin = '10';
+#This value will be substracted from the higher threshold to define the low one
+#so you can have hysteresis to prevent flip-flop
+my $temp_hyst = '10';
+
+GetOptions(
+  "output=s"      => \$output,
+  "temp-margin=i" => \$temp_margin,
+  "temp-hyst=i"   => \$temp_hyst
+);
+
+sub usage(){
+  print<<"_EOF";
+Usage: $0 --output=/etc/zabbix/sensors.ini
+_EOF
+}
+
+unless ($output){
+  usage();
+  exit 1;
+}
+
+# Path
+my $ipmitool = '/usr/bin/ipmitool';
+my $smartctl = '/usr/sbin/smartctl';
+
+# Default threshold if not detected
+my $def_temp_thres_high = '50';
+
+my $def_fan_thres_high  = '1000';
+my $def_fan_thres_low   = '700';
+
+my $cfg = new Config::Simple(syntax => 'ini');
+
+my $sensors = {};
+
+# Try to detect IPMI sensors
+if (-x $ipmitool){
+  # First check for temperature sensors
+  my @lines = qx($ipmitool sdr type Temperature);
+  SENSOR: foreach my $l (@lines){
+    chomp $l;
+    # Looks like
+    # Inlet Temp       | 04h | ok  |  7.1 | 25 degrees C
+    if ($l !~ m/^(\w+[\s\w]+?\w+)\s*\|.*\|\s*([\w\.\s]+)\s*\|.*\|\s*([\-\w\.\s]+)$/){
+      next SENSOR;
+    }
+    my $name = $1;
+    my $sensor = {};
+
+    my @details = qx($ipmitool sdr get '$name');
+    foreach my $d (@details){
+      chomp $d;
+      if ($d =~ m/^\s*Sensor\sReading\s*:\s*(\w+)/){
+        my $val = $1;
+        if ($val !~ m/^\d+$/){
+          print "Skipping sensor $name, couldn't parse its value: $val\n";
+          next SENSOR;
+        }
+      }
+      elsif ($d =~ m/^\s*Upper\scritical\s*:\s*(\d+(\.\d+))/){
+        $sensor->{threshold_high} = $1-$temp_margin;
+      }
+      elsif ($d =~ m/^\s*Upper\snon\-critical\s*:\s*(\d+(\.\d+))/){
+        $sensor->{threshold_low} = $1-$temp_margin;
+      }
+    }
+    $sensor->{threshold_high} ||= $def_temp_thres_high;
+    $sensor->{threshold_low}  ||= $def_temp_thres_high-$temp_hyst;
+    $sensor->{threshold_high} =~ s/\.0+$//;
+    $sensor->{threshold_low}  =~ s/\.0+$//;
+    $sensor->{description} = $name;
+    $sensor->{type} = 'temp';
+    $sensor->{unit} = '°C';
+    $sensor->{cmd} = "$ipmitool sdr get '$name' | grep 'Sensor Reading' | awk '{print \$4}'";
+    my $id = lc $name;
+    $id =~ s/\s/_/g;
+    $sensors->{$id} = $sensor;
+    print "Found a temperature sensor using IPMI: $name\n";
+  }
+  # Now check for Fan, nearly the same as Temp, but
+  # * We try to detect the unit
+  # * threshold handling is not the same
+  @lines = qx($ipmitool sdr type Fan);
+  SENSOR: foreach my $l (@lines){
+    chomp $l;
+    $l =~ m/^(\w+[\s\w]+?\w+)\s*\|.*\|\s*([\w\.\s]+)\s*\|.*\|\s*([\-\w\.\s]+)$/;
+    my $name = $1;
+    my $val  = $3;
+    my $sensor = {};
+
+    my @details = qx($ipmitool sdr get '$name');
+    foreach my $d (@details){
+      chomp $d;
+      if ($d =~ m/^\s*Sensor\sReading\s*:\s*(\w+)/){
+        my $val = $1;
+        if ($val !~ m/^\d+$/){
+          print "Skipping sensor $name, couldn't parse its value: $val\n";
+          next SENSOR;
+        }
+      }
+      elsif ($d =~ m/^\s*Lower\scritical\s*:\s*(\d+(\.\d+))/){
+        $sensor->{threshold_low} = $1-$temp_margin;
+      }
+      elsif ($d =~ m/^\s*Lower\snon\-critical\s*:\s*(\d+(\.\d+))/){
+        $sensor->{threshold_high} = $1-$temp_margin;
+      }
+    }
+    $sensor->{threshold_high} ||= $def_fan_thres_high;
+    $sensor->{threshold_low}  ||= $def_fan_thres_high-$temp_hyst;
+    $sensor->{threshold_high} =~ s/\.0+$//;
+    $sensor->{threshold_low}  =~ s/\.0+$//;
+    $sensor->{description} = $name;
+    $sensor->{type} = 'fan';
+    $sensor->{unit} = ($val =~ m/percent|%/) ? '%' : 'rpm';
+    $sensor->{cmd} = "$ipmitool sdr get '$name' | grep 'Sensor Reading' | awk '{print \$4}'";
+    my $id = lc $name;
+    $id =~ s/\s/_/g;
+    $sensors->{$id} = $sensor;
+    print "Found a fan sensor using IPMI: $name\n";
+  }
+}
+
+# Now, try to detect smart capable HDD
+if (-x $smartctl){
+  # This is copied from disco_smart_sudo, I should create a module to
+  # consolidate this
+  opendir(my $dh, "/sys/block") or die "Couldn't open /sys/block: $!";
+  my @blocks = grep { $_ !~ m/^\./ } readdir($dh);
+  closedir($dh);
+  foreach my $block (@blocks){
+    my $removable = 0;
+    my $size = 1;
+    # Skip block we already know they won't support SMART
+    next if ($block =~ m/^(ram|loop|md|dm\-)\d+/);
+    if ( -e "/sys/block/$block/removable"){
+      open REMOVABLE, "/sys/block/$block/removable";
+      $removable = join "", <REMOVABLE>;
+      close REMOVABLE;
+      chomp($removable);
+      next if ($removable eq '1');
+    }
+    if ( -e "/sys/block/$block/size"){
+      open SIZE, "/sys/block/$block/size";
+      $size = join "", <SIZE>;
+      close SIZE;
+      chomp($size);
+      next if ($size eq '0');
+    }
+    my @lines = qx($smartctl -A /dev/$block);
+    next if ($? != 0);
+    foreach my $l (@lines){
+      if ($l =~ /Temperature_Celsius/){
+        my $sensor = {
+          description    => "$block temperature",
+          threshold_low  => $def_temp_thres_high-$temp_hyst,
+          threshold_high => $def_temp_thres_high,
+          type           => 'temp',
+          unit           => '°C',
+          cmd            => "$smartctl -A /dev/$block | grep Temperature_Celsius | awk '{print \$10}'"
+        };
+        $sensors->{$block} = $sensor;
+        print "Found a temperature sensor using smartctl: $block\n";
+        last;
+      }
+    }
+  }
+  # Some LSI based hardware RAID controller can report HDD temp
+  if (-e '/dev/megaraid_sas_ioctl_node'){
+    # Only check for the firsts 26 drives
+    foreach my $i (0..25){
+      my @res = qx($smartctl -d megaraid,$i -A /dev/sda);
+      next if ($? != 0);
+      foreach my $l (@res){
+        if ($l =~ m/Drive\sTrip\sTemperature:\s+(\d+)\s/){
+          my $sensor = {
+            description    => "Temperature for disk No $i on sda",
+            type           => 'temp',
+            threshold_high => $1-$temp_margin,
+            threshold_low  => $1-$temp_margin-$temp_hyst,
+            unit           => '°C',
+            cmd            => "$smartctl -A -d megaraid,$i /dev/sda | grep 'Current Drive Temperature' | awk '{print \$4}'"
+          };
+          $sensors->{'sda-' . $i} = $sensor;
+          print "Found a temperature sensor using smartctl (megaraid): sda-$i\n";
+        }
+      }
+    }
+  }
+}
+
+# TODO: add support for lm sensors, but its ouput is harder to parse
+
+foreach my $s (keys %$sensors){
+  $cfg->set_block($s, $sensors->{$s});
+}
+
+$cfg->write($output);
