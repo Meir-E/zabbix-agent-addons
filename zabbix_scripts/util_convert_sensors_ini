@@ -1,0 +1,46 @@
+#!/usr/bin/env perl -w
+
+use strict;
+use warnings;
+
+use Config::Simple '-strict';
+use JSON;
+
+my $old = '/etc/zabbix/sensors.conf';
+my $new = '/etc/zabbix/sensors.ini';
+
+my $sensors = {};
+
+my $units = {
+  temp  => '°C',
+  fan   => 'rpm',
+  power => 'W'
+};
+
+open OLDSENSORS, ("<$old") ||
+    die "Couldn't open $old: $!\n";
+
+
+foreach (<OLDSENSORS>){
+    next unless (/^(\w+)(\s+)?=(\s+)?(.*)!(\-?\d+)!(\-?\d+)(!(\w+))?$/);
+    my ($sensor,$cmd,$threshigh,$threslow,$type) = ($1,$4,$5,$6,$8);
+    $type ||= 'temp';
+    $sensors->{$sensor} = {
+      description     => $sensor,
+      cmd             => $cmd,
+      threshold_high  => $threshigh,
+      threshold_low   => $threslow,
+      type            => $type,
+      unit            => $units->{$type}
+    };
+}
+
+my $cfg = new Config::Simple(syntax => 'ini');
+
+foreach my $k (keys %$sensors){
+  $cfg->set_block($k, $sensors->{$k});
+}
+
+$cfg->write($new);
+
+rename $old, $old . '.bak';

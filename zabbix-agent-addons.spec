@@ -17,6 +17,7 @@ Requires: perl(Linux::LVM)
 Requires: perl(POSIX)
 Requires: perl(MIME::Base64)
 Requires: perl(File::Which)
+Requires: per(Config::Simple)
 
 AutoReqProv: no
 
@@ -55,6 +56,11 @@ LVM, RAID status, S.M.A.R.T. drives, BackupPC etc...
 %preun
 
 %post
+if [ $1 -eq 1 ] ; then
+  if [ -e "/etc/zabbix/sensors.conf" ]; then
+    /var/lib/zabbix/bin/util_convert_sensors_ini
+  fi
+fi
 
 %files
 %defattr(-,root,root,-)

@@ -1,29 +1,32 @@
 #!/usr/bin/perl -w
 
+use strict;
+use warnings;
+use Config::Simple;
+
 my $what = $ARGV[0];
 
 unless (defined $what){
-    usage();
-    exit(1);
+  usage();
+  exit(1);
 }
 
-open SENSORS, ('</etc/zabbix/sensors.conf') ||
-    die "Couldn't open /etc/zabbix/sensors.conf: $!\n";
+my $cfg = new Config::Simple;
+$cfg->read('/etc/zabbix/sensors.ini');
 
 my $ret = 'ZBX_NOTSUPPORTED';
-
-foreach (<SENSORS>){
-    next unless (/^$what(\s+)?=(\s+)?(.*)!(\-?\d+)!(\-?\d+)(!(\w+))?$/);
-    my $cmd = $3;
-    $ret = `$cmd`;
+my $sensor = $cfg->get_block($what);
+if ($sensor && $sensor->{cmd}){
+  $ret = qx($sensor->{cmd});
 }
+
 print $ret;
 exit(0);
 
 sub usage {
     print <<"EOF";
 
-Usage: $0 sensor_name [high|low]
+Usage: $0 sensor_name
 
 EOF
 }

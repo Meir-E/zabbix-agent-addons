@@ -1,36 +1,40 @@
 #!/usr/bin/perl -w
 
-use JSON;
+use Config::Simple;
 use Getopt::Long;
+use JSON;
 
-my $sensor_type = 'temp';
+my $type = 'temp';
 GetOptions(
-  "type:s"   => \$sensor_type
+  "type:s" => \$type
 );
 
 # empty means temp
-$sensor_type = ($sensor_type eq '') ? 'temp' : $sensor_type;
+$type = ($type eq '') ? 'temp' : $type;
 
 my $json;
 @{$json->{data}} = ();
 
-open SENSORS, ('</etc/zabbix/sensors.conf') ||
-    die "Couldn't open /etc/zabbix/sensors.conf: $!\n";
-
-
-foreach (<SENSORS>){
-    next unless (/^(\w+)(\s+)?=(\s+)?(.*)!(\-?\d+)!(\-?\d+)(!(\w+))?$/);
-    my ($sensor,$threshigh,$threslow,$type) = ($1,$5,$6,$8);
-    $type ||= 'temp';
-    next if ($sensor_type ne 'all' && $type ne $sensor_type);
-    push @{$json->{data}}, {
-        "{#SENSORNAME}"      => $sensor,
-        "{#SENSORTHRESHIGH}" => $threshigh,
-        "{#SENSORTHRESLOW}"  => $threslow,
-        "{#SENSORTYPE}"      => $type
-    };
+my $cfg = new Config::Simple;
+$cfg->read('/etc/zabbix/sensors.ini');
+my %sensors = ();
+foreach my $k (keys $cfg->vars){
+  $k =~ s/\..*$//;
+  $sensors{$k} = 1 unless $sensors{$k};
 }
-close SENSORS;
+
+foreach my $k (keys %sensors){
+  my $sensor = $cfg->get_block($k);
+  next if ($type ne 'all' && $type ne $sensor->{type});
+  push @{$json->{data}}, {
+    "{#SENSORNAME}"      => $k,
+    "{#SENSORDESC}"      => $sensor->{description},
+    "{#SENSORTHRESHIGH}" => $sensor->{threshold_high},
+    "{#SENSORTHRESLOW}"  => $sensor->{threshold_low},
+    "{#SENSORTYPE}"      => $sensor->{type},
+    "{#SENSORUNIT}"      => $sensor->{unit}
+  };
+}
+
 print to_json($json);
 exit(0);
-
