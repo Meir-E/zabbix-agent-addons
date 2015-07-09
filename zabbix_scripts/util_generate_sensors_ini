@@ -173,10 +173,10 @@ if (-x $ipmitool){
               next SENSOR;
             }
           }
-          elsif ($d =~ m/^\s*Lower\scritical\s*:\s*(\d+(\.\d+))/){
+          elsif ($d =~ m/^\s*Upper\scritical\s*:\s*(\d+(\.\d+))/){
             $sensor->{threshold_low} = $1-$pwr_margin;
           }
-          elsif ($d =~ m/^\s*Lower\snon\-critical\s*:\s*(\d+(\.\d+))/){
+          elsif ($d =~ m/^\s*Upper\snon\-critical\s*:\s*(\d+(\.\d+))/){
             $sensor->{threshold_high} = $1-$pwr_margin;
           }
         }
