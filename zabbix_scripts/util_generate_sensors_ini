@@ -11,7 +11,7 @@ my $output = undef;
 # When a threshold can be automatically detected,
 # you may want to be notified before it's reached, so you can 
 # set a margin which will be substracted from the real threshold
-my $temp_margin = '10';
+my $temp_margin = '20';
 my $pwr_margin = '200';
 #This value will be substracted from the higher threshold to define the low one
 #so you can have hysteresis to prevent flip-flop
