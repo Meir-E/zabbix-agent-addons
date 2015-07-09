@@ -6,7 +6,8 @@ use warnings;
 use Config::Simple '-strict';
 use JSON;
 
-my $old = '/etc/zabbix/sensors.conf';
+my $old = shift;
+$old ||= '/etc/zabbix/sensors.conf';
 my $new = '/etc/zabbix/sensors.ini';
 
 my $sensors = {};
