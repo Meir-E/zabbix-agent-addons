@@ -12,17 +12,21 @@ my $output = undef;
 # you may want to be notified before it's reached, so you can 
 # set a margin which will be substracted from the real threshold
 my $temp_margin = '20';
+my $temp_hd_margin = '10';
 my $pwr_margin = '200';
 #This value will be substracted from the higher threshold to define the low one
 #so you can have hysteresis to prevent flip-flop
 my $temp_hyst = '10';
+my $temp_hd_hyst = '5';
 my $pwr_hyst = '200';
 
 GetOptions(
-  "output=s"      => \$output,
-  "temp-margin=i" => \$temp_margin,
-  "pwr-margin=i"  => \$pwr_margin,
-  "temp-hyst=i"   => \$temp_hyst,
+  "output=s"         => \$output,
+  "temp-margin=i"    => \$temp_margin,
+  "temp-hd-margin=i" => \$temp_hd_margin,
+  "pwr-margin=i"     => \$pwr_margin,
+  "temp-hyst=i"      => \$temp_hyst,
+  "temp-hd-hyst=i"   => \$temp_hd_hyst
 );
 
 sub usage(){
@@ -252,8 +256,8 @@ if (-x $smartctl){
           my $sensor = {
             description    => "Temperature for disk No $i on sda",
             type           => 'temp',
-            threshold_high => $1-$temp_margin,
-            threshold_low  => $1-$temp_margin-$temp_hyst,
+            threshold_high => $1-$temp_hd_margin,
+            threshold_low  => $1-$temp_hd_margin-$temp_hyst,
             unit           => '°C',
             cmd            => "$smartctl -A -d megaraid,$i /dev/sda | grep 'Current Drive Temperature' | awk '{print \$4}'"
           };
