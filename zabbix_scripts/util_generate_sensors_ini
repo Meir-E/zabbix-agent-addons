@@ -16,6 +16,7 @@ my $pwr_margin = '200';
 #This value will be substracted from the higher threshold to define the low one
 #so you can have hysteresis to prevent flip-flop
 my $temp_hyst = '10';
+my $pwr_hyst = '200';
 
 GetOptions(
   "output=s"      => \$output,
@@ -46,7 +47,6 @@ my $def_fan_thres_high  = '1000';
 my $def_fan_thres_low   = '700';
 
 my $def_pwr_thres_high  = '1000';
-my $def_pwr_thres_low   = '800';
 
 my $cfg = new Config::Simple(syntax => 'ini');
 
@@ -174,14 +174,14 @@ if (-x $ipmitool){
             }
           }
           elsif ($d =~ m/^\s*Upper\scritical\s*:\s*(\d+(\.\d+))/){
-            $sensor->{threshold_low} = $1-$pwr_margin;
+            $sensor->{threshold_high} = $1-$pwr_margin;
           }
           elsif ($d =~ m/^\s*Upper\snon\-critical\s*:\s*(\d+(\.\d+))/){
-            $sensor->{threshold_high} = $1-$pwr_margin;
+            $sensor->{threshold_low} = $1-$pwr_margin;
           }
         }
         $sensor->{threshold_high} ||= $def_pwr_thres_high;
-        $sensor->{threshold_low}  ||= $def_pwr_thres_high-$temp_hyst;
+        $sensor->{threshold_low}  ||= $def_pwr_thres_high-$pwr_hyst;
         $sensor->{threshold_high} =~ s/\.0+$//;
         $sensor->{threshold_low}  =~ s/\.0+$//;
         $sensor->{description} = $name;
