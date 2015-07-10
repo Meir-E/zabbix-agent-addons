@@ -1,6 +1,6 @@
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.0
+Version: 0.2.1
 Release: 1
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -73,6 +73,9 @@ fi
 %attr(0440,root,root) %{_sysconfdir}/sudoers.d/*
 
 %changelog
+* Fri Jul 10 2015 Daniel B. <daniel@firewall-services.com> - 0.2.1-1
+- Fix GlusterFS brick count on 3.7.x
+
 * Fri Jul 10 2015 Daniel B. <daniel@firewall-services.com> - 0.2.0-1
 - Migrate sensors config to an ini format
 - Add a generator script which detects available sensors
