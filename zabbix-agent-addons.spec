@@ -1,6 +1,6 @@
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.1.27
+Version: 0.2.0
 Release: 1
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -17,7 +17,7 @@ Requires: perl(Linux::LVM)
 Requires: perl(POSIX)
 Requires: perl(MIME::Base64)
 Requires: perl(File::Which)
-Requires: per(Config::Simple)
+Requires: perl(Config::Simple)
 
 AutoReqProv: no
 
@@ -43,7 +43,7 @@ LVM, RAID status, S.M.A.R.T. drives, BackupPC etc...
 %{__install} -d $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/zabbix_agentd.conf.d/
 %{__install} -m 0644 zabbix_conf/* $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/zabbix_agentd.conf.d/
 # Install sensors conf
-%{__install} -m 0755 conf/sensors.conf $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/
+%{__install} -m 0755 conf/sensors.ini $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/
 # Install sudo conf
 %{__install} -d 750 $RPM_BUILD_ROOT%{_sysconfdir}/sudoers.d
 %{__install} -m 600 conf/sudo.conf $RPM_BUILD_ROOT%{_sysconfdir}/sudoers.d/zabbix_agent
@@ -53,12 +53,13 @@ LVM, RAID status, S.M.A.R.T. drives, BackupPC etc...
 
 %pre
 
+
 %preun
 
 %post
-if [ $1 -eq 1 ] ; then
+if [ $1 -eq 2 ] ; then
   if [ -e "/etc/zabbix/sensors.conf" ]; then
-    /var/lib/zabbix/bin/util_convert_sensors_ini
+    /var/lib/zabbix/bin/util_convert_sensors_ini /etc/zabbix/sensors.conf
   fi
 fi
 
@@ -67,11 +68,15 @@ fi
 %doc README CHANGELOG.git
 %dir %attr(0750,zabbix,zabbix) %{_localstatedir}/lib/zabbix/bin
 %{_localstatedir}/lib/zabbix/bin/*
-%config(noreplace) %attr(0640,root,zabbix) %{_sysconfdir}/zabbix/sensors.conf
+%config(noreplace) %attr(0640,root,zabbix) %{_sysconfdir}/zabbix/sensors.ini
 %config(noreplace) %attr(0640,root,zabbix) %{_sysconfdir}/zabbix/zabbix_agentd.conf.d/*
 %attr(0440,root,root) %{_sysconfdir}/sudoers.d/*
 
 %changelog
+* Fri Jul 10 2015 Daniel B. <daniel@firewall-services.com> - 0.2.0-1
+- Migrate sensors config to an ini format
+- Add a generator script which detects available sensors
+
 * Tue Jul 7 2015 Daniel B. <daniel@firewall-services.com> - 0.1.27-1
 - Support different sensors types
 
