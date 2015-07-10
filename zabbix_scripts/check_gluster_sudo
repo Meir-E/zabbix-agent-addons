@@ -65,10 +65,10 @@ if ($what eq 'volume'){
   }
   foreach my $line (@volinfo){
     # Check that all bricks are online
-    if ($line =~ m/^Brick\ ([\w\.]+:\/[\w\.\/]+)\s+\d+\s+([A-Z])/){
+    if ($line =~ m/^Brick\ ([\w\.]+:\/[\w\.\/]+)\s+\d+(\s+\d+)?\s+([A-Z])/){
       $bricksfound++;
-      if ($2 ne 'Y') {
-        print "CRITICAL: brick status (reported $2 on $1)";
+      if ($3 ne 'Y') {
+        print "CRITICAL: brick status (reported $3 on $1)";
         exit 1;
       }
     }
