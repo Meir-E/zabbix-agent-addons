@@ -233,7 +233,7 @@ if (-x $smartctl){
       if ($l =~ /Temperature_Celsius/){
         my $sensor = {
           description    => "$block temperature",
-          threshold_low  => $def_temp_thres_high-$temp_hyst,
+          threshold_low  => $def_temp_thres_high-$temp_hd_hyst,
           threshold_high => $def_temp_thres_high,
           type           => 'temp',
           unit           => '°C',
@@ -257,7 +257,7 @@ if (-x $smartctl){
             description    => "Temperature for disk No $i on sda",
             type           => 'temp',
             threshold_high => $1-$temp_hd_margin,
-            threshold_low  => $1-$temp_hd_margin-$temp_hyst,
+            threshold_low  => $1-$temp_hd_margin-$temp_hd_hyst,
             unit           => '°C',
             cmd            => "$smartctl -A -d megaraid,$i /dev/sda | grep 'Current Drive Temperature' | awk '{print \$4}'"
           };
