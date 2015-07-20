@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Config::Simple '-strict';
 use Getopt::Long;
+use File::Which;
 use File::Basename;
 use Zabbix::Agent::Addons::Disks;
 use Zabbix::Agent::Addons::UPS;
@@ -53,16 +54,16 @@ unless ($output){
 }
 
 # Path
-my $ipmitool = '/usr/bin/ipmitool';
-my $smartctl = '/usr/sbin/smartctl';
-my $upsc     = '/usr/bin/upsc';
+my $ipmitool = which('ipmitool');
+my $smartctl = which('smartctl');
+my $upsc     = which('upsc');
 
 my $cfg = new Config::Simple(syntax => 'ini');
 
 my $sensors = {};
 
 # Try to detect IPMI sensors
-if (-x $ipmitool){
+if ($ipmitool && -x $ipmitool){
   # First check for temperature sensors
   my @lines = qx($ipmitool sdr type Temperature);
   if ($? == 0){
@@ -182,10 +183,10 @@ if (-x $ipmitool){
               next SENSOR;
             }
           }
-          elsif ($d =~ m/^\s*Upper\scritical\s*:\s*(\d+(\.\d+))/){
+          elsif ($d =~ m/^\s*Upper\scritical\s*:\s*(\d+(\.\d+)?)/){
             $sensor->{threshold_high} = $1-$pwr_margin;
           }
-          elsif ($d =~ m/^\s*Upper\snon\-critical\s*:\s*(\d+(\.\d+))/){
+          elsif ($d =~ m/^\s*Upper\snon\-critical\s*:\s*(\d+(\.\d+)?)/){
             $sensor->{threshold_low} = $1-$pwr_margin;
           }
         }
@@ -207,7 +208,7 @@ if (-x $ipmitool){
 }
 
 # Now, try to detect smart capable HDD
-if (-x $smartctl){
+if ($smartctl && -x $smartctl){
   foreach my $block (Zabbix::Agent::Addons::Disks::list_smart_hdd({ skip_remouvable => 1 })){
     my @lines = qx($smartctl -A /dev/$block);
     next if ($? != 0);
@@ -252,7 +253,7 @@ if (-x $smartctl){
 }
 
 # Now check UPS
-if (-x $upsc){
+if ($upsc && -x $upsc){
   foreach my $ups (Zabbix::Agent::Addons::UPS::list_ups()){
     my @lines = qx($upsc $ups);
     next if ($? != 0);
