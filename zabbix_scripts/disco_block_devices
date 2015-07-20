@@ -1,22 +1,21 @@
 #!/usr/bin/perl -w
 
+use warnings;
+use strict;
+use Zabbix::Agent::Addons::Disks;
 use JSON;
 
-opendir(my $dh, "/sys/block") or die "Couldn't open /sys/block: $!";
-my @blocks = grep { $_ !~ m/^\./ } readdir($dh);
-closedir($dh);
 my $json;
 @{$json->{data}} = ();
-foreach my $block (@blocks){
-    my $size = 1;
-    if ( -e "/sys/block/$block/size"){
-        open SIZE, "/sys/block/$block/size";
-        $size = join "", <SIZE>;
-        close SIZE;
-        chomp($size);
-        next if ($size eq '0');
-    }
-    push @{$json->{data}}, { "{#BLOCKDEVICE}" => $block, "{#BLOCKSIZE}" => $size };
+foreach my $block (Zabbix::Agent::Addons::Disks::list_block_dev()){
+  my $size = 1;
+  if ( -e "/sys/block/$block/size"){
+    open SIZE, "/sys/block/$block/size";
+    $size = join "", <SIZE>;
+    close SIZE;
+    chomp($size);
+  }
+  push @{$json->{data}}, { "{#BLOCKDEVICE}" => $block, "{#BLOCKSIZE}" => $size };
 }
 print to_json($json);
 exit(0);

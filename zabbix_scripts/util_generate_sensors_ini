@@ -5,6 +5,8 @@ use warnings;
 use Config::Simple '-strict';
 use Getopt::Long;
 use File::Basename;
+use Zabbix::Agent::Addons::Disks;
+
 
 # Output file
 my $output = undef;
@@ -203,30 +205,7 @@ if (-x $ipmitool){
 
 # Now, try to detect smart capable HDD
 if (-x $smartctl){
-  # This is copied from disco_smart_sudo, I should create a module to
-  # consolidate this
-  opendir(my $dh, "/sys/block") or die "Couldn't open /sys/block: $!";
-  my @blocks = grep { $_ !~ m/^\./ } readdir($dh);
-  closedir($dh);
-  foreach my $block (@blocks){
-    my $removable = 0;
-    my $size = 1;
-    # Skip block we already know they won't support SMART
-    next if ($block =~ m/^(ram|loop|md|dm\-)\d+/);
-    if ( -e "/sys/block/$block/removable"){
-      open REMOVABLE, "/sys/block/$block/removable";
-      $removable = join "", <REMOVABLE>;
-      close REMOVABLE;
-      chomp($removable);
-      next if ($removable eq '1');
-    }
-    if ( -e "/sys/block/$block/size"){
-      open SIZE, "/sys/block/$block/size";
-      $size = join "", <SIZE>;
-      close SIZE;
-      chomp($size);
-      next if ($size eq '0');
-    }
+  foreach my $block (Zabbix::Agent::Addons::Disks::list_smart_hdd({ skip_remouvable => 1 })){
     my @lines = qx($smartctl -A /dev/$block);
     next if ($? != 0);
     foreach my $l (@lines){
@@ -270,7 +249,6 @@ if (-x $smartctl){
 }
 
 # TODO: add support for lm sensors, but its ouput is harder to parse
-
 foreach my $s (keys %$sensors){
   $cfg->set_block($s, $sensors->{$s});
 }
