@@ -33,7 +33,7 @@ sub list_smart_hdd{
       next unless (system("/usr/sbin/smartctl -A /dev/$block >/dev/null 2>&1") == 0);
       if ($param->{skip_remouvable} && -e "/sys/block/$block/removable"){
         open REMOVABLE, "/sys/block/$block/removable";
-        $removable = join "", <REMOVABLE>;
+        my $removable = join "", <REMOVABLE>;
         close REMOVABLE;
         chomp($removable);
         next if ($removable eq '1');
