@@ -6,7 +6,7 @@ use Config::Simple '-strict';
 use Getopt::Long;
 use File::Basename;
 use Zabbix::Agent::Addons::Disks;
-
+use Zabbix::Agent::Addons::UPS;
 
 # Output file
 my $output = undef;
@@ -16,19 +16,29 @@ my $output = undef;
 my $temp_margin = '20';
 my $temp_hd_margin = '10';
 my $pwr_margin = '200';
-#This value will be substracted from the higher threshold to define the low one
-#so you can have hysteresis to prevent flip-flop
+# This value will be substracted from the higher threshold to define the low one
+# so you can have hysteresis to prevent flip-flop
 my $temp_hyst = '10';
 my $temp_hd_hyst = '5';
+my $temp_ups_hyst = '10';
 my $pwr_hyst = '200';
 
+# Default threshold if not detected
+my $def_temp_thres_high = '50';
+my $def_fan_thres_high  = '1000';
+my $def_fan_thres_low   = '700';
+my $def_pwr_thres_high  = '1000';
+
+
 GetOptions(
-  "output=s"         => \$output,
-  "temp-margin=i"    => \$temp_margin,
-  "temp-hd-margin=i" => \$temp_hd_margin,
-  "pwr-margin=i"     => \$pwr_margin,
-  "temp-hyst=i"      => \$temp_hyst,
-  "temp-hd-hyst=i"   => \$temp_hd_hyst
+  "output=s"          => \$output,
+  "temp-margin=i"     => \$temp_margin,
+  "temp-hd-margin=i"  => \$temp_hd_margin,
+  "pwr-margin=i"      => \$pwr_margin,
+  "temp-hyst=i"       => \$temp_hyst,
+  "temp-hd-hyst=i"    => \$temp_hd_hyst,
+  "temp-ups-hyst=i"   => \$temp_hyst_hyst,
+  "pwr-hyst=i"        => \$pwr_hyst
 );
 
 sub usage(){
@@ -45,14 +55,7 @@ unless ($output){
 # Path
 my $ipmitool = '/usr/bin/ipmitool';
 my $smartctl = '/usr/sbin/smartctl';
-
-# Default threshold if not detected
-my $def_temp_thres_high = '50';
-
-my $def_fan_thres_high  = '1000';
-my $def_fan_thres_low   = '700';
-
-my $def_pwr_thres_high  = '1000';
+my $upsc     = '/usr/bin/upsc';
 
 my $cfg = new Config::Simple(syntax => 'ini');
 
@@ -242,6 +245,27 @@ if (-x $smartctl){
           };
           $sensors->{'sda-' . $i} = $sensor;
           print "Found a temperature sensor using smartctl (megaraid): sda-$i\n";
+        }
+      }
+    }
+  }
+}
+
+# Now check UPS
+if (-x $upsc){
+  foreach my $ups (Zabbix::Agent::Addons::UPS::list_ups()){
+    my @lines = qx($upsc $ups);
+    next if ($? != 0);
+    foreach my $l (@lines){
+      if ($l =~ m/^ups\.temperature:\s+(\d+(\.\d+)?)/){
+        my $sensor = {
+            description    => "ups temperature",
+            type           => 'temp',
+            threshold_high => $def_temp_threshold_high,
+            threshold_low  => $def_temp_threshold_high-$temp_ups_hyst,
+            unit           => '°C',
+            cmd            => "$upsc $ups ups.temperature"
+          };
         }
       }
     }
