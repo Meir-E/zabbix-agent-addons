@@ -11,7 +11,8 @@ sub list_ups {
   if ($upsc && -x $upsc){
     my @out = qx($upsc -l);
     if ($? == 0){
-      @ups = map { chomp($_) } @out;
+      @ups = @out;
+      chomp @ups;
     }
   }
   return @ups;
