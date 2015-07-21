@@ -16,3 +16,5 @@ sub list_ups {
   }
   return @ups;
 };
+
+1;
