@@ -259,14 +259,15 @@ if ($upsc && -x $upsc){
     next if ($? != 0);
     foreach my $l (@lines){
       if ($l =~ m/^ups\.temperature:\s+(\d+(\.\d+)?)/){
-        my $sensor = {
-          description    => "ups temperature",
+        $sensors->{'ups_' . lc $ups} = {
+          description    => "ups temperature for $ups",
           type           => 'temp',
           threshold_high => $def_temp_thres_high,
           threshold_low  => $def_temp_thres_high-$temp_ups_hyst,
           unit           => '°C',
           cmd            => "$upsc $ups ups.temperature"
         };
+        print "Foudn a temperature sensor for ups $ups";
       }
     }
   }
