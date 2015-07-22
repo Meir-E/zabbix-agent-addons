@@ -265,14 +265,14 @@ if ($upsc && -x $upsc){
           unit           => '°C',
           cmd            => "$upsc $ups ups.temperature"
         };
-        print "Foudn a temperature sensor for ups $ups";
+        print "Found a temperature sensor for ups $ups\n";
       }
     }
   }
 }
 
 # TODO: add support for lm sensors, but its ouput is harder to parse
-foreach my $s (keys %$sensors){
+foreach my $s (sort keys %$sensors){
   $cfg->set_block($s, $sensors->{$s});
 }
 
