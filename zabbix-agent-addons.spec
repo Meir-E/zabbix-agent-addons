@@ -1,6 +1,6 @@
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.1
+Version: 0.2.2
 Release: 1
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -42,6 +42,9 @@ LVM, RAID status, S.M.A.R.T. drives, BackupPC etc...
 # Install Zabbix conf
 %{__install} -d $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/zabbix_agentd.conf.d/
 %{__install} -m 0644 zabbix_conf/* $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/zabbix_agentd.conf.d/
+# Install perl modules
+%{__install} -d -m 0755 $RPM_BUILD_ROOT%{perl_vendorlib}
+cp -r lib/* $RPM_BUILD_ROOT%{perl_vendorlib}/
 # Install sensors conf
 %{__install} -m 0755 conf/sensors.ini $RPM_BUILD_ROOT%{_sysconfdir}/zabbix/
 # Install sudo conf
@@ -68,11 +71,16 @@ fi
 %doc README CHANGELOG.git
 %dir %attr(0750,zabbix,zabbix) %{_localstatedir}/lib/zabbix/bin
 %{_localstatedir}/lib/zabbix/bin/*
+%{perl_vendorlib}
 %config(noreplace) %attr(0640,root,zabbix) %{_sysconfdir}/zabbix/sensors.ini
 %config(noreplace) %attr(0640,root,zabbix) %{_sysconfdir}/zabbix/zabbix_agentd.conf.d/*
 %attr(0440,root,root) %{_sysconfdir}/sudoers.d/*
 
 %changelog
+* Mon Jul 20 2015 Daniel B. <daniel@firewall-services.com> - 0.2.2-1
+- Start working on perl libs to reduce code duplication
+- Detect nut UPS temp sensors
+
 * Fri Jul 10 2015 Daniel B. <daniel@firewall-services.com> - 0.2.1-1
 - Fix GlusterFS brick count on 3.7.x
 
