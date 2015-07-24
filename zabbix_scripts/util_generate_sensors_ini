@@ -21,11 +21,13 @@ my $pwr_margin = '200';
 # so you can have hysteresis to prevent flip-flop
 my $temp_hyst = '10';
 my $temp_hd_hyst = '5';
-my $temp_ups_hyst = '10';
+my $temp_ups_hyst = '5';
 my $pwr_hyst = '200';
 
 # Default threshold if not detected
 my $def_temp_thres_high = '50';
+my $def_hd_thres_high   = '50';
+my $def_ups_thres_high  = '40';
 my $def_fan_thres_high  = '1000';
 my $def_fan_thres_low   = '700';
 my $def_pwr_thres_high  = '1000';
@@ -102,10 +104,10 @@ if ($ipmitool && -x $ipmitool){
       $sensor->{threshold_low}  ||= $def_temp_thres_high-$temp_hyst;
       $sensor->{threshold_high} =~ s/\.0+$//;
       $sensor->{threshold_low}  =~ s/\.0+$//;
-      $sensor->{description} = $name;
-      $sensor->{type} = 'temp';
-      $sensor->{unit} = '°C';
-      $sensor->{cmd} = "$ipmitool sdr get '$name' | grep 'Sensor Reading' | awk '{print \$4}'";
+      $sensor->{description}    = $name;
+      $sensor->{type}           = 'temp';
+      $sensor->{unit}           = '°C';
+      $sensor->{cmd}            = "$ipmitool sdr get '$name' | grep 'Sensor Reading' | awk '{print \$4}'";
       my $id = lc $name;
       $id =~ s/\s/_/g;
       $sensors->{$id} = $sensor;
@@ -149,10 +151,10 @@ if ($ipmitool && -x $ipmitool){
       $sensor->{threshold_low}  ||= $def_fan_thres_high-$temp_hyst;
       $sensor->{threshold_high} =~ s/\.0+$//;
       $sensor->{threshold_low}  =~ s/\.0+$//;
-      $sensor->{description} = $name;
-      $sensor->{type} = 'fan';
-      $sensor->{unit} = ($value =~ m/percent|%/ || $val < 100) ? '%' : 'rpm';
-      $sensor->{cmd} = "$ipmitool sdr get '$name' | grep 'Sensor Reading' | awk '{print \$4}'";
+      $sensor->{description}    = $name;
+      $sensor->{type}           = 'fan';
+      $sensor->{unit}           = ($value =~ m/percent|%/ || $val < 100) ? '%' : 'rpm';
+      $sensor->{cmd}            = "$ipmitool sdr get '$name' | grep 'Sensor Reading' | awk '{print \$4}'";
       my $id = lc $name;
       $id =~ s/\s/_/g;
       $sensors->{$id} = $sensor;
@@ -194,10 +196,10 @@ if ($ipmitool && -x $ipmitool){
         $sensor->{threshold_low}  ||= $def_pwr_thres_high-$pwr_hyst;
         $sensor->{threshold_high} =~ s/\.0+$//;
         $sensor->{threshold_low}  =~ s/\.0+$//;
-        $sensor->{description} = $name;
-        $sensor->{type} = 'power';
-        $sensor->{unit} = 'Watt';
-        $sensor->{cmd} = "$ipmitool sdr get '$name' | grep 'Sensor Reading' | awk '{print \$4}'";
+        $sensor->{description}    = $name;
+        $sensor->{type}           = 'power';
+        $sensor->{unit}           = 'Watt';
+        $sensor->{cmd}            = "$ipmitool sdr get '$name' | grep 'Sensor Reading' | awk '{print \$4}'";
         my $id = lc $name;
         $id =~ s/\s/_/g;
         $sensors->{$id} = $sensor;
@@ -216,8 +218,8 @@ if ($smartctl && -x $smartctl){
       if ($l =~ /Temperature_Celsius/){
         $sensors->{$block} = {
           description    => "$block temperature",
-          threshold_low  => $def_temp_thres_high-$temp_hd_hyst,
-          threshold_high => $def_temp_thres_high,
+          threshold_low  => $def_hd_thres_high-$temp_hd_hyst,
+          threshold_high => $def_hd_thres_high,
           type           => 'temp',
           unit           => '°C',
           cmd            => "$smartctl -A /dev/$block | grep Temperature_Celsius | awk '{print \$10}'"
@@ -244,6 +246,7 @@ if ($smartctl && -x $smartctl){
             cmd            => "$smartctl -A -d megaraid,$i /dev/sda | grep 'Current Drive Temperature' | awk '{print \$4}'"
           };
           print "Found a temperature sensor using smartctl (megaraid): sda-$i\n";
+          last;
         }
       }
     }
@@ -260,12 +263,13 @@ if ($upsc && -x $upsc){
         $sensors->{'ups_' . lc $ups} = {
           description    => "ups temperature for $ups",
           type           => 'temp',
-          threshold_high => $def_temp_thres_high,
-          threshold_low  => $def_temp_thres_high-$temp_ups_hyst,
+          threshold_high => $def_ups_thres_high,
+          threshold_low  => $def_ups_thres_high-$temp_ups_hyst,
           unit           => '°C',
           cmd            => "$upsc $ups ups.temperature"
         };
         print "Found a temperature sensor for ups $ups\n";
+        last;
       }
     }
   }
