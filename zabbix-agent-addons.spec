@@ -1,6 +1,6 @@
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.2
+Version: 0.2.4
 Release: 1
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -77,6 +77,13 @@ fi
 %attr(0440,root,root) %{_sysconfdir}/sudoers.d/*
 
 %changelog
+* Mon Jul 27 2015 Daniel B. <daniel@firewall-services.com> - 0.2.4-1
+- Several enhancements in sensors ini generator
+
+* Fri Jul 24 2015 Daniel B. <daniel@firewall-services.com> - 0.2.3-1
+- Separate UPS default threshold
+- Minor coding style updates
+
 * Mon Jul 20 2015 Daniel B. <daniel@firewall-services.com> - 0.2.2-1
 - Start working on perl libs to reduce code duplication
 - Detect nut UPS temp sensors
