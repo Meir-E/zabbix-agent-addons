@@ -91,24 +91,33 @@ if ($ipmitool && -x $ipmitool){
       my $val = undef;
       foreach my $d (@details){
         chomp $d;
-        if ($d =~ m/^\s*Sensor\sReading\s*:\s*(\w+)/){
+        if ($d =~ m/^\s*Sensor\sReading\s*:\s*(\-?\w+)/){
           $val = $1;
           print "Sensor $name has value: $val\n";
-          if ($val !~ m/^\d+$/){
+          if ($val !~ m/^\-?\d+$/){
             print "Skipping sensor $name, couldn't parse its value: $val\n";
             next SENSOR;
           }
         }
-        elsif ($d =~ m/^\s*Upper\scritical\s*:\s*(\d+(\.\d+))/){
+        elsif ($d =~ m/^\s*Upper\scritical\s*:\s*(\-?\d+(\.\d+))/){
           $sensor->{threshold_high} = $1-$temp_margin;
         }
-        elsif ($d =~ m/^\s*Upper\snon\-critical\s*:\s*(\d+(\.\d+))/){
+        elsif ($d =~ m/^\s*Upper\snon\-critical\s*:\s*(\-?\d+(\.\d+))/){
           $sensor->{threshold_low} = $1-$temp_margin;
         }
       }
+      # Another loop to check for Normal max if Upper critical wasn't found
+      if (!$sensor->{threshold_high}){
+        foreach my $d (@details){
+          chomp $d;
+          if ($d =~ m/^\s*Normal\sMaximum\s*:\s*(\-?\d+(\.\d+))/){
+            $sensor->{threshold_high} = $1-$temp_margin;
+          }
+        }
+      }
       next SENSOR unless $val;
+      $sensor->{threshold_low}  ||= ($sensor->{threshold_high}) ? $sensor->{threshold_high}-$temp_hyst : $def_temp_thres_high-$temp_hyst;
       $sensor->{threshold_high} ||= $def_temp_thres_high;
-      $sensor->{threshold_low}  ||= $def_temp_thres_high-$temp_hyst;
       $sensor->{threshold_high} =~ s/\.0+$//;
       $sensor->{threshold_low}  =~ s/\.0+$//;
       $sensor->{description}    = $name;
