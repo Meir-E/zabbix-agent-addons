@@ -1,0 +1,46 @@
+#!/usr/bin/perl -w
+
+use strict;
+use File::Which;
+use Getopt::Long;
+
+my $what = 'cstate';
+my $resource = undef;
+my @supported = qw(cstate dstate role);
+
+GetOptions(
+  "what=s"     => \$what,
+  "resource=s" => \$resource
+);
+
+my $drbdadm = which('drbdadm');
+
+unless($drbdadm){
+  die 'ZBX_NOTSUPPORTED';
+}
+
+sub usage(){
+  my $supp = join('|', @supported);
+  print <<"EOF";
+
+usage: $0 --what=[$supp] --resource=<drbd resource name>
+
+EOF
+}
+
+unless ((grep { $_ eq $what } @supported) && $resource){
+  usage();
+  exit 1;
+}
+
+open RES, '-|', $drbdadm, $what, $resource || die "Can't open pipe: $!";
+my $out = join "", <RES>;
+close RES || die "An error occured: $!\n";
+chomp($out);
+# We only want the state of the local node
+if ($out =~ m{(.*)/.*}){
+  $out = $1;
+}
+
+print $out;
+exit 0;

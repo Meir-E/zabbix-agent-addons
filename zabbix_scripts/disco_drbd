@@ -1,0 +1,26 @@
+#!/usr/bin/perl -w
+
+use warnings;
+use strict;
+use File::Which;
+use JSON;
+
+my $json;
+@{$json->{data}} = ();
+my $drbdoverview = which('drbd-overview');
+
+if ($drbdoverview){
+  open RES, "$drbdoverview |" || die "Couldn't execute $drbdoverview";
+  foreach my $l (<RES>){
+    if ($l =~ m{(\d+):(\w+)/\d+}){
+      push @{$json->{data}}, {
+        "{#DRBD_RES_ID}"   => $1,
+        "{#DRBD_RES_NAME}" => $2
+      };
+    }
+  }
+  close RES;
+}
+
+print to_json($json);
+exit(0);
