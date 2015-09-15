@@ -1,6 +1,6 @@
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.5
+Version: 0.2.6
 Release: 1
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -77,6 +77,9 @@ fi
 %attr(0440,root,root) %{_sysconfdir}/sudoers.d/*
 
 %changelog
+* Mon Sep 14 2015 Daniel B. <daniel@firewall-services.com> - 0.2.6-1
+- Add script to discover and monitor DRBD resources
+
 * Wed Sep 9 2015 Daniel B. <daniel@firewall-services.com> - 0.2.5-1
 - Support negative values for temp sensors
 
