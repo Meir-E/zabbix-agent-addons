@@ -89,8 +89,18 @@ if ($what eq 'volume'){
   }
   foreach my $line (@volinfo){
     if ($line =~ m/^Number\ of\ entries:\s+(\d+)$/ && $1 gt 0){
-      print "CRITICAL: self-heal in progress ($1)";
-      exit 1;
+      # Lets check a second time to limit false positives
+      sleep 1;
+      @volinfo = gluster("$gluster vol heal $volume info");
+      unless (scalar @volinfo){
+        die "Error occurred while trying to get volume heal info for $volume";
+      }
+      foreach my $line (@volinfo){
+        if ($line =~ m/^Number\ of\ entries:\s+(\d+)$/ && $1 gt 0){
+          print "CRITICAL: self-heal in progress ($1)";
+          exit 1;
+        }
+      }
     }
   }
   @volinfo = gluster("$gluster vol heal $volume info heal-failed");
