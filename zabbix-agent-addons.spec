@@ -1,6 +1,6 @@
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.6
+Version: 0.2.7
 Release: 1
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -77,6 +77,9 @@ fi
 %attr(0440,root,root) %{_sysconfdir}/sudoers.d/*
 
 %changelog
+* Wed Sep 16 2015 Daniel B. <daniel@firewall-services.com> - 0.2.7-1
+- Prevent GlusterFS heal false positive due to concurrent locking
+
 * Mon Sep 14 2015 Daniel B. <daniel@firewall-services.com> - 0.2.6-1
 - Add script to discover and monitor DRBD resources
 
