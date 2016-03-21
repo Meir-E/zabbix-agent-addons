@@ -10,12 +10,16 @@ my $peer = undef;
 my $bricks = undef;
 
 my $gluster = which('gluster');
+my $lock = '/var/lock/gluster-zabbix.lock';
 
 unless($gluster){
   # Gluster is not installed, exit with an error
   die "gluster command not found";
 }
 
+# Get an exclusive lock
+open(LOCK, ">$lock") || die "Can't open $lock";
+flock(LOCK, 2);
 
 GetOptions(
   "what=s"   => \$what,
@@ -150,3 +154,5 @@ elsif ($what eq 'peer'){
   print $status;
 }
 
+close(LOCK);
+exit(0);

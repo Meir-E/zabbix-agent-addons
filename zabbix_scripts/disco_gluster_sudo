@@ -9,12 +9,17 @@ my $json;
 @{$json->{data}} = ();
 
 my $gluster = which('gluster');
+my $lock = '/var/lock/gluster-zabbix.lock';
 
 unless($gluster){
   # Gluster is not installed, just return an empty JSON object
   print to_json($json);
   exit(0);
 }
+
+# Get an exclusive lock
+open(LOCK, ">$lock") || die "Can't open $lock";
+flock(LOCK, 2);
 
 my $what = 'volumes';
 GetOptions(
@@ -110,6 +115,7 @@ else{
   exit(1);
 }
 
+close(LOCK);
 print to_json($json);
 exit(0);
 
