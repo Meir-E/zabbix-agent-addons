@@ -271,6 +271,18 @@ if ($smartctl && -x $smartctl){
           print "Found a temperature sensor using smartctl (megaraid): sda-$i\n";
           last;
         }
+        elsif ($l =~ /Temperature_Celsius/){
+          $sensors->{'sda-' . $i} = {
+            description    => "Temperature for disk No $i on sda",
+            threshold_low  => $def_hd_temp_thres_high-$temp_hd_hyst,
+            threshold_high => $def_hd_temp_thres_high,
+            type           => 'temp',
+            unit           => '°C',
+            cmd            => "$smartctl -A -d megaraid,$i /dev/sda | grep Temperature_Celsius | awk '{print \$10}'"
+          };
+          print "Found a temperature sensor using smartctl (megaraid): sda-$i\n";
+          last;
+        }
       }
     }
   }
