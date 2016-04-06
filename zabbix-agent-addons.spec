@@ -1,6 +1,6 @@
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.8
+Version: 0.2.9
 Release: 1
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -77,6 +77,9 @@ fi
 %attr(0440,root,root) %{_sysconfdir}/sudoers.d/*
 
 %changelog
+* Wed Apr 6 2016 Daniel Berteaud <daniel@firewall-services.com> - 0.2.9-1
+- Detect HDD temp sensors on sat+megaraid controllers
+
 * Mon Mar 21 2016 Daniel B. <daniel@firewall-services.com> - 0.2.8-1
 - Prevent running several gluster check commands at the same time
 
