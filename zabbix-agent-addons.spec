@@ -1,6 +1,6 @@
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.9
+Version: 0.2.10
 Release: 1
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -77,6 +77,9 @@ fi
 %attr(0440,root,root) %{_sysconfdir}/sudoers.d/*
 
 %changelog
+* Thu Aug 25 2016 Daniel Berteaud <daniel@firewall-services.com> - 0.2.10-1
+- Add monitoring item for squid's FD
+
 * Wed Apr 6 2016 Daniel Berteaud <daniel@firewall-services.com> - 0.2.9-1
 - Detect HDD temp sensors on sat+megaraid controllers
 
