@@ -235,7 +235,6 @@ if ($ipmitool && -x $ipmitool){
 
 # Try to detect lm_sensors, using the sensors command
 if ($lmsensor && -x $lmsensor){
-  print "Trying $lmsensor\n";
   my @lines = qx($lmsensor);
   if ($? == 0){
     SENSOR: foreach my $l (@lines){
