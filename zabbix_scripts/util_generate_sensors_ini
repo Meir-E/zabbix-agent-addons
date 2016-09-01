@@ -62,6 +62,7 @@ unless ($output){
 # Path
 my $ipmitool = which('ipmitool');
 my $smartctl = which('smartctl');
+my $lmsensor = which('sensors');
 my $upsc     = which('upsc');
 
 my $cfg = new Config::Simple(syntax => 'ini');
@@ -228,6 +229,53 @@ if ($ipmitool && -x $ipmitool){
         $sensors->{$id} = $sensor;
         print "Found a power sensor using IPMI: $name\n";
       }
+    }
+  }
+}
+
+# Try to detect lm_sensors, using the sensors command
+if ($lmsensor && -x $lmsensor){
+  print "Trying $lmsensor\n";
+  my @lines = qx($lmsensor);
+  if ($? == 0){
+    SENSOR: foreach my $l (@lines){
+      chomp $l;
+      # Looks like
+      # temp1:       +27.8°C  (crit = +119.0°C)
+      # or
+      # Core 0:        +36.0°C  (high = +80.0°C, crit = +100.0°C)
+      if ($l !~ m/^(\w+[\s\w]+?):\s*\+?(\d+)(\.\d+)?°C\s*(.*)$/){
+        next SENSOR;
+      }
+      my $name   = $1;
+      my $val    = $2;
+      my $thr    = $4;
+      my $sensor = {};
+
+      if ($val !~ m/^\-?\d+$/){
+        print "Skipping sensor $name, couldn't parse its value: $val\n";
+        next SENSOR;
+      }
+
+      if ($thr =~ m/high\s+=\s+\+(\d+(\.\d+)?)/){
+        $sensor->{threshold_high} = $1;
+      }
+      elsif ($thr =~ m/^crit\s+=\s+\+(\d+(\.\d+)?)/){
+        $sensor->{threshold_high} = $1 - $temp_margin;
+      }
+
+      next SENSOR unless $val;
+      $sensor->{threshold_low}  ||= ($sensor->{threshold_high}) ? $sensor->{threshold_high}-$temp_hyst : $def_temp_thres_high-$temp_hyst;
+      $sensor->{threshold_high} ||= $def_temp_thres_high;
+      $sensor->{threshold_high} =~ s/\.0+$//;
+      $sensor->{threshold_low}  =~ s/\.0+$//;
+      $sensor->{description}    = $name;
+      $sensor->{type}           = 'temp';
+      $sensor->{unit}           = '°C';
+      $sensor->{cmd}            = "$lmsensor | grep '$name:' | cut -d+ -f2 | cut -d. -f1";
+      my $id = sensor_name($name);
+      $sensors->{$id} = $sensor;
+      print "Found a temperature sensor using lm_sensors: $name\n";
     }
   }
 }
