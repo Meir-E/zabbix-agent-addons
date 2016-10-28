@@ -1,6 +1,6 @@
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.11
+Version: 0.2.12
 Release: 1
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -77,6 +77,9 @@ fi
 %attr(0440,root,root) %{_sysconfdir}/sudoers.d/*
 
 %changelog
+* Fri Oct 28 2016 Daniel Berteaud <daniel@firewall-services.com> - 0.2.12-1
+- Support Airflow_Temperature_Cel as temp label for smartctl based sensors
+
 * Thu Sep 1 2016 Daniel Berteaud <daniel@firewall-services.com> - 0.2.11-1
 - Add support for lm_sensors based sensors
 
