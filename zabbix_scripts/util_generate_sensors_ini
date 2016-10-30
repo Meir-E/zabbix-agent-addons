@@ -285,14 +285,14 @@ if ($smartctl && -x $smartctl){
     my @lines = qx($smartctl -A /dev/$block);
     next if ($? != 0);
     foreach my $l (@lines){
-      if ($l =~ /Temperature_Celsius|Airflow_Temperature_Cel/){
+      if ($l =~ /(Temperature_Celsius|Airflow_Temperature_Cel)/){
         $sensors->{$block} = {
           description    => "$block temperature",
           threshold_low  => $def_hd_temp_thres_high-$temp_hd_hyst,
           threshold_high => $def_hd_temp_thres_high,
           type           => 'temp',
           unit           => '°C',
-          cmd            => "$smartctl -A /dev/$block | grep Temperature_Celsius | awk '{print \$10}'"
+          cmd            => "$smartctl -A /dev/$block | grep $1 | awk '{print \$10}'"
         };
         print "Found a temperature sensor using smartctl: $block\n";
         last;
@@ -318,14 +318,14 @@ if ($smartctl && -x $smartctl){
           print "Found a temperature sensor using smartctl (megaraid): sda-$i\n";
           last;
         }
-        elsif ($l =~ /Temperature_Celsius|Airflow_Temperature_Cel/){
+        elsif ($l =~ /(Temperature_Celsius|Airflow_Temperature_Cel)/){
           $sensors->{'sda-' . $i} = {
             description    => "Temperature for disk No $i on sda",
             threshold_low  => $def_hd_temp_thres_high-$temp_hd_hyst,
             threshold_high => $def_hd_temp_thres_high,
             type           => 'temp',
             unit           => '°C',
-            cmd            => "$smartctl -A -d megaraid,$i /dev/sda | grep Temperature_Celsius | awk '{print \$10}'"
+            cmd            => "$smartctl -A -d megaraid,$i /dev/sda | grep $1 | awk '{print \$10}'"
           };
           print "Found a temperature sensor using smartctl (megaraid): sda-$i\n";
           last;
