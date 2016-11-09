@@ -28,7 +28,10 @@ foreach my $line (split(/\n/, $status)){
   my ($key, $val) = split(/:/, $line);
   $key =~ s/\s/_/g;
   $key = lc $key;
+  # Remove leading and trailing spaces
   $val =~ s/^\s+|\s+$//g;
+  # Add 0 before the . when needed
+  $val =~ s/^(\.\d+)$/0$1/;
   $res{$key} = $val;
 }
 
