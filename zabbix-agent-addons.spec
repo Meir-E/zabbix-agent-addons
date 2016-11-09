@@ -1,6 +1,6 @@
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.13
+Version: 0.2.14
 Release: 1
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -77,6 +77,9 @@ fi
 %attr(0440,root,root) %{_sysconfdir}/sudoers.d/*
 
 %changelog
+* Wed Nov 9 2016 Daniel Berteaud <daniel@firewall-services.com> - 0.2.14-1
+- Add scripts to monitor apache httpd
+
 * Sun Oct 30 2016 Daniel Berteaud <daniel@firewall-services.com> - 0.2.13-1
 - Fix handling Airflow_Temperature_Cel label
 
