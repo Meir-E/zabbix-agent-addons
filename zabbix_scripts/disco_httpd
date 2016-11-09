@@ -1,4 +1,4 @@
-#!/usr/bin/env perl -w
+#!/usr/bin/perl -w
 
 use strict;
 use warnings;
@@ -11,7 +11,7 @@ my $json;
 my $status = get('http://127.0.0.1/server-status?auto');
 
 if ($status){
-  push @{$json->{data}}, {"{#HTTPD_STATUS_AVAILABLE}" => 'yes'};
+  push @{$json->{data}}, {"{#HTTPD_STATUS_URI}" => 'http://127.0.0.1/server-status'};
 }
 
 print to_json($json);
