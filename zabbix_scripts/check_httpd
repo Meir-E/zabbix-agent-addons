@@ -1,0 +1,45 @@
+#!/usr/bin/env perl -w
+
+use strict;
+use warnings;
+use LWP::Simple;
+use Getopt::Long;
+
+my $what = undef;
+my $help = 0;
+
+GetOptions(
+  "what=s" => \$what,
+  "help"   => \$help
+);
+
+my %res = ();
+my $status = get("http://127.0.0.1/server-status?auto");
+
+
+unless ($status){
+  print 'ZBX_UNSUPPOTED';
+  exit 1;
+}
+
+foreach my $line (split(/\n/, $status)){
+  my ($key, $val) = split(/:/, $line);
+  $key =~ s/\s/_/g;
+  $key = lc $key;
+  $val =~ s/^\s+|\s+$//g;
+  $res{$key} = $val;
+}
+
+if ($help || !$what){
+  print "Valid keys are:\n\n";
+  print "$_\n" for keys %res;
+  exit 0;
+}
+
+if (defined $res{$what}){
+  print $res{$what};
+}
+else{
+  print 'ZBX_UNSUPPOTED';
+}
+exit 0;

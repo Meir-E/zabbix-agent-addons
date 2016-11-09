@@ -1,0 +1,18 @@
+#!/usr/bin/env perl -w
+
+use strict;
+use warnings;
+use LWP::Simple;
+use JSON;
+
+my $json;
+@{$json->{data}} = ();
+
+my $status = get('http://127.0.0.1/server-status?auto');
+
+if ($status){
+  push @{$json->{data}}, {"{#HTTPD_STATUS_AVAILABLE}" => 'yes'};
+}
+
+print to_json($json);
+exit(0);
