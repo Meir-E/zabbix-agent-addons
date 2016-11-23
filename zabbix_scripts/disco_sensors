@@ -17,6 +17,7 @@ my $json;
 
 my $cfg = new Config::Simple;
 $cfg->read('/etc/zabbix/sensors.ini');
+$cfg->syntax('ini');
 my %sensors = ();
 foreach my $k (keys %{$cfg->vars}){
   $k =~ s/\..*$//;
