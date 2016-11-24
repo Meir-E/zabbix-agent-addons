@@ -1,6 +1,6 @@
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.14
+Version: 0.2.15
 Release: 1
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -77,6 +77,10 @@ fi
 %attr(0440,root,root) %{_sysconfdir}/sudoers.d/*
 
 %changelog
+* Thu Nov 24 2016 Daniel Berteaud <daniel@firewall-services.com> - 0.2.15-1
+- Fix discovery scripts to always return a valid JSON value, even if empty
+  (sensors, lvm and nut_ups)
+
 * Wed Nov 9 2016 Daniel Berteaud <daniel@firewall-services.com> - 0.2.14-1
 - Add scripts to monitor apache httpd
 
