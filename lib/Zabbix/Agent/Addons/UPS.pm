@@ -3,6 +3,8 @@ package Zabbix::Agent::Addons::UPS;
 use warnings;
 use strict;
 use File::Which;
+use File::Spec;
+open STDERR, '>', File::Spec->devnull() or die "could not open STDERR: $!\n";
 
 # List configured UPS (only nut is supported)
 sub list_ups {
