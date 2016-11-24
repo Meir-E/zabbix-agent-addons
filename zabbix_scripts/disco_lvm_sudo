@@ -10,49 +10,52 @@ open STDERR, '>/dev/null';
 my $json;
 @{$json->{data}} = ();
 
-if ($what eq "volumes"){
-    foreach my $group (get_volume_group_list()){
-        my %lvs = get_logical_volume_information($group);
-        foreach my $lv (keys %lvs){
-            $lv = ($lv =~ m!^/dev/$group!) ? $lv : "/dev/$group/$lv";
-            push @{$json->{data}}, { "{#LVMVOL}" => "$lv" };
+my @vg = eval { get_volume_group_list() };
+
+unless ($@){
+  if ($what eq "volumes"){
+    foreach my $group (@vg){
+      my %lvs = get_logical_volume_information($group);
+      foreach my $lv (keys %lvs){
+        $lv = ($lv =~ m!^/dev/$group!) ? $lv : "/dev/$group/$lv";
+        push @{$json->{data}}, { "{#LVMVOL}" => "$lv" };
+      }
+    }
+  }
+  elsif ($what eq "snapshots"){
+    foreach my $group (@vg){
+      my %lvs = get_logical_volume_information($group);
+      foreach my $lv (keys %lvs){
+        if (defined $lvs{$lv}->{allocated_to_snapshot}){
+          $lv = ($lv =~ m!^/dev/$group!) ? $lv : "/dev/$group/$lv";
+          push @{$json->{data}}, { "{#LVMSNAP}" => "$lv" };
         }
+      }
     }
-}
-elsif ($what eq "snapshots"){
-    foreach my $group (get_volume_group_list()){
-        my %lvs = get_logical_volume_information($group);
-        foreach my $lv (keys %lvs){
-            if (defined $lvs{$lv}->{allocated_to_snapshot}){
-                $lv = ($lv =~ m!^/dev/$group!) ? $lv : "/dev/$group/$lv";
-                push @{$json->{data}}, { "{#LVMSNAP}" => "$lv" };
-            }
+  }
+  elsif ($what eq "thin_pools"){
+    foreach my $group (@vg){
+      my %lvs = get_logical_volume_information($group);
+      foreach my $lv (keys %lvs){
+        if (defined $lvs{$lv}->{allocated_pool_data}){
+          $lv = ($lv =~ m!^/dev/$group!) ? $lv : "/dev/$group/$lv";
+          push @{$json->{data}}, { "{#LVMTHINP}" => "$lv" };
         }
+      }
     }
-}
-elsif ($what eq "thin_pools"){
-    foreach my $group (get_volume_group_list()){
-        my %lvs = get_logical_volume_information($group);
-        foreach my $lv (keys %lvs){
-            if (defined $lvs{$lv}->{allocated_pool_data}){
-                $lv = ($lv =~ m!^/dev/$group!) ? $lv : "/dev/$group/$lv";
-                push @{$json->{data}}, { "{#LVMTHINP}" => "$lv" };
-            }
-        }
-    }
-}
-elsif ($what eq "groups"){
-    foreach my $group (get_volume_group_list()){
-        push @{$json->{data}}, { "{#LVMGRP}" => $group };
-    }
-}
-else{
+  }
+  elsif ($what eq "groups"){
+    foreach my $group (@vg){
+      push @{$json->{data}}, { "{#LVMGRP}" => $group };                                                                                                                                                                }
+  }
+  else{
     print <<"EOF";
 
-Usage: $0 [volumes|snapshots|groups]
+Usage: $0 [volumes|snapshots|thin_pools|groups]
 
 EOF
+    exit 1;
+  }
 }
-
 print to_json($json);
 exit(0);
