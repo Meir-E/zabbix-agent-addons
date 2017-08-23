@@ -1,0 +1,27 @@
+module zabbix-agent-addons 1.0;
+
+require {
+        type kernel_t;
+        type devlog_t;
+        type zabbix_var_lib_t;
+        type sudo_exec_t;
+        type proc_mdstat_t;
+        type zabbix_agent_t;
+        class process setrlimit;
+        class capability { audit_write dac_override sys_resource };
+        class file { execute execute_no_trans getattr ioctl open read };
+        class netlink_audit_socket { create nlmsg_relay };
+        class sock_file write;
+        class unix_dgram_socket { connect create sendto };
+}
+
+#============= zabbix_agent_t ==============
+allow zabbix_agent_t devlog_t:sock_file write;
+allow zabbix_agent_t kernel_t:unix_dgram_socket sendto;
+allow zabbix_agent_t proc_mdstat_t:file { getattr ioctl open read };
+allow zabbix_agent_t self:capability { audit_write dac_override sys_resource };
+allow zabbix_agent_t self:netlink_audit_socket { create nlmsg_relay };
+allow zabbix_agent_t self:process setrlimit;
+allow zabbix_agent_t self:unix_dgram_socket { connect create };
+allow zabbix_agent_t sudo_exec_t:file { execute execute_no_trans };
+allow zabbix_agent_t zabbix_var_lib_t:file { execute execute_no_trans ioctl open read };
