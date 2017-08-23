@@ -1,7 +1,11 @@
+%if 0%{?rhel} && 0%{?rhel} < 5
+%global _without_selinux 1
+%endif
+
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.16
-Release: 1
+Version: 0.2.17
+Release: 0.beta1
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
 
@@ -18,6 +22,11 @@ Requires: perl(POSIX)
 Requires: perl(MIME::Base64)
 Requires: perl(File::Which)
 Requires: perl(Config::Simple)
+%if ! 0%{?_without_selinux}
+Requires: policycoreutils
+BuildRequires: selinux-policy-devel
+BuildRequires: checkpolicy
+%endif
 
 AutoReqProv: no
 
@@ -31,6 +40,11 @@ LVM, RAID status, S.M.A.R.T. drives, BackupPC etc...
 %setup -q
 
 %build
+%if ! 0%{?_without_selinux}
+pushd selinux
+make -f %{_datadir}/selinux/devel/Makefile
+popd
+%endif
 
 %install
 
@@ -50,6 +64,11 @@ cp -r lib/* $RPM_BUILD_ROOT%{perl_vendorlib}/
 # Install sudo conf
 %{__install} -d 750 $RPM_BUILD_ROOT%{_sysconfdir}/sudoers.d
 %{__install} -m 600 conf/sudo.conf $RPM_BUILD_ROOT%{_sysconfdir}/sudoers.d/zabbix_agent
+# Install SELinux policy
+%if ! 0%{?_without_selinux}
+  %{__install} -d 750 $RPM_BUILD_ROOT%{_datadir}/selinux/packages/%{name}
+  %{__install} -m644 selinux/%{name}.pp $RPM_BUILD_ROOT%{_datadir}/selinux/packages/%{name}/%{name}.pp
+%endif
 
 %clean
 %{__rm} -rf $RPM_BUILD_ROOT
@@ -75,8 +94,12 @@ fi
 %config(noreplace) %attr(0640,root,zabbix) %{_sysconfdir}/zabbix/sensors.ini
 %config(noreplace) %attr(0640,root,zabbix) %{_sysconfdir}/zabbix/zabbix_agentd.conf.d/*
 %attr(0440,root,root) %{_sysconfdir}/sudoers.d/*
+%{_datadir}/selinux/packages/%{name}/%{name}.pp
 
 %changelog
+* Wed Aug 23 2017 Daniel Berteaud <daniel@firewall-services.com> - 0.2.17-1
+- Add a SELinux policy module
+
 * Wed Jun 14 2017 Daniel Berteaud <daniel@firewall-services.com> - 0.2.16-1
 - Add kernel.openedfile UserParameter
 
