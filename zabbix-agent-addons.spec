@@ -1,10 +1,10 @@
-%if 0%{?rhel} && 0%{?rhel} < 5
+%if 0%{?rhel} && 0%{?rhel} < 7
 %global _without_selinux 1
 %endif
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.17
+Version: 0.2.18
 Release: 1
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -66,8 +66,8 @@ cp -r lib/* $RPM_BUILD_ROOT%{perl_vendorlib}/
 %{__install} -m 600 conf/sudo.conf $RPM_BUILD_ROOT%{_sysconfdir}/sudoers.d/zabbix_agent
 # Install SELinux policy
 %if ! 0%{?_without_selinux}
-  %{__install} -d 750 $RPM_BUILD_ROOT%{_datadir}/selinux/packages/%{name}
-  %{__install} -m644 selinux/%{name}.pp $RPM_BUILD_ROOT%{_datadir}/selinux/packages/%{name}/%{name}.pp
+%{__install} -d 750 $RPM_BUILD_ROOT%{_datadir}/selinux/packages/%{name}
+%{__install} -m644 selinux/%{name}.pp $RPM_BUILD_ROOT%{_datadir}/selinux/packages/%{name}/%{name}.pp
 %endif
 
 %clean
@@ -94,9 +94,14 @@ fi
 %config(noreplace) %attr(0640,root,zabbix) %{_sysconfdir}/zabbix/sensors.ini
 %config(noreplace) %attr(0640,root,zabbix) %{_sysconfdir}/zabbix/zabbix_agentd.conf.d/*
 %attr(0440,root,root) %{_sysconfdir}/sudoers.d/*
+%if ! 0%{?_without_selinux}
 %{_datadir}/selinux/packages/%{name}/%{name}.pp
+%endif
 
 %changelog
+* Thu Aug 24 2017 Daniel Berteaud <daniel@firewall-services.com> - 0.2.18-1
+- Only include SELinux policy module on el7
+
 * Wed Aug 23 2017 Daniel Berteaud <daniel@firewall-services.com> - 0.2.17-1
 - Add a SELinux policy module
 
