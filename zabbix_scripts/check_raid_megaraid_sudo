@@ -140,7 +140,7 @@ ADAPTER: for ( my $adp = 0; $adp < $adapters; $adp++ ) {
 					$size = sprintf( "%.0f", ($size / 1024) );
 					$unit= 'GB';
 				}
-			} elsif ( m/^State\s*:\s*(\w+)/ ) {
+			} elsif ( m/^State\s*:\s*(\w+(\s\w+)?)/ ) {
 				$state = $1;
 				if ( $state ne 'Optimal' ) {
 					$status = 'CRITICAL';
