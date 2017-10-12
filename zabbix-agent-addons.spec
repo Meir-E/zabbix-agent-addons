@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.18
+Version: 0.2.19
 Release: 1
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -99,6 +99,9 @@ fi
 %endif
 
 %changelog
+* Thu Oct 12 2017 Daniel Berteaud <daniel@firewall-services.com> - 0.2.19-1
+- Correctly handle Partially Degraded state
+
 * Thu Aug 24 2017 Daniel Berteaud <daniel@firewall-services.com> - 0.2.18-1
 - Only include SELinux policy module on el7
 
