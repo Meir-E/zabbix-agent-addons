@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.19
+Version: 0.2.20
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -99,6 +99,9 @@ fi
 %endif
 
 %changelog
+* Tue Nov 14 2017 Daniel Berteaud <daniel@firewall-services.com> 0.2.20-1
+- new package built with tito
+
 * Thu Oct 12 2017 Daniel Berteaud <daniel@firewall-services.com> - 0.2.19-1
 - Correctly handle Partially Degraded state
 
