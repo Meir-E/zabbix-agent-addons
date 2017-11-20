@@ -1,0 +1,46 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use JSON;
+use Getopt::Long;
+use File::Spec;
+open STDERR, '>', File::Spec->devnull() or die "could not open STDERR: $!\n";
+
+my $what = 'all';
+GetOptions(
+  "what=s" => \$what
+);
+
+my @salearn = qx(sa-learn --dump magic);
+my $data = {
+  spam  => 0,
+  ham   => 0,
+  token => 0
+};
+
+foreach my $line (@salearn){
+  if ($line =~ m/(\d+)\s*0\s*non-token\sdata:\snspam$/){
+    $data->{spam} = $1;
+  }
+  elsif ($line =~ m/(\d+)\s*0\s*non-token\sdata:\snham$/){
+    $data->{ham} = $1;
+  }
+  elsif ($line =~ m/(\d+)\s*0\s*non-token\sdata:\sntokens$/){
+    $data->{token} = $1;
+  }
+}
+
+if ($what eq 'spam'){
+  print $data->{spam} . "\n";
+}
+elsif ($what eq 'ham'){
+  print $data->{ham} . "\n";
+}
+elsif ($what eq 'token'){
+  print $data->{token} . "\n";
+}
+else{
+  print to_json($data);
+}
+exit(0);
