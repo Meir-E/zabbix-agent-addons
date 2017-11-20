@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.21
+Version: 0.2.22
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -99,6 +99,11 @@ fi
 %endif
 
 %changelog
+* Mon Nov 20 2017 Daniel Berteaud <daniel@firewall-services.com> 0.2.22-1
+- Add script to monitor spamassassin's bayes database stats (daniel@firewall-
+  services.com)
+- Symlink releasrs.conf to global's one (daniel@firewall-services.com)
+
 * Tue Nov 14 2017 Daniel Berteaud <daniel@firewall-services.com> 0.2.21-1
 - Remove now non existing CHANGELOG.git file (daniel@firewall-services.com)
 
