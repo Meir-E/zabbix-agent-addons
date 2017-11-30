@@ -25,7 +25,8 @@ unless ($status){
 }
 
 foreach my $line (split(/\n/, $status)){
-  my ($key, $val) = split(/:/, $line);
+  next unless ($line =~ m/^(\w+):\s([\.\d]+)/);
+  my ($key, $val) = ($1,$2);
   $key =~ s/\s/_/g;
   $key = lc $key;
   # Remove leading and trailing spaces
