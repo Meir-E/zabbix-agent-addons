@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.22
+Version: 0.2.23
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -99,6 +99,10 @@ fi
 %endif
 
 %changelog
+* Thu Nov 30 2017 Daniel Berteaud <daniel@firewall-services.com> 0.2.23-1
+- Check line format in check_httpd Instead of spliting errors in case server-
+  status redirect to somewhere else (daniel@firewall-services.com)
+
 * Mon Nov 20 2017 Daniel Berteaud <daniel@firewall-services.com> 0.2.22-1
 - Add script to monitor spamassassin's bayes database stats (daniel@firewall-
   services.com)
