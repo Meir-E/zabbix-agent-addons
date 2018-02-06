@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.24
+Version: 0.2.25
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -99,6 +99,9 @@ fi
 %endif
 
 %changelog
+* Tue Feb 06 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.25-1
+- Fix mdadm RAID discovery condition (daniel@firewall-services.com)
+
 * Tue Jan 09 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.24-1
 - Don't WARN when device is being checked, only when it's rebuilding
   (daniel@firewall-services.com)
