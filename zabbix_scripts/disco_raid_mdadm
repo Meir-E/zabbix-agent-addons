@@ -6,7 +6,7 @@ use JSON;
 my $json;
 @{$json->{data}} = ();
 
-if (-x '/bin/systemd-detect-virt' && system('/bin/systemd-detect-virt', '-qc') != 0){
+if (!-x '/usr/bin/systemd-detect-virt' || system('/usr/bin/systemd-detect-virt', '-qc') != 0){
   open FILE, "< /proc/mdstat" or die "Can't open /proc/mdadm : $!";
   foreach my $line (<FILE>) {
     next unless ($line =~ m/^(md\d+)+\s*:/);
