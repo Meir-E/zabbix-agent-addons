@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.25
+Version: 0.2.26
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -99,6 +99,10 @@ fi
 %endif
 
 %changelog
+* Tue Mar 06 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.26-1
+- Support space in httpd status key So total_accesses and total_kbytes are
+  available again (daniel@firewall-services.com)
+
 * Tue Feb 06 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.25-1
 - Fix mdadm RAID discovery condition (daniel@firewall-services.com)
 
