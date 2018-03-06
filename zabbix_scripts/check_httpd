@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use LWP::Simple;
 use Getopt::Long;
+use JSON;
 
 my $uri  = 'http://127.0.0.1/server-status';
 my $what = undef;
@@ -36,13 +37,16 @@ foreach my $line (split(/\n/, $status)){
   $res{$key} = $val;
 }
 
-if ($help || !$what){
+if ($help){
   print "Valid keys are:\n\n";
   print "$_\n" for keys %res;
   exit 0;
 }
 
-if (defined $res{$what}){
+if (!$what){
+  print to_json(\%res);
+}
+elsif (defined $res{$what}){
   print $res{$what};
 }
 else{
