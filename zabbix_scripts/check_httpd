@@ -7,7 +7,7 @@ use Getopt::Long;
 use JSON;
 
 my $uri  = 'http://127.0.0.1/server-status';
-my $what = undef;
+my $what = 'all';
 my $help = 0;
 
 GetOptions(
@@ -43,7 +43,7 @@ if ($help){
   exit 0;
 }
 
-if (!$what){
+if ($what eq 'all'){
   print to_json(\%res);
 }
 elsif (defined $res{$what}){
