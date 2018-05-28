@@ -12,7 +12,7 @@ my $zpool = which('zpool');
 if ($zpool){
   foreach (qx($zpool list -H -o name)){
     chomp;
-    push @{$json->{data}}, { ZPOOL => $_ };
+    push @{$json->{data}}, { '{#ZPOOL}' => $_ };
   }
 }
 print to_json($json);
