@@ -1,0 +1,18 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use JSON;
+use File::Which;
+
+my $json;
+@{$json->{data}} = ();
+my $zpool = which('zpool');
+
+if ($zpool){
+  foreach (qx($zpool list -H -o name)){
+    chomp;
+    push @{$json->{data}}, { ZPOOL => $_ };
+  }
+}
+print to_json($json);

@@ -1,0 +1,47 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use JSON;
+use File::Which;
+use Getopt::Long;
+
+my $json = {};
+my $pool = undef;
+my $what = undef;
+
+GetOptions(
+  "zpool|pool=s" => \$pool,
+  "what=s" => \$what
+);
+
+my $zpool = which('zpool');
+
+if ($what and !$pool){
+  print <<_EOF;
+Usage:
+$0 [--zpool=<name>] [--what=<item>]
+
+<name> is an optional zpool name. If specified, will only output info for this zpool.
+<item> is one of size, alloc, frag, cap, dedup, health and if specified, will only output the corresponding value
+If --what is specified then --zpool is mandatory.
+The default (with no option) is to output all the info of all the zpool in a JSON format
+_EOF
+  exit 1;
+}
+
+if ($zpool){
+  my $cmd = "$zpool list -H" . ( ($pool) ? " $pool" : "");
+  foreach (qx($cmd)){
+    #NAME    SIZE  ALLOC   FREE  EXPANDSZ   FRAG    CAP  DEDUP  HEALTH  ALTROOT
+    #rpool   464G  7.49G   457G         -     2%     1%  1.00x  ONLINE  -
+    if (m/^(?<pool>\w+)\s+(?<size>\d+(\.\d+)?)[MGT]\s+(?<alloc>\d+(\.\d+)?)[MGT]\s+.+\s+(?<frag>\d+(\.\d+)?)%\s+(?<cap>\d+(\.\d+)?)%\s+(?<dedup>\d+(\.\d+)?)x\s+(?<health>\w+)/){
+      $json->{$+{pool}}->{$_} = $+{$_} foreach (grep { $_ ne 'pool' } keys %+);
+    }
+  }
+}
+if ($what){
+  print ((defined $json->{$pool}->{$what}) ? $json->{$pool}->{$what} : 'ZBX_UNSUPORTED');
+} else{
+  print to_json($json);
+}
