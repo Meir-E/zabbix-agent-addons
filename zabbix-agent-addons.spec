@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.28
+Version: 0.2.29
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -99,6 +99,9 @@ fi
 %endif
 
 %changelog
+* Mon May 28 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.29-1
+- Add scripts to discover and check ZFS zpools (daniel@firewall-services.com)
+
 * Tue Mar 06 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.28-1
 - Use "all" key to get all httpd stats in JSON format (daniel@firewall-
   services.com)
