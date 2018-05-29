@@ -96,6 +96,8 @@ sub get_zpool_errors {
     }
     $i++;
   }
+  # Ensure evey item returns something
+  $errors->{$_} ||= '' foreach (qw(scan action status errors));
   return $errors;
 }
 
