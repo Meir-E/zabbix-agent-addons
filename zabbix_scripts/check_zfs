@@ -31,17 +31,70 @@ _EOF
 }
 
 if ($zpool){
-  my $cmd = "$zpool list -H" . ( ($pool) ? " $pool" : "");
+  my $cmd = "$zpool list -p -H" . ( ($pool) ? " $pool" : "");
   foreach (qx($cmd)){
     #NAME    SIZE  ALLOC   FREE  EXPANDSZ   FRAG    CAP  DEDUP  HEALTH  ALTROOT
     #rpool   464G  7.49G   457G         -     2%     1%  1.00x  ONLINE  -
-    if (m/^(?<pool>\w+)\s+(?<size>\d+(\.\d+)?)[MGT]\s+(?<alloc>\d+(\.\d+)?)[MGT]\s+.+\s+(?<frag>\d+(\.\d+)?)%\s+(?<cap>\d+(\.\d+)?)%\s+(?<dedup>\d+(\.\d+)?)x\s+(?<health>\w+)/){
+    if (m/^(?<pool>\w+)\s+(?<size>\d+)\s+(?<alloc>\d+)\s+(?<free>\d+)\s+.+\s+(?<frag>\d+(\.\d+)?)\s+(?<cap>\d+(\.\d+)?)\s+(?<dedup>\d+(\.\d+)?)\s+(?<health>\w+)/){
       $json->{$+{pool}}->{$_} = $+{$_} foreach (grep { $_ ne 'pool' } keys %+);
     }
+    $json->{$+{pool}}->{errors} = get_zpool_errors($+{pool});
   }
 }
 if ($what){
   print ((defined $json->{$pool}->{$what}) ? $json->{$pool}->{$what} : 'ZBX_UNSUPORTED');
-} else{
-  print to_json($json);
+} elsif ($pool){
+  print ((defined $json->{$pool}) ? to_json($json->{$pool}) : 'ZBX_UNSUPORTED');
+} else {
+  print to_json($json) . "\n";
+}
+exit 0;
+
+sub get_zpool_errors {
+  my $pool = shift;
+  my $errors = {
+    read_errors  => 0,
+    write_errors => 0,
+    cksum_errors => 0
+  };
+  my $i = 0;
+  my $index = {};
+  foreach my $line (qx($zpool status $pool)){
+    # Output looks like
+    #   pool: rpool
+    #  state: ONLINE
+    # status: One or more devices has experienced an unrecoverable error.  An
+    #         attempt was made to correct the error.  Applications are unaffected.
+    # action: Determine if the device needs to be replaced, and clear the errors
+    #         using 'zpool clear' or replace the device with 'zpool replace'.
+    #    see: http://zfsonlinux.org/msg/ZFS-8000-9P
+    #   scan: scrub repaired 0B in 0h5m with 0 errors on Tue May 29 10:04:31 2018
+    # config:
+    #
+    #         NAME        STATE     READ WRITE CKSUM
+    #          rpool       ONLINE       0     0     0
+    #            mirror-0  ONLINE       0     0     0
+    #              sda2    ONLINE       0     0     0
+    #              sdb2    ONLINE       0     0   474
+    #
+    # errors: No known data errors
+
+    # We want to save status, action, scan and errors
+    if ($line =~ m/^\s*(scan|action|status|errors):\s+(\w+.*)/){
+      $errors->{$1} = $2;
+      $index->{$i} = $1;
+    } elsif ($line !~ /:/ and defined $index->{$i-1}){
+      # Here, we reconstitute multiline values (like status and action)
+      chomp($line);
+      $line =~ s/\s+/ /g;
+      $errors->{$index->{$i-1}} .= $line;
+    } elsif ($line =~ m/\s+[a-zA-Z0-9_\-]+\s+[A-Z]+\s+(\d+)\s+(\d+)\s+(\d+)/){
+      # And here, we count the number of read, write and checksum errors
+      $errors->{read_errors}  += $1;
+      $errors->{write_errors} += $2;
+      $errors->{cksum_errors} += $3;
+    }
+    $i++;
+  }
+  return $errors;
 }
