@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.31
+Version: 0.2.32
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -99,6 +99,10 @@ fi
 %endif
 
 %changelog
+* Tue May 29 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.32-1
+- Handle situations where there's more than 1000 errors on a item in ZFS pools
+  (daniel@firewall-services.com)
+
 * Tue May 29 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.31-1
 - Various enhancements in check_zfs (daniel@firewall-services.com)
 - Fix macro name for zfs zpool discovery (daniel@firewall-services.com)
