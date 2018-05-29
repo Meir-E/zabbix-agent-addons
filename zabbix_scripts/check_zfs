@@ -88,13 +88,29 @@ sub get_zpool_errors {
       chomp($line);
       $line =~ s/\s+/ /g;
       $errors->{$index->{$i-1}} .= $line;
-    } elsif ($line =~ m/\s+[a-zA-Z0-9_\-]+\s+[A-Z]+\s+(\d+)\s+(\d+)\s+(\d+)/){
+    } elsif ($line =~ m/\s+[a-zA-Z0-9_\-]+\s+[A-Z]+\s+(?<read>\d+(\.\d+)?)(?<read_suffix>[KMT])?\s+(?<write>\d+(\.\d+)?)(?<write_suffix>[KMT])?\s+(?<cksum>\d+(\.\d+)?)(?<cksum_suffix>[KMT])?/){
       # And here, we count the number of read, write and checksum errors
-      $errors->{read_errors}  += $1;
-      $errors->{write_errors} += $2;
-      $errors->{cksum_errors} += $3;
+      $errors->{read_errors}  += convert_suffix($+{'read'},$+{'read_suffix'});
+      $errors->{write_errors} += convert_suffix($+{'write'},$+{'write_suffix'});
+      $errors->{cksum_errors} += convert_suffix($+{'cksum'},$+{'cksum_suffix'});
     }
     $i++;
   }
   return $errors;
+}
+
+# Error counter can be suffixed. Apply this suffix to get raw error numbers
+sub convert_suffix {
+  my $val = shift;
+  my $suf = shift;
+  if (!$suf){
+    return $val;
+  } elsif ($suf eq 'K'){
+    $val *= 1000;
+  } elsif ($suf eq 'M') {
+    $val *= 1000000;
+  } elsif ($suf eq 'T') {
+    $val *= 1000000000;
+  }
+  return $val;
 }
