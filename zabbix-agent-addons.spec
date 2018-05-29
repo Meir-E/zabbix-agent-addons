@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.30
+Version: 0.2.31
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -99,6 +99,10 @@ fi
 %endif
 
 %changelog
+* Tue May 29 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.31-1
+- Various enhancements in check_zfs (daniel@firewall-services.com)
+- Fix macro name for zfs zpool discovery (daniel@firewall-services.com)
+
 * Mon May 28 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.30-1
 - Rename vfs.zfs.discovery to vfs.zfs.zpool.discovery So later we'll be able to
   add other discovery rules for say, datasets (daniel@firewall-services.com)
