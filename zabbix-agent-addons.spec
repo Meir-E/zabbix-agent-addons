@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.33
+Version: 0.2.34
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -99,6 +99,9 @@ fi
 %endif
 
 %changelog
+* Wed May 30 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.34-1
+- Add stats for ZFS zpools (daniel@firewall-services.com)
+
 * Tue May 29 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.33-1
 - Ensure we always return a value for scan action status errors in check_zfs
   (daniel@firewall-services.com)
