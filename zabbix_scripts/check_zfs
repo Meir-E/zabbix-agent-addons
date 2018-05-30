@@ -9,10 +9,12 @@ use Getopt::Long;
 my $json = {};
 my $pool = undef;
 my $what = undef;
+my $pretty = 0;
 
 GetOptions(
   "zpool|pool=s" => \$pool,
-  "what=s" => \$what
+  "what=s" => \$what,
+  "pretty" => \$pretty
 );
 
 my $zpool = which('zpool');
@@ -39,15 +41,17 @@ if ($zpool){
       $json->{$+{pool}}->{$_} = $+{$_} foreach (grep { $_ ne 'pool' } keys %+);
     }
     $json->{$+{pool}}->{errors} = get_zpool_errors($+{pool});
+    $json->{$+{pool}}->{stats}  = get_zpool_stats($+{pool});
   }
 }
 if ($what){
   print ((defined $json->{$pool}->{$what}) ? $json->{$pool}->{$what} : 'ZBX_UNSUPORTED');
 } elsif ($pool){
-  print ((defined $json->{$pool}) ? to_json($json->{$pool}) : 'ZBX_UNSUPORTED');
+  print ((defined $json->{$pool}) ? to_json($json->{$pool}, { pretty => $pretty }) : 'ZBX_UNSUPORTED');
 } else {
-  print to_json($json) . "\n";
+  print to_json($json, { pretty => $pretty });
 }
+print "\n";
 exit 0;
 
 sub get_zpool_errors {
@@ -115,4 +119,18 @@ sub convert_suffix {
     $val *= 1000000000;
   }
   return $val;
+}
+
+sub get_zpool_stats {
+  my $pool = shift;
+  my $stats = {};
+  return $stats unless (-e "/proc/spl/kstat/zfs/rpool/io");
+  open STAT, "</proc/spl/kstat/zfs/rpool/io";
+  while (<STAT>){
+    if (m/^(?<nread>\d+)\s+(?<nwritten>\d+)\s+(?<reads>\d+)\s+(?<writes>\d+)\s+(?<wtime>\d+)\s+(?<wlentime>\d+)\s+(?<wupdate>\d+)\s+(?<rtime>\d+)\s+(?<rlentime>\d+)\s+(?<rupdate>\d+)\s+(?<wcnt>\d+)\s+(?<rcnt>\d+)/){
+      $stats->{$_} = $+{$_} foreach (keys %+);
+    }
+  }
+  close STAT;
+  return $stats;
 }
