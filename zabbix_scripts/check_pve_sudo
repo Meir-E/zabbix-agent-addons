@@ -1,0 +1,62 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use JSON;
+use Getopt::Long;
+use File::Which;
+use Data::Dumper;
+
+my $pvesh = which('pvesh');
+my $json;
+my $pretty = 0;
+my ($cluster,$guest,$node,$storage,$pool) = undef;
+
+GetOptions(
+  'cluster'   => \$cluster,
+  'guest=i'   => \$guest,
+  'node=s'    => \$node,
+  'storage=s' => \$storage,
+  'pool=s'    => \$pool,
+  'pretty'    => \$pretty
+);
+
+if ($cluster){
+  my $cluster = from_json(qx($pvesh get /cluster/status 2>/dev/null));
+  foreach my $item (@{$cluster}){
+    if ($item->{type} eq 'cluster'){
+      $json->{$_} = $item->{$_} foreach (qw(quorate nodes name version));
+      last;
+    }
+  }
+} elsif ($node){
+  foreach my $item (qw(status version subscription)){
+    $json->{$item} = from_json(qx(pvesh get /nodes/$node/$item 2>/dev/null));
+  }
+} elsif ($guest){
+  my $guests = from_json(qx($pvesh get /cluster/resources --type=vm 2>/dev/null));
+  foreach my $g (@{$guests}){
+    if ($g->{vmid} eq $guest){
+      $json = from_json(qx($pvesh get /nodes/$g->{node}/$g->{type}/$guest/status/current 2>/dev/null));
+      last;
+    }
+  } 
+} elsif ($pool){
+  my $pool = from_json(qx($pvesh get /pools/$pool 2>/dev/null));
+  $json->{comment} = $pool->{comment};
+  foreach my $type (qw(qemu lxc)){
+    $json->{$_}->{$type} = 0 foreach (qw(guests templates));
+  }
+  foreach my $item (@{$pool->{members}}){
+    if ($item->{type} =~ m/^(qemu|lxc)$/ and !$item->{template}){
+      $json->{guests}->{$_} += $item->{$_} foreach (qw(cpu maxcpu diskread diskwrite maxdisk mem maxmem netin netout));
+      $json->{guests}->{$item->{type}}++;
+    }
+    if ($item->{type} =~ m/^(qemu|lxc)$/ and $item->{template}){
+      $json->{templates}->{$_} += $item->{$_} foreach (qw(maxdisk));
+      $json->{templates}->{$item->{type}}++;
+    }
+  }
+}
+
+print to_json($json, { pretty => $pretty }) . "\n";

@@ -1,0 +1,69 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use JSON;
+use Getopt::Long;
+use File::Which;
+
+my $what = 'nodes';
+my $pretty = 0;
+
+GetOptions(
+  'what=s' => \$what,
+  'pretty' => \$pretty
+);
+
+my $pvesh = which('pvesh');
+my $json = {};
+@{$json->{data}} = ();
+
+unless($pvesh){
+  print to_json($json) . "\n";
+  exit 0;
+}
+
+if ($what eq 'nodes'){
+  my $cluster_status = from_json(qx($pvesh get /cluster/status 2>/dev/null));
+  foreach my $item (@{$cluster_status}){
+    next unless ($item->{type} eq 'node');
+    push @{$json->{data}}, {
+      '{#PVE_NODE_NAME}'  => $item->{name},
+      '{#PVE_NODE_IP}'    => $item->{ip},
+      '{#PVE_NODE_ID}'    => $item->{nodeid},
+      '{#PVE_NODE_LOCAL}' => $item->{local}
+    };
+  }
+} elsif ($what eq 'guests'){
+  my $guests = from_json(qx($pvesh get /cluster/resources --type=vm 2>/dev/null));
+  foreach my $guest (@{$guests}){
+    push @{$json->{data}}, {
+      '{#PVE_GUEST_ID}'       => $guest->{vmid},
+      '{#PVE_GUEST_NODE}'     => $guest->{node},
+      '{#PVE_GUEST_TYPE}'     => $guest->{type},
+      '{#PVE_GUEST_NAME}'     => $guest->{name},
+      '{#PVE_GUEST_TEMPLATE}' => $guest->{template}
+    };
+  }
+} elsif ($what eq 'storage'){
+  my $stores = from_json(qx($pvesh get /storage 2>/dev/null));
+  foreach my $store (@{$stores}){
+    push @{$json->{data}}, {
+      '{#PVE_STOR_ID}'      => $store->{storage},
+      '{#PVE_STOR_TYPE}'    => $store->{type},
+      '{#PVE_STOR_STATUS}'  => ($store->{disabled} || 0),
+      '{#PVE_STOR_SHARED}'  => ($store->{shared} || 0),
+      '{#PVE_STOR_CONTENT}' => $store->{content}
+    };
+  }
+} elsif ($what eq 'pools'){
+  my $pools = from_json(qx($pvesh get /pools 2>/dev/null));
+  foreach my $pool (@{$pools}){
+    push @{$json->{data}}, {
+      '{#PVE_POOL_ID}'   => $pool->{poolid},
+      '{#PVE_POOL_DESC}' => $pool->{comment}
+    };
+  }
+}
+
+print to_json($json, { pretty => $pretty }) . "\n";
