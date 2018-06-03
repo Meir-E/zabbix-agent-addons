@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.34
+Version: 0.2.35
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -99,6 +99,10 @@ fi
 %endif
 
 %changelog
+* Sun Jun 03 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.35-1
+- Enhance PVE scripts and conf (daniel@firewall-services.com)
+- Add basic scripts for PVE monitoring (daniel@firewall-services.com)
+
 * Wed May 30 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.34-1
 - Add stats for ZFS zpools (daniel@firewall-services.com)
 
