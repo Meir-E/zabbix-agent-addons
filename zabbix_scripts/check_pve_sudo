@@ -37,7 +37,7 @@ if ($cluster){
   my $guests = from_json(qx($pvesh get /cluster/resources --type=vm 2>/dev/null));
   foreach my $g (@{$guests}){
     if ($g->{vmid} eq $guest){
-      $json = from_json(qx($pvesh get /nodes/$g->{node}/$g->{type}/$guest/status/current 2>/dev/null));
+      $json = $g;
       last;
     }
   } 
@@ -57,6 +57,21 @@ if ($cluster){
       $json->{templates}->{$item->{type}}++;
     }
   }
+  $json->{guests}->{$_} //= 0 foreach (qw(cpu maxcpu diskread diskwrite maxdisk mem maxmem netin netout));
+  $json->{templates}->{$_} //= 0 foreach (qw(maxdisk));
+} elsif ($storage){
+  $json = from_json(qx($pvesh get /storage/$storage 2>/dev/null));
+  my $stores = from_json(qx($pvesh get /cluster/resources --type=storage 2>/dev/null));
+  foreach my $s (@{$stores}){
+    if ($s->{storage} eq $storage){
+      $json->{maxdisk} = $s->{maxdisk};
+      $json->{disk}    = $s->{disk};
+      last;
+    }
+  }
+} else{
+  print 'ZBX_UNSUPORTED';
+  exit 0;
 }
 
 print to_json($json, { pretty => $pretty }) . "\n";
