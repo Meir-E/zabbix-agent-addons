@@ -28,8 +28,9 @@ if ($cluster){
   foreach my $item (@{$cluster}){
     if ($item->{type} eq 'cluster'){
       $json->{status}->{$_} = $item->{$_} foreach (qw(quorate nodes name version));
-    } elsif ($item->{type} eq 'node'){
+    } elsif ($item->{type} eq 'node' and $item->{online}){
       push @nodes, $item->{name};
+    } elsif ($item->{type} eq 'node'){
       $json->{status}->{all_online} = 0 unless ($item->{online});
     }
   }
