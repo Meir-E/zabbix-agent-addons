@@ -51,7 +51,7 @@ if ($what eq 'nodes'){
     push @{$json->{data}}, {
       '{#PVE_STOR_ID}'      => $store->{storage},
       '{#PVE_STOR_TYPE}'    => $store->{type},
-      '{#PVE_STOR_STATUS}'  => ($store->{disabled} || 0),
+      '{#PVE_STOR_STATUS}'  => (($store->{disable}) ? 0 : 1),
       '{#PVE_STOR_SHARED}'  => ($store->{shared} || 0),
       '{#PVE_STOR_CONTENT}' => $store->{content}
     };
