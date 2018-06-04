@@ -31,7 +31,7 @@ if ($cluster){
     } elsif ($item->{type} eq 'node' and $item->{online}){
       push @nodes, $item->{name};
     } elsif ($item->{type} eq 'node'){
-      $json->{status}->{all_online} = 0 unless ($item->{online});
+      $json->{status}->{all_online} = 0;
     }
   }
   foreach my $node (@nodes){
