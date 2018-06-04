@@ -23,12 +23,27 @@ GetOptions(
 
 if ($cluster){
   my $cluster = from_json(qx($pvesh get /cluster/status 2>/dev/null));
+  $json->{status}->{all_online} = 1;
+  my @nodes = ();
   foreach my $item (@{$cluster}){
     if ($item->{type} eq 'cluster'){
-      $json->{$_} = $item->{$_} foreach (qw(quorate nodes name version));
-      last;
+      $json->{status}->{$_} = $item->{$_} foreach (qw(quorate nodes name version));
+    } elsif ($item->{type} eq 'node'){
+      push @nodes, $item->{name};
+      $json->{status}->{all_online} = 0 unless ($item->{online});
     }
   }
+  foreach my $node (@nodes){
+    my $n = from_json(qx($pvesh get /nodes/$node/status 2>/dev/null));
+    # Here we gather (and sum) some info about individual nodes to get the total number of
+    # CPU, the amount of memory etc...
+    $json->{memory}->{$_}  += $n->{memory}->{$_}  foreach(qw(free total used));
+    $json->{ksm}->{$_}     += $n->{ksm}->{$_}     foreach (qw(shared));
+    $json->{cpuinfo}->{$_} += $n->{cpuinfo}->{$_} foreach (qw(cpus sockets));
+    $json->{loadavg}[$_]   += $n->{loadavg}[$_]   foreach (0..2);
+  }
+  # We want average load avg of the cluster, not the sum of individual loads
+  $json->{loadavg}[$_] = sprintf "%.2f", $json->{loadavg}[$_] / $json->{status}->{nodes} foreach (0..2);
 } elsif ($node){
   foreach my $item (qw(status version subscription)){
     $json->{$item} = from_json(qx(pvesh get /nodes/$node/$item 2>/dev/null));
