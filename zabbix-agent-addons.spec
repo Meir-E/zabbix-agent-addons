@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.35
+Version: 0.2.36
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -99,6 +99,12 @@ fi
 %endif
 
 %changelog
+* Tue Jun 05 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.36-1
+- Remove redundant condition (daniel@firewall-services.com)
+- Fix {#PVE_STOR_STATUS} macro (daniel@firewall-services.com)
+- Only gather info about online nodes (daniel@firewall-services.com)
+- Add some global cluster stats for PVE (daniel@firewall-services.com)
+
 * Sun Jun 03 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.35-1
 - Enhance PVE scripts and conf (daniel@firewall-services.com)
 - Add basic scripts for PVE monitoring (daniel@firewall-services.com)
