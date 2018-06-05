@@ -23,7 +23,14 @@ GetOptions(
 
 if ($cluster){
   my $cluster = from_json(qx($pvesh get /cluster/status 2>/dev/null));
-  $json->{status}->{all_online} = 1;
+  # Set default values so monitoring works for single node, without cluster setup
+  $json->{status} = {
+    all_online => 1,
+    quorate    => 1,
+    nodes      => 1,
+    name       => 'default',
+    version    => 1
+  };
   my @nodes = ();
   foreach my $item (@{$cluster}){
     if ($item->{type} eq 'cluster'){
