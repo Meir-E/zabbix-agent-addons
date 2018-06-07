@@ -31,6 +31,15 @@ if ($cluster){
     name       => 'default',
     version    => 1
   };
+  # Set default global stats
+  $json->{network} = {
+    in  => 0,
+    out => 0
+  };
+  $json->{disk} = {
+    read  => 0,
+    write => 0
+  };
   my @nodes = ();
   foreach my $item (@{$cluster}){
     if ($item->{type} eq 'cluster'){
@@ -52,6 +61,14 @@ if ($cluster){
   }
   # We want average load avg of the cluster, not the sum of individual loads
   $json->{loadavg}[$_] = sprintf "%.2f", $json->{loadavg}[$_] / $json->{status}->{nodes} foreach (0..2);
+
+  my $guests = from_json(qx($pvesh get /cluster/resources --type=vm 2>/dev/null));
+  foreach my $guest (@{$guests}){
+    $json->{network}->{in}  += $guest->{netin};
+    $json->{network}->{out} += $guest->{netout};
+    $json->{disk}->{read}   += $guest->{diskread};
+    $json->{disk}->{write}  += $guest->{diskwrite};
+  }
 } elsif ($node){
   foreach my $item (qw(status version subscription)){
     $json->{$item} = from_json(qx(pvesh get /nodes/$node/$item 2>/dev/null));
