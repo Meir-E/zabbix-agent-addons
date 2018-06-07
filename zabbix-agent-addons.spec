@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.37
+Version: 0.2.38
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -99,6 +99,10 @@ fi
 %endif
 
 %changelog
+* Thu Jun 07 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.38-1
+- Add global net and disk stats for the cluster in check_pve_sudo
+  (daniel@firewall-services.com)
+
 * Tue Jun 05 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.37-1
 - Fix check_pve_sudo for single node monitoring (daniel@firewall-services.com)
 
