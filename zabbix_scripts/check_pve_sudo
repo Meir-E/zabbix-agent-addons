@@ -89,7 +89,8 @@ if ($cluster){
   }
   foreach my $item (@{$pool->{members}}){
     if ($item->{type} =~ m/^(qemu|lxc)$/ and !$item->{template}){
-      $json->{guests}->{$_} += $item->{$_} foreach (qw(cpu maxcpu diskread diskwrite maxdisk mem maxmem netin netout));
+      $json->{guests}->{$_} += $item->{$_} foreach (qw(maxcpu diskread diskwrite maxdisk mem maxmem netin netout));
+      $json->{guests}->{used_cpu} += $item->{cpu} * $item->{maxcpu};
       $json->{guests}->{$item->{type}}++;
     }
     if ($item->{type} =~ m/^(qemu|lxc)$/ and $item->{template}){
@@ -97,8 +98,9 @@ if ($cluster){
       $json->{templates}->{$item->{type}}++;
     }
   }
-  $json->{guests}->{$_} //= 0 foreach (qw(cpu maxcpu diskread diskwrite maxdisk mem maxmem netin netout));
+  $json->{guests}->{$_}    //= 0 foreach (qw(cpu maxcpu diskread diskwrite maxdisk mem maxmem netin netout));
   $json->{templates}->{$_} //= 0 foreach (qw(maxdisk));
+  $json->{guests}->{cpu} = ($json->{guests}->{maxcpu} == 0) ? 0 : $json->{guests}->{used_cpu} / $json->{guests}->{maxcpu};
 } elsif ($storage){
   $json = from_json(qx($pvesh get /storage/$storage 2>/dev/null));
   my $stores = from_json(qx($pvesh get /cluster/resources --type=storage 2>/dev/null));
