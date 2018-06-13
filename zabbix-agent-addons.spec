@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.38
+Version: 0.2.39
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -99,6 +99,9 @@ fi
 %endif
 
 %changelog
+* Wed Jun 13 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.39-1
+- Fix computing pool CPU usage in check_pve (daniel@firewall-services.com)
+
 * Thu Jun 07 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.38-1
 - Add global net and disk stats for the cluster in check_pve_sudo
   (daniel@firewall-services.com)
