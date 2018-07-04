@@ -124,8 +124,8 @@ sub convert_suffix {
 sub get_zpool_stats {
   my $pool = shift;
   my $stats = {};
-  return $stats unless (-e "/proc/spl/kstat/zfs/rpool/io");
-  open STAT, "</proc/spl/kstat/zfs/rpool/io";
+  return $stats unless (-e "/proc/spl/kstat/zfs/$pool/io");
+  open STAT, "</proc/spl/kstat/zfs/$pool/io";
   while (<STAT>){
     if (m/^(?<nread>\d+)\s+(?<nwritten>\d+)\s+(?<reads>\d+)\s+(?<writes>\d+)\s+(?<wtime>\d+)\s+(?<wlentime>\d+)\s+(?<wupdate>\d+)\s+(?<rtime>\d+)\s+(?<rlentime>\d+)\s+(?<rupdate>\d+)\s+(?<wcnt>\d+)\s+(?<rcnt>\d+)/){
       $stats->{$_} = $+{$_} foreach (keys %+);
