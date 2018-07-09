@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.40
+Version: 0.2.41
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -99,6 +99,9 @@ fi
 %endif
 
 %changelog
+* Mon Jul 09 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.41-1
+- Don't log sudo usage for Zabbix (daniel@firewall-services.com)
+
 * Wed Jul 04 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.40-1
 - Fix ZFS pool stats retrieval (daniel@firewall-services.com)
 
