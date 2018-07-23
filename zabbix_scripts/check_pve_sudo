@@ -8,7 +8,7 @@ use File::Which;
 use Data::Dumper;
 
 my $pvesh = which('pvesh');
-my $json;
+my $json = {};
 my $pretty = 0;
 my ($cluster,$guest,$node,$storage,$pool) = undef;
 
