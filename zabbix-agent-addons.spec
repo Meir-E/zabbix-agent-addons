@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.42
+Version: 0.2.43
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -99,6 +99,9 @@ fi
 %endif
 
 %changelog
+* Tue Aug 21 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.43-1
+- Fix PVE scripts to Work with new pvesh version (daniel@firewall-services.com)
+
 * Mon Jul 23 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.42-1
 - Initialize an empty json object (daniel@firewall-services.com)
 
