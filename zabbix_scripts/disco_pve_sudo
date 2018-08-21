@@ -23,8 +23,11 @@ unless($pvesh){
   exit 0;
 }
 
+# Are we using the new pvesh for which we have to specify the output format ?
+my $pvesh_opt = (system("$pvesh get /version --output-format=json >/dev/null 2>&1") == 0) ? '--output-format=json' : '';
+
 if ($what eq 'nodes'){
-  my $cluster_status = from_json(qx($pvesh get /cluster/status 2>/dev/null));
+  my $cluster_status = from_json(qx($pvesh get /cluster/status $pvesh_opt 2>/dev/null));
   foreach my $item (@{$cluster_status}){
     next unless ($item->{type} eq 'node');
     push @{$json->{data}}, {
@@ -35,7 +38,7 @@ if ($what eq 'nodes'){
     };
   }
 } elsif ($what eq 'guests'){
-  my $guests = from_json(qx($pvesh get /cluster/resources --type=vm 2>/dev/null));
+  my $guests = from_json(qx($pvesh get /cluster/resources --type=vm $pvesh_opt 2>/dev/null));
   foreach my $guest (@{$guests}){
     push @{$json->{data}}, {
       '{#PVE_GUEST_ID}'       => $guest->{vmid},
@@ -46,7 +49,7 @@ if ($what eq 'nodes'){
     };
   }
 } elsif ($what eq 'storage'){
-  my $stores = from_json(qx($pvesh get /storage 2>/dev/null));
+  my $stores = from_json(qx($pvesh get /storage $pvesh_opt 2>/dev/null));
   foreach my $store (@{$stores}){
     push @{$json->{data}}, {
       '{#PVE_STOR_ID}'      => $store->{storage},
@@ -57,7 +60,7 @@ if ($what eq 'nodes'){
     };
   }
 } elsif ($what eq 'pools'){
-  my $pools = from_json(qx($pvesh get /pools 2>/dev/null));
+  my $pools = from_json(qx($pvesh get /pools $pvesh_opt 2>/dev/null));
   foreach my $pool (@{$pools}){
     push @{$json->{data}}, {
       '{#PVE_POOL_ID}'   => $pool->{poolid},

@@ -21,8 +21,11 @@ GetOptions(
   'pretty'    => \$pretty
 );
 
+# Are we using the new pvesh for which we have to specify the output format ?
+my $pvesh_opt = (system("$pvesh get /version --output-format=json >/dev/null 2>&1") == 0) ? '--output-format=json' : '';
+
 if ($cluster){
-  my $cluster = from_json(qx($pvesh get /cluster/status 2>/dev/null));
+  my $cluster = from_json(qx($pvesh get /cluster/status $pvesh_opt 2>/dev/null));
   # Set default values so monitoring works for single node, without cluster setup
   $json->{status} = {
     all_online => 1,
@@ -51,7 +54,7 @@ if ($cluster){
     }
   }
   foreach my $node (@nodes){
-    my $n = from_json(qx($pvesh get /nodes/$node/status 2>/dev/null));
+    my $n = from_json(qx($pvesh get /nodes/$node/status $pvesh_opt 2>/dev/null));
     # Here we gather (and sum) some info about individual nodes to get the total number of
     # CPU, the amount of memory etc...
     $json->{memory}->{$_}  += $n->{memory}->{$_}  foreach(qw(free total used));
@@ -62,7 +65,7 @@ if ($cluster){
   # We want average load avg of the cluster, not the sum of individual loads
   $json->{loadavg}[$_] = sprintf "%.2f", $json->{loadavg}[$_] / $json->{status}->{nodes} foreach (0..2);
 
-  my $guests = from_json(qx($pvesh get /cluster/resources --type=vm 2>/dev/null));
+  my $guests = from_json(qx($pvesh get /cluster/resources --type=vm $pvesh_opt 2>/dev/null));
   foreach my $guest (@{$guests}){
     $json->{network}->{in}  += $guest->{netin};
     $json->{network}->{out} += $guest->{netout};
@@ -71,10 +74,10 @@ if ($cluster){
   }
 } elsif ($node){
   foreach my $item (qw(status version subscription)){
-    $json->{$item} = from_json(qx(pvesh get /nodes/$node/$item 2>/dev/null));
+    $json->{$item} = from_json(qx(pvesh get /nodes/$node/$item $pvesh_opt 2>/dev/null));
   }
 } elsif ($guest){
-  my $guests = from_json(qx($pvesh get /cluster/resources --type=vm 2>/dev/null));
+  my $guests = from_json(qx($pvesh get /cluster/resources --type=vm $pvesh_opt 2>/dev/null));
   foreach my $g (@{$guests}){
     if ($g->{vmid} eq $guest){
       $json = $g;
@@ -82,7 +85,7 @@ if ($cluster){
     }
   } 
 } elsif ($pool){
-  my $pool = from_json(qx($pvesh get /pools/$pool 2>/dev/null));
+  my $pool = from_json(qx($pvesh get /pools/$pool $pvesh_opt 2>/dev/null));
   $json->{comment} = $pool->{comment};
   foreach my $type (qw(qemu lxc)){
     $json->{$_}->{$type} = 0 foreach (qw(guests templates));
@@ -103,7 +106,7 @@ if ($cluster){
   $json->{guests}->{cpu} = ($json->{guests}->{maxcpu} == 0) ? 0 : $json->{guests}->{used_cpu} / $json->{guests}->{maxcpu};
 } elsif ($storage){
   $json = from_json(qx($pvesh get /storage/$storage 2>/dev/null));
-  my $stores = from_json(qx($pvesh get /cluster/resources --type=storage 2>/dev/null));
+  my $stores = from_json(qx($pvesh get /cluster/resources --type=storage $pvesh_opt 2>/dev/null));
   foreach my $s (@{$stores}){
     if ($s->{storage} eq $storage){
       $json->{maxdisk} = $s->{maxdisk};
