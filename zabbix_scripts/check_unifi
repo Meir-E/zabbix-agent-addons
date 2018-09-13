@@ -73,7 +73,7 @@ if ($unifi){
       $json->{wired_guests}  = $entry->{num_guest};
     }
     foreach (qw/adopted pending disabled/){
-      $json->{'dev_' . $_} += $entry->{'num_' . $_} if ($entry->{'num_' . $_});
+      $json->{'dev_' . $_} += $entry->{'num_' . $_} if (defined $entry->{'num_' . $_});
     }
     foreach (qw/num_ap num_sw num_gw/){
       $json->{$_} += $entry->{$_} if ($entry->{$_});
@@ -95,21 +95,21 @@ if ($unifi){
   foreach (qw/sys_stats locating serial name num_sta user-num_sta
               guest-num_sta inform_url version model state type
               cfgversion adopted avg_client_signal/){
-    $json->{$_} = $obj->{$_} if ($obj->{$_});
+    $json->{$_} = $obj->{$_} if (defined $obj->{$_});
   }
   foreach (qw/guest-rx_packets guest-tx_packets guest-rx_bytes
               guest-tx_bytes user-rx_packets user-tx_packets
               user-rx_bytes user-tx_bytes rx_packets tx_packets
               rx_bytes tx_bytes rx_errors tx_errors
               rx_dropped tx_dropped/){
-    $json->{net_stats}->{$_} = $obj->{stat}->{$_} if ($obj->{stat}->{$_});
+    $json->{net_stats}->{$_} = $obj->{stat}->{$_} if (defined $obj->{stat}->{$_});
   }
   # Convert last seen into a relative time
   $json->{last_seen} = time - $obj->{last_seen};
   # Add some more info in sys_stats
   $json->{sys_stats}->{$_} = $obj->{'system-stats'}->{$_} foreach (qw/cpu mem uptime/);
   # Count the number of SSID served
-  $json->{num_wlan} = scalar @{$obj->{radio_table}} if ($obj->{radio_table});
+  $json->{num_wlan} = scalar @{$obj->{radio_table}} if (defined $obj->{radio_table});
 } elsif ($client) {
   
 } elsif ($wlan) {
