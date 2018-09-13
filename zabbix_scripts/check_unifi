@@ -1,0 +1,155 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use JSON;
+use Getopt::Long;
+use LWP::UserAgent;
+use Data::Dumper;
+
+my $user   = 'zabbix';
+my $pass   = 'secret';
+my $site   = 'default';
+my $url    = 'https://localhost:8443';
+my $unifi;
+my $dev;
+my $client;
+my $net;
+my $wlan;
+my $pretty = 0;
+
+my $json = {};
+my $site_id;
+
+GetOptions (
+  'user=s'       => \$user,
+  'password|p=s' => \$pass,
+  'site=s'       => \$site,
+  'url=s'        => \$url,
+  'unifi'        => \$unifi,
+  'dev=s'        => \$dev,
+  'client=s'     => \$client,
+  'net=s'        => \$net,
+  'wlan=s'       => \$wlan,
+  'pretty'       => \$pretty
+);
+
+# Log into the API
+my $resp;
+my $ua = LWP::UserAgent->new(
+  ssl_opts => { verify_hostname => 0 },
+  cookie_jar => {}
+);
+$resp = $ua->post(
+  $url . '/api/login',
+  Content => to_json({ username => $user, password => $pass }),
+  Content_Type => 'application/json;charset=UTF-8'
+);
+die "Login failed: " . $resp->message . "\n" if $resp->is_error;
+
+# Now, we need to get the site ID
+$resp = $ua->get($url . '/api/self/sites');
+die $resp->message . "\n" if $resp->is_error;
+foreach (@{from_json($resp->decoded_content)->{data}}){
+  if ($_->{name} eq $site || $_->{desc} eq $site){
+    $site_id = $_->{_id};
+    # If site is referenced by description, translate it to name
+    $site = $_->{name} if ($_->{name} ne $site);
+    last;
+  }
+}
+die "Site $site not found\n" unless ($site_id);
+
+# Global info about the instance of Unifi
+if ($unifi){
+  $resp = $ua->get($url . '/api/s/' . $site . '/stat/health');
+  die $resp->message . "\n" if $resp->is_error;
+  foreach my $entry (@{from_json($resp->decoded_content)->{data}}){
+    if ($entry->{subsystem} eq 'wlan'){
+      $json->{wireless_clients} = $entry->{num_user};
+      $json->{wireless_guests}  = $entry->{num_guest};
+    } elsif ($entry->{subsystem} eq 'lan'){
+      $json->{wired_clients} = $entry->{num_user};
+      $json->{wired_guests}  = $entry->{num_guest};
+    }
+    foreach (qw/adopted pending disabled/){
+      $json->{'dev_' . $_} += $entry->{'num_' . $_} if ($entry->{'num_' . $_});
+    }
+    foreach (qw/num_ap num_sw num_gw/){
+      $json->{$_} += $entry->{$_} if ($entry->{$_});
+    }
+  }
+  $json->{$_} ||= 0 foreach (qw/wireless_clients wireless_guests
+                                wired_clients wired_guests dev_adopted
+                                dev_pending dev_disabled num_ap num_sw
+                                num_gw/);
+  $resp = $ua->get($url . '/api/s/' . $site . '/stat/sysinfo');
+  die $resp->message . "\n" if $resp->is_error;
+  $json->{$_} = from_json($resp->decoded_content)->{data}->[0]->{$_}
+    foreach (qw/version build update_available/);
+
+} elsif ($dev) {
+  $resp = $ua->get($url . '/api/s/' . $site . '/stat/device/' . $dev);
+  die $resp->message . "\n" if $resp->is_error;
+  my $obj = from_json($resp->decoded_content)->{data}->[0];
+  foreach (qw/sys_stats locating serial name num_sta user-num_sta
+              guest-num_sta inform_url version model state type
+              cfgversion adopted avg_client_signal/){
+    $json->{$_} = $obj->{$_} if ($obj->{$_});
+  }
+  foreach (qw/guest-rx_packets guest-tx_packets guest-rx_bytes
+              guest-tx_bytes user-rx_packets user-tx_packets
+              user-rx_bytes user-tx_bytes rx_packets tx_packets
+              rx_bytes tx_bytes rx_errors tx_errors
+              rx_dropped tx_dropped/){
+    $json->{net_stats}->{$_} = $obj->{stat}->{$_} if ($obj->{stat}->{$_});
+  }
+  # Convert last seen into a relative time
+  $json->{last_seen} = time - $obj->{last_seen};
+  # Add some more info in sys_stats
+  $json->{sys_stats}->{$_} = $obj->{'system-stats'}->{$_} foreach (qw/cpu mem uptime/);
+  # Count the number of SSID served
+  $json->{num_wlan} = scalar @{$obj->{radio_table}} if ($obj->{radio_table});
+} elsif ($client) {
+  
+} elsif ($wlan) {
+  $resp = $ua->get($url . '/api/s/' . $site . '/rest/wlanconf/' . $wlan);
+  die $resp->message . "\n" if $resp->is_error;
+  my $obj = from_json($resp->decoded_content)->{data}->[0];
+  foreach (qw/name enabled is_guest mac_filter_enabled security
+              mac_filter_policy vlan vlan_enabled/){
+    $json->{$_} = $obj->{$_};
+  }
+
+  # Now, we need to count stations for each SSID
+  $resp = $ua->get($url . '/api/s/' . $site . '/stat/sta');
+  die $resp->message . "\n" if $resp->is_error;
+  $json->{$_} = 0 foreach (qw/avg_rx_rate_ac avg_tx_rate_ac avg_rx_rate_ng
+                              avg_tx_rate_ng num_sta num_sta_ac num_sta_ng/);
+  foreach my $entry (@{from_json($resp->decoded_content)->{data}}){
+    next if (not $entry->{essid} or $entry->{essid} ne $json->{name} or $entry->{is_wired} == JSON::PP::true);
+    $json->{num_sta}++;
+    if ($entry->{radio_proto} eq 'ac'){
+      $json->{num_sta_ac}++;
+      $json->{avg_rx_rate_ac} += $entry->{rx_rate};
+      $json->{avg_tx_rate_ac} += $entry->{tx_rate};
+    } elsif ($entry->{radio_proto} eq 'ng'){
+      $json->{num_sta_ng}++;
+      $json->{avg_rx_rate_ng} += $entry->{rx_rate};
+      $json->{avg_tx_rate_ng} += $entry->{tx_rate};
+    }
+    $json->{$_} += $entry->{$_} foreach (qw/rx_bytes tx_bytes rx_packets tx_packets/);
+    $json->{'avg_' . $_} += $entry->{$_} foreach (qw/satisfaction tx_power signal noise/);
+  }
+  # Now lets compute average values
+  $json->{'avg_' . $_} = ($json->{num_sta} == 0) ? 0 : $json->{'avg_' . $_} / $json->{num_sta}
+                                                foreach (qw/satisfaction tx_power signal noise/);
+  $json->{$_} = ($json->{num_sta_ac} == 0) ? 0 : $json->{$_} / $json->{num_sta_ac}
+                                                foreach (qw/avg_rx_rate_ac avg_tx_rate_ac/);
+  $json->{$_} = ($json->{num_sta_ng} == 0) ? 0 : $json->{$_} / $json->{num_sta_ng}
+                                                foreach (qw/avg_rx_rate_ng avg_tx_rate_ng/);
+}
+
+# TODO: convert JSON bool to 0/1
+
+print to_json($json, { pretty => $pretty });

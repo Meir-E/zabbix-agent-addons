@@ -1,0 +1,112 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use JSON;
+use Getopt::Long;
+use LWP::UserAgent;
+use Data::Dumper;
+
+my $user   = 'zabbix';
+my $pass   = 'secret';
+my $site   = 'default';
+my $url    = 'https://localhost:8443';
+my $what   = 'devices';
+my $type   = 'all';
+my $pretty = 0;
+
+my $json = {};
+@{$json->{data}} = ();
+
+GetOptions (
+  'user=s'       => \$user,
+  'password|p=s' => \$pass,
+  'site=s'       => \$site,
+  'url=s'        => \$url,
+  'what=s'       => \$what,
+  'type:s'       => \$type,
+  'pretty'       => \$pretty
+);
+
+# An empty type is the same as all
+$type = 'all' if ($type eq '');
+my $site_id;
+my $resp;
+my $ua = LWP::UserAgent->new(
+  ssl_opts => { verify_hostname => 0 },
+  cookie_jar => {}
+);
+
+# Login on the API
+$resp = $ua->post(
+  $url . '/api/login',
+  Content => to_json({ username => $user, password => $pass }),
+  Content_Type => 'application/json;charset=UTF-8'
+);
+die "Login failed: " . $resp->message . "\n" if $resp->is_error;
+# Now, we need to get the site ID
+$resp = $ua->get($url . '/api/self/sites');
+die $resp->message . "\n" if $resp->is_error;
+foreach (@{from_json($resp->decoded_content)->{data}}){
+  if ($_->{name} eq $site || $_->{desc} eq $site){
+    $site_id = $_->{_id};
+    # If site is referenced by description, translate it to name
+    $site = $_->{name} if ($_->{name} ne $site);
+    last;
+  }
+}
+die "Site $site not found\n" unless ($site_id);
+
+if ($what eq 'devices'){
+  $resp = $ua->get($url . '/api/s/' . $site . '/stat/device');
+  die $resp->message . "\n" if $resp->is_error;
+  foreach my $entry (@{from_json($resp->decoded_content)->{data}}){
+    next if ($type ne 'all' && $entry->{type} ne $type);
+    push @{$json->{data}}, {
+      '{#UNIFI_DEV_ID}'      => $entry->{device_id},
+      '{#UNIFI_DEV_ADOPTED}' => $entry->{adopted},
+      '{#UNIFI_DEV_MODEL}'   => $entry->{model},
+      '{#UNIFI_DEV_NAME}'    => $entry->{name},
+      '{#UNIFI_DEV_MAC}'     => $entry->{mac},
+      '{#UNIFI_DEV_TYPE}'    => $entry->{type}
+    };
+  }
+} elsif ($what eq 'clients'){
+  $resp = $ua->get($url . '/api/s/' . $site . '/stat/alluser');
+  die $resp->message . "\n" if $resp->is_error;
+  foreach my $entry (@{from_json($resp->decoded_content)->{data}}){
+    # Ignore other sites
+    next if ($entry->{site_id} ne $site_id);
+    # Ignore clients not seen since more than 30 days
+    next if (time - $entry->{last_seen} > 2592000);
+    next if ($type eq 'wireless' and $entry->{is_wired} eq 'true');
+    next if ($type eq 'wired' and $entry->{is_wired} eq 'false');
+    push @{$json->{data}}, {
+      '{#UNIFI_STA_ID}'   => $entry->{_id},
+      '{#UNIFI_STA_NAME}' => (defined $entry->{hostname}) ? $entry->{hostname} : $entry->{mac}
+    };
+  }
+} elsif ($what eq 'networks'){
+  $resp = $ua->get($url . '/api/s/' . $site . '/rest/networkconf');
+  die $resp->message . "\n" if $resp->is_error;
+  foreach my $entry (@{from_json($resp->decoded_content)->{data}}){
+    # Ignore other sites
+    next if ($entry->{site_id} ne $site_id);
+    next if ($type ne 'all' and $entry->{purpose} ne $type);
+    push @{$json->{data}}, {
+      '{#UNIFI_NET_ID}'   => $entry->{_id},
+      '{#UNIFI_NET_NAME}' => $entry->{name}
+    };
+  }
+} elsif ($what eq 'wlan') {
+  $resp = $ua->get($url . '/api/s/' . $site . '/rest/wlanconf');
+  die $resp->message . "\n" if $resp->is_error;
+  foreach my $entry (@{from_json($resp->decoded_content)->{data}}){
+    push @{$json->{data}}, {
+      '{#UNIFI_WLAN_ID}'   => $entry->{_id},
+      '{#UNIFI_WLAN_NAME}' => $entry->{name}
+    };
+  }
+}
+
+print to_json($json, { pretty => $pretty });
