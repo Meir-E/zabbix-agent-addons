@@ -4,8 +4,8 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.43
-Release: 1%{?dist}
+Version: 0.2.44
+Release: 0.beta1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
 
@@ -99,6 +99,9 @@ fi
 %endif
 
 %changelog
+* Thu Sep 13 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.44-0.beta1
+- Add scripts to monitor Unifi sites (daniel@firewall-services.com)
+
 * Tue Aug 21 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.43-1
 - Fix PVE scripts to Work with new pvesh version (daniel@firewall-services.com)
 
