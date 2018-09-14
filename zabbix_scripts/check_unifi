@@ -13,7 +13,7 @@ my $site   = 'default';
 my $url    = 'https://localhost:8443';
 my $unifi;
 my $dev;
-my $client;
+my $station;
 my $net;
 my $wlan;
 my $pretty = 0;
@@ -28,18 +28,20 @@ GetOptions (
   'url=s'        => \$url,
   'unifi'        => \$unifi,
   'dev=s'        => \$dev,
-  'client=s'     => \$client,
+  'station=s'    => \$station,
   'net=s'        => \$net,
   'wlan=s'       => \$wlan,
   'pretty'       => \$pretty
 );
 
-# Log into the API
+my @radio_proto = qw/a b g na ng ac/;
 my $resp;
 my $ua = LWP::UserAgent->new(
   ssl_opts => { verify_hostname => 0 },
   cookie_jar => {}
 );
+
+# Log into the API
 $resp = $ua->post(
   $url . '/api/login',
   Content => to_json({ username => $user, password => $pass }),
@@ -89,6 +91,7 @@ if ($unifi){
     foreach (qw/version build update_available/);
 
 } elsif ($dev) {
+  # Dev is identified by MAC
   $resp = $ua->get($url . '/api/s/' . $site . '/stat/device/' . $dev);
   die $resp->message . "\n" if $resp->is_error;
   my $obj = from_json($resp->decoded_content)->{data}->[0];
@@ -108,11 +111,73 @@ if ($unifi){
   $json->{last_seen} = time - $obj->{last_seen};
   # Add some more info in sys_stats
   $json->{sys_stats}->{$_} = $obj->{'system-stats'}->{$_} foreach (qw/cpu mem uptime/);
-  # Count the number of SSID served
-  $json->{num_wlan} = scalar @{$obj->{radio_table}} if (defined $obj->{radio_table});
-} elsif ($client) {
+
+  # If this is an ap
+  if ($obj->{type} eq 'uap'){
+
+    # Count the number of SSID served
+    $json->{num_wlan} = scalar @{$obj->{radio_table}};
+
+    $resp = $ua->get($url . '/api/s/' . $site . '/stat/sta');
+    die $resp->message . "\n" if $resp->is_error;
+
+    foreach my $proto (@radio_proto){
+      $json->{$_ . $proto} = 0 foreach (qw/num_sta_ avg_rx_rate_ avg_tx_rate_/);
+    }
+
+    foreach my $entry (@{from_json($resp->decoded_content)->{data}}){
+      next if (not $entry->{ap_mac} or $entry->{ap_mac} ne $dev or $entry->{is_wired} == JSON::PP::true);
+      foreach (@radio_proto){
+        if ($entry->{radio_proto} eq $_){
+          $json->{'num_sta_' . $_}++;
+          $json->{'avg_rx_rate_' . $_} += $entry->{rx_rate};
+          $json->{'avg_tx_rate_' . $_} += $entry->{tx_rate};
+        }
+      }
+      $json->{$_} += $entry->{$_} foreach (qw/rx_bytes tx_bytes rx_packets tx_packets/);
+      $json->{'avg_' . $_} += $entry->{$_} foreach (qw/satisfaction tx_power signal noise/);
+    }
   
+    # Now lets compute average values
+    $json->{'avg_' . $_} = ($json->{num_sta} == 0) ? 0 : $json->{'avg_' . $_} / $json->{num_sta}
+                                                  foreach (qw/satisfaction tx_power signal noise/);
+    $json->{$_} = ($json->{num_sta_ac} == 0) ? 0 : $json->{$_} / $json->{num_sta_ac}
+                                                  foreach (qw/avg_rx_rate_ac avg_tx_rate_ac/);
+    $json->{$_} = ($json->{num_sta_ng} == 0) ? 0 : $json->{$_} / $json->{num_sta_ng}
+                                                foreach (qw/avg_rx_rate_ng avg_tx_rate_ng/);
+
+  }
+
+} elsif ($station) {
+  # Client is identified by MAC
+  $resp = $ua->get($url . '/api/s/' . $site . '/stat/sta/' . $station);
+  die $resp->message . "\n" if $resp->is_error;
+  my $obj = from_json($resp->decoded_content)->{data}->[0];
+  my @client_base = qw/rx_packets tx_packets rx_bytes tx_bytes hostname last_seen ip authorized oui is_guest/;
+  foreach (@client_base){
+    $json->{$_} = $obj->{$_} || 0;
+  }
+  # Convert last_seen to relative
+  $json->{last_seen} = time - $json->{last_seen};
+
+  # For wireless stations, we gather some more info
+  if ($obj->{is_wired} == JSON::PP::false){
+    my @client_wireless = qw/rx_rate tx_rate essid ap_mac tx_power radio_proto signal noise/;
+    foreach (@client_wireless){
+      $json->{$_} = $obj->{$_} || 0;
+    }
+    # We have the MAC of the AP, lets try to find the name of this AP
+    $resp = $ua->get($url . '/api/s/' . $site . '/stat/device/' . $json->{ap_mac});
+    die $resp->message . "\n" if $resp->is_error;
+    $json->{ap} = from_json($resp->decoded_content)->{data}->[0]->{name};
+  }
+
+  # Force some data to be numbers and not strings
+  $json->{$_} = 0 + $json->{$_} foreach(qw/signal noise/);
+
+
 } elsif ($wlan) {
+  # Wlan is identified by ID
   $resp = $ua->get($url . '/api/s/' . $site . '/rest/wlanconf/' . $wlan);
   die $resp->message . "\n" if $resp->is_error;
   my $obj = from_json($resp->decoded_content)->{data}->[0];
@@ -124,23 +189,27 @@ if ($unifi){
   # Now, we need to count stations for each SSID
   $resp = $ua->get($url . '/api/s/' . $site . '/stat/sta');
   die $resp->message . "\n" if $resp->is_error;
-  $json->{$_} = 0 foreach (qw/avg_rx_rate_ac avg_tx_rate_ac avg_rx_rate_ng
-                              avg_tx_rate_ng num_sta num_sta_ac num_sta_ng/);
+
+  # Set default values to 0
+  $json->{num_sta} = 0;
+  foreach my $proto (@radio_proto){
+    $json->{$_ . $proto} = 0 foreach (qw/num_sta_ avg_rx_rate_ avg_tx_rate_/);
+  }
+
   foreach my $entry (@{from_json($resp->decoded_content)->{data}}){
     next if (not $entry->{essid} or $entry->{essid} ne $json->{name} or $entry->{is_wired} == JSON::PP::true);
     $json->{num_sta}++;
-    if ($entry->{radio_proto} eq 'ac'){
-      $json->{num_sta_ac}++;
-      $json->{avg_rx_rate_ac} += $entry->{rx_rate};
-      $json->{avg_tx_rate_ac} += $entry->{tx_rate};
-    } elsif ($entry->{radio_proto} eq 'ng'){
-      $json->{num_sta_ng}++;
-      $json->{avg_rx_rate_ng} += $entry->{rx_rate};
-      $json->{avg_tx_rate_ng} += $entry->{tx_rate};
+    foreach (@radio_proto){
+      if ($entry->{radio_proto} eq $_){
+        $json->{'num_sta_' . $_}++;
+        $json->{'avg_rx_rate_' . $_} += $entry->{rx_rate};
+        $json->{'avg_tx_rate_' . $_} += $entry->{tx_rate};
+      }
     }
     $json->{$_} += $entry->{$_} foreach (qw/rx_bytes tx_bytes rx_packets tx_packets/);
     $json->{'avg_' . $_} += $entry->{$_} foreach (qw/satisfaction tx_power signal noise/);
   }
+
   # Now lets compute average values
   $json->{'avg_' . $_} = ($json->{num_sta} == 0) ? 0 : $json->{'avg_' . $_} / $json->{num_sta}
                                                 foreach (qw/satisfaction tx_power signal noise/);

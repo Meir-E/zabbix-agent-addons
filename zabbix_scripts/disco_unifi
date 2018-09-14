@@ -71,19 +71,18 @@ if ($what eq 'devices'){
       '{#UNIFI_DEV_TYPE}'    => $entry->{type}
     };
   }
-} elsif ($what eq 'clients'){
-  $resp = $ua->get($url . '/api/s/' . $site . '/stat/alluser');
+} elsif ($what eq 'stations'){
+  $resp = $ua->get($url . '/api/s/' . $site . '/stat/sta');
   die $resp->message . "\n" if $resp->is_error;
   foreach my $entry (@{from_json($resp->decoded_content)->{data}}){
     # Ignore other sites
     next if ($entry->{site_id} ne $site_id);
-    # Ignore clients not seen since more than 30 days
-    next if (time - $entry->{last_seen} > 2592000);
     next if ($type eq 'wireless' and $entry->{is_wired} eq 'true');
     next if ($type eq 'wired' and $entry->{is_wired} eq 'false');
     push @{$json->{data}}, {
       '{#UNIFI_STA_ID}'   => $entry->{_id},
-      '{#UNIFI_STA_NAME}' => (defined $entry->{hostname}) ? $entry->{hostname} : $entry->{mac}
+      '{#UNIFI_STA_NAME}' => (defined $entry->{hostname}) ? $entry->{hostname} : $entry->{mac},
+      '{#UNIFI_STA_MAC}'  => $entry->{mac}
     };
   }
 } elsif ($what eq 'networks'){
