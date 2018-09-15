@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.48
+Version: 0.2.49
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -99,6 +99,10 @@ fi
 %endif
 
 %changelog
+* Sat Sep 15 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.49-1
+- Report number of unarchived alarms in check_unifi --unifi (daniel@firewall-
+  services.com)
+
 * Sat Sep 15 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.48-1
 - More fixes for AP monitoring in check_unifi (daniel@firewall-services.com)
 
