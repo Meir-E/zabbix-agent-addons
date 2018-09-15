@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.46
+Version: 0.2.47
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -99,6 +99,9 @@ fi
 %endif
 
 %changelog
+* Sat Sep 15 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.47-1
+- Several fixes in check_unifi (daniel@firewall-services.com)
+
 * Fri Sep 14 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.46-1
 - Enhance Unifi discovery and monitoring Adding support for station monitoring
   (daniel@firewall-services.com)
