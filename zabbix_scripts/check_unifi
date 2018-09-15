@@ -90,6 +90,14 @@ if ($unifi){
   $json->{$_} = from_json($resp->decoded_content)->{data}->[0]->{$_}
     foreach (qw/version build update_available/);
 
+  # Get unarchived alarms
+  $resp = $ua->post($url . '/api/s/' . $site . '/stat/alarm',
+    Content => to_json({ archived => 'false' }),
+    Content_Type => 'application/json;charset=UTF-8'
+  );
+  die $resp->message . "\n" if $resp->is_error;
+  $json->{alarm} = scalar @{from_json($resp->decoded_content)->{data}};
+
 } elsif ($dev) {
   # Dev is identified by MAC
   $resp = $ua->get($url . '/api/s/' . $site . '/stat/device/' . $dev);
