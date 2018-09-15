@@ -172,18 +172,17 @@ if ($unifi){
     $json->{ap} = from_json($resp->decoded_content)->{data}->[0]->{name};
   }
 
-  # Force some data to be numbers and not strings
-  $json->{$_} = 0 + $json->{$_} foreach(qw/signal noise/);
-
-
 } elsif ($wlan) {
   # Wlan is identified by ID
   $resp = $ua->get($url . '/api/s/' . $site . '/rest/wlanconf/' . $wlan);
   die $resp->message . "\n" if $resp->is_error;
   my $obj = from_json($resp->decoded_content)->{data}->[0];
-  foreach (qw/name enabled is_guest mac_filter_enabled security
-              mac_filter_policy vlan vlan_enabled/){
+  foreach (qw/name security mac_filter_policy vlan/){
     $json->{$_} = $obj->{$_};
+  }
+  # For boolean, we need to convert
+  foreach (qw/enabled is_guest mac_filter_enabled vlan_enabled/){
+    $json->{$_} = ($obj->{$_} == JSON::PP::true) ? 1 : 0;
   }
 
   # Now, we need to count stations for each SSID
@@ -192,9 +191,8 @@ if ($unifi){
 
   # Set default values to 0
   $json->{num_sta} = 0;
-  foreach my $proto (@radio_proto){
-    $json->{$_ . $proto} = 0 foreach (qw/num_sta_ avg_rx_rate_ avg_tx_rate_/);
-  }
+  $json->{'num_sta_' . $_} = 0 foreach (@radio_proto);
+  $json->{$_} = 0 foreach (qw/rx_bytes tx_bytes rx_packets tx_packets/);
 
   foreach my $entry (@{from_json($resp->decoded_content)->{data}}){
     next if (not $entry->{essid} or $entry->{essid} ne $json->{name} or $entry->{is_wired} == JSON::PP::true);
@@ -211,12 +209,13 @@ if ($unifi){
   }
 
   # Now lets compute average values
-  $json->{'avg_' . $_} = ($json->{num_sta} == 0) ? 0 : $json->{'avg_' . $_} / $json->{num_sta}
+  $json->{'avg_' . $_} = ($json->{num_sta} == 0) ? undef : $json->{'avg_' . $_} / $json->{num_sta}
                                                 foreach (qw/satisfaction tx_power signal noise/);
-  $json->{$_} = ($json->{num_sta_ac} == 0) ? 0 : $json->{$_} / $json->{num_sta_ac}
-                                                foreach (qw/avg_rx_rate_ac avg_tx_rate_ac/);
-  $json->{$_} = ($json->{num_sta_ng} == 0) ? 0 : $json->{$_} / $json->{num_sta_ng}
-                                                foreach (qw/avg_rx_rate_ng avg_tx_rate_ng/);
+  foreach my $proto (@radio_proto){
+    $json->{'avg_' . $_ . '_rate_' . $proto} = ($json->{'num_sta_' . $proto} == 0) ?
+      undef : $json->{'avg_' . $_ . '_rate_' . $proto} / $json->{'num_sta_' . $proto}
+                                                foreach (qw/tx rx/);
+  }
 }
 
 # TODO: convert JSON bool to 0/1
