@@ -139,15 +139,14 @@ if ($unifi){
     }
   
     # Now lets compute average values
-    $json->{'avg_' . $_} = ($json->{num_sta} == 0) ? 0 : $json->{'avg_' . $_} / $json->{num_sta}
+    $json->{'avg_' . $_} = ($json->{num_sta} == 0) ? undef : $json->{'avg_' . $_} / $json->{num_sta}
                                                   foreach (qw/satisfaction tx_power signal noise/);
-    $json->{$_} = ($json->{num_sta_ac} == 0) ? 0 : $json->{$_} / $json->{num_sta_ac}
-                                                  foreach (qw/avg_rx_rate_ac avg_tx_rate_ac/);
-    $json->{$_} = ($json->{num_sta_ng} == 0) ? 0 : $json->{$_} / $json->{num_sta_ng}
-                                                foreach (qw/avg_rx_rate_ng avg_tx_rate_ng/);
-
+    foreach my $proto (@radio_proto){
+      $json->{'avg_' . $_ . '_rate_' . $proto} = ($json->{'num_sta_' . $proto} == 0) ?
+        undef : $json->{'avg_' . $_ . '_rate_' . $proto} / $json->{'num_sta_' . $proto}
+                                                foreach (qw/tx rx/);
+    }
   }
-
 } elsif ($station) {
   # Client is identified by MAC
   $resp = $ua->get($url . '/api/s/' . $site . '/stat/sta/' . $station);
@@ -217,7 +216,5 @@ if ($unifi){
                                                 foreach (qw/tx rx/);
   }
 }
-
-# TODO: convert JSON bool to 0/1
 
 print to_json($json, { pretty => $pretty });
