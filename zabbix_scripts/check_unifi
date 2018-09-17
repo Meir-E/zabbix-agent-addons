@@ -189,7 +189,7 @@ if ($unifi){
   }
   # For boolean, we need to convert
   foreach (qw/enabled is_guest mac_filter_enabled vlan_enabled/){
-    $json->{$_} = ($obj->{$_} == JSON::PP::true) ? 1 : 0;
+    $json->{$_} = (defined $obj->{$_} and $obj->{$_} == JSON::PP::true) ? 1 : 0;
   }
 
   # Now, we need to count stations for each SSID
