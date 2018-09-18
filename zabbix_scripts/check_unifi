@@ -169,7 +169,7 @@ if ($unifi){
 
   # For wireless stations, we gather some more info
   if ($obj->{is_wired} == JSON::PP::false){
-    my @client_wireless = qw/rx_rate tx_rate essid ap_mac tx_power radio_proto signal noise/;
+    my @client_wireless = qw/rx_rate tx_rate essid ap_mac tx_power radio_proto signal noise satisfaction/;
     foreach (@client_wireless){
       $json->{$_} = $obj->{$_} || 0;
     }
