@@ -1,0 +1,35 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use JSON;
+use Getopt::Long;
+use File::Which;
+
+my $what = 'nodes';
+my $pretty = 0;
+
+GetOptions(
+  'what=s' => \$what,
+  'pretty' => \$pretty
+);
+
+my $pmgsh = which('pmgsh');
+my $json = {};
+@{$json->{data}} = ();
+
+unless($pmgsh){
+  print to_json($json) . "\n";
+  exit 0;
+}
+
+if ($what eq 'domains'){ 
+  my $domains = from_json(qx($pmgsh get /config/domains 2>/dev/null));
+  foreach my $item (@{$domains}){
+    push @{$json->{data}}, {
+      '{#PMG_RELAY_DOMAIN}' => $item->{domain},
+    }; 
+  }
+}
+
+print to_json($json, { pretty => $pretty }) . "\n";

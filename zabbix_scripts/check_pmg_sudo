@@ -1,0 +1,31 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use JSON;
+use Getopt::Long;
+use File::Which;
+use Data::Dumper;
+
+my $pmgsh = which('pmgsh');
+my $json = {};
+my $pretty = 0;
+my ($domain) = undef;
+
+GetOptions(
+  'domain=s' => \$domain,
+  'pretty'   => \$pretty
+);
+
+if ($domain){
+  my $stats = from_json(qx($pmgsh get /statistics/domains 2>/dev/null));
+  foreach my $dom (@{$stats}){
+    next unless ($dom->{domain} eq $domain);
+    $json->{$_} = $dom->{$_} foreach (qw/bytes_in bytes_out count_in count_out spamcount_in spamcount_out viruscount_in viruscount_out/);
+  }
+} else{
+  print 'ZBX_UNSUPORTED';
+  exit 0;
+}
+
+print to_json($json, { pretty => $pretty }) . "\n";
