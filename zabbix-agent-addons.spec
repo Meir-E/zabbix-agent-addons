@@ -4,8 +4,8 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.51
-Release: 1%{?dist}
+Version: 0.2.52
+Release: 0.beta1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
 
@@ -99,6 +99,9 @@ fi
 %endif
 
 %changelog
+* Thu Oct 18 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.52-0.beta1
+- Add very basic script for PMG monitoring (daniel@firewall-services.com)
+
 * Tue Sep 18 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.51-1
 - check_unifi: also output satisfaction for stations (daniel@firewall-
   services.com)
