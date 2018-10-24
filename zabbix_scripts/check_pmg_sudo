@@ -4,28 +4,90 @@ use strict;
 use warnings;
 use JSON;
 use Getopt::Long;
-use File::Which;
 use Data::Dumper;
+use PMG::DBTools;
 
-my $pmgsh = which('pmgsh');
-my $json = {};
+my $json = {
+  count_in  => 0,
+  count_out => 0,
+  bytes_in  => 0,
+  bytes_out => 0,
+  spam_in   => 0,
+  spam_out  => 0,
+  virus_in  => 0,
+  virus_out => 0,
+  ptime_in  => 0,
+  ptime_out => 0
+};
 my $pretty = 0;
-my ($domain) = undef;
+my ($domain,$what) = undef;
+my $timespan = 900;
+my $spamthres = 5;
+my $resp = undef;
 
 GetOptions(
-  'domain=s' => \$domain,
-  'pretty'   => \$pretty
+  'domain=s'    => \$domain,
+  'what=s'      => \$what,
+  'timespan=i'  => \$timespan,
+  'spamthres=i' => \$spamthres,
+  'pretty'      => \$pretty
 );
 
-if ($domain){
-  my $stats = from_json(qx($pmgsh get /statistics/domains 2>/dev/null));
-  foreach my $dom (@{$stats}){
-    next unless ($dom->{domain} eq $domain);
-    $json->{$_} = $dom->{$_} foreach (qw/bytes_in bytes_out count_in count_out spamcount_in spamcount_out viruscount_in viruscount_out/);
+my $dbh = PMG::DBTools::open_ruledb;
+
+my $since = time - $timespan;
+my $query = "SELECT cstatistic.direction AS direction, cstatistic.bytes AS bytes, cstatistic.spamlevel AS spamlevel, " .
+            "cstatistic.virusinfo AS virus, cstatistic.ptime AS ptime, cstatistic.sender AS sender, creceivers.receiver " .
+            "AS receiver FROM cstatistic LEFT JOIN creceivers ON cstatistic.rid = creceivers.cstatistic_rid" .
+            " WHERE time > ?";
+my $sth = $dbh->prepare($query);
+$sth->execute($since);
+
+while (my $res = $sth->fetchrow_hashref){
+  if (not $res->{direction}){
+    next if (defined $domain and $res->{sender} !~ m/.*\@$domain$/);
+    $json->{bytes_out} += $res->{bytes};
+    $json->{count_out} += 1;
+    $json->{ptime_out} += $res->{ptime};
+    $json->{spam_out}  += 1 if ($res->{spamlevel} ge $spamthres);
+    $json->{virus_out} += 1 if (defined $res->{virus});
+  } else {
+    next if (defined $domain and $res->{receiver} !~ /.*\@$domain$/);
+    $json->{bytes_in} += $res->{bytes};
+    $json->{count_in} += 1;
+    $json->{ptime_in} += $res->{ptime};
+    $json->{spam_in}  += 1 if ($res->{spamlevel} ge $spamthres);
+    $json->{virus_in} += 1 if (defined $res->{virus});
   }
-} else{
-  print 'ZBX_UNSUPORTED';
-  exit 0;
 }
 
-print to_json($json, { pretty => $pretty }) . "\n";
+# Init to 0 if missing
+$json->{$_} //= 0 foreach (qw/bytes_out count_out ptime_out spam_out virus_out
+                              bytes_in count_in ptime_in spam_in virus_in/);
+
+# Compute averages
+$json->{ptime_in} = $json->{ptime_in} / $json->{count_in} / 1000 if ($json->{count_in} > 0);
+$json->{ptime_out} = $json->{ptime_out} / $json->{count_out} / 1000 if ($json->{count_out} > 0);
+
+# Now, only for general stats, count early rejects
+if (not defined $domain){
+  $query = "SELECT SUM(rblcount) AS rbl, SUM(pregreetcount) AS pregreet FROM localstat WHERE mtime > ?";
+  $sth = $dbh->prepare($query);
+  $sth->execute($since);
+  my $res = $sth->fetchrow_hashref;
+  $json->{$_} = $res->{$_} foreach (qw/rbl pregreet/);
+}
+
+$json->{$_} //= 0 foreach (qw/rbl pregreet/);
+
+if (defined $what and not defined $json->{$what}){
+  print 'ZBX_UNSUPORTED';
+  exit 0;
+} elsif (defined $what){
+  $resp = $json->{$what}
+} else {
+  $resp = $json;
+}
+$resp = (ref $resp eq 'HASH' or ref $resp eq 'ARRAY') ? to_json($resp, { pretty => $pretty }) : $resp;
+print $resp . "\n";
+
