@@ -105,7 +105,6 @@ if ($cluster){
   $json->{templates}->{$_} //= 0 foreach (qw(maxdisk));
   $json->{guests}->{cpu} = ($json->{guests}->{maxcpu} == 0) ? 0 : $json->{guests}->{used_cpu} / $json->{guests}->{maxcpu};
 } elsif ($storage){
-  $json = from_json(qx($pvesh get /storage/$storage 2>/dev/null));
   my $stores = from_json(qx($pvesh get /cluster/resources --type=storage $pvesh_opt 2>/dev/null));
   foreach my $s (@{$stores}){
     if ($s->{storage} eq $storage){
