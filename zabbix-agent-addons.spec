@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.55
+Version: 0.2.56
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -99,6 +99,9 @@ fi
 %endif
 
 %changelog
+* Fri Nov 09 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.56-1
+- Add simple script for nginx (similar httpd) (daniel@firewall-services.com)
+
 * Fri Oct 26 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.55-1
 - Fix PVE storage monitoring GLPI #33910 (daniel@firewall-services.com)
 
