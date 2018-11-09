@@ -1,0 +1,56 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use LWP::Simple;
+use Getopt::Long;
+use JSON;
+
+my $uri    = 'http://127.0.0.1/nginx-status';
+my $what   = 'all';
+my $help   = 0;
+my $pretty = 0;
+
+GetOptions(
+  "uri=s"  => \$uri,
+  "what=s" => \$what,
+  "help"   => \$help,
+  "pretty" => \$pretty
+);
+
+my $res = {};
+my $status = get($uri);
+
+
+unless ($status){
+  print 'ZBX_UNSUPPOTED';
+  exit 1;
+}
+
+foreach my $line (split(/\n/, $status)){
+  if ($line =~ m/^Active connections: (\d+)/){
+    $res->{active_connections} = $1;
+  } elsif ($line =~ m/\s*(\d+)\s+\d+\s+(\d+)/){
+    $res->{total_connections} = $1;
+    $res->{total_requests} = $2;
+  } elsif ($line =~ m/Waiting: (\d+)/){
+    $res->{keep_alive} = $1;
+  }
+}
+
+if ($help){
+  print "Valid keys are:\n\n";
+  print "$_\n" for keys %{$res};
+  exit 0;
+}
+
+if ($what eq 'all'){
+  print to_json($res, { pretty => $pretty });
+}
+elsif (defined $res->{$what}){
+  print $res->{$what};
+}
+else{
+  print 'ZBX_UNSUPPOTED';
+}
+exit 0;
