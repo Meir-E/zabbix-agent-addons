@@ -1,0 +1,87 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use LWP::Simple;
+use Getopt::Long;
+use JSON;
+
+my $uri    = 'http://127.0.0.1:3128/squid-internal-mgr/info';
+my $what   = 'all';
+my $help   = 0;
+my $pretty = 0;
+
+GetOptions(
+  "uri=s"  => \$uri,
+  "what=s" => \$what,
+  "help"   => \$help,
+  "pretty" => \$pretty
+);
+
+my $res = {};
+my $status = get($uri);
+
+
+unless ($status){
+  print 'ZBX_UNSUPPOTED';
+  exit 1;
+}
+
+foreach my $line (split(/\n/, $status)){
+  if ($line =~ m/^Squid Object Cache: Version (\d+(\.\d+)*)/){
+    $res->{version} = $1;
+  } elsif ($line =~ m/^\s+Number of clients accessing cache:\s+(\d+)/){
+    $res->{clients_num} = $1 * 1;
+  } elsif ($line =~ m/^\s+Number of HTTP requests received:\s+(\d+)/){
+    $res->{requests} = $1 * 1;
+  } elsif ($line =~ m/^\s+Hits as % of all requests:\s+5min:\s+(\d+(\.\d+)?)%,/){
+    $res->{hits_req_percent} = $1 * 1;
+  } elsif ($line =~ m/^\s+Hits as % of bytes sent:\s+5min:\s+(\d+(\.\d+)?)%,/){
+    $res->{hits_bytes_percent} = $1 * 1;
+  } elsif ($line =~ m/^\s+Memory hits as % of hit requests:\s+5min:\s+(\d+(\.\d+)?)%,/){
+    $res->{mem_hits_req_percent} = $1 * 1;
+  } elsif ($line =~ m/^\s+Disk hits as % of hit requests:\s+5min:\s+(\d+(\.\d+)?)%,/){
+    $res->{disk_hits_req_percent} = $1 * 1; 
+  } elsif ($line =~ m/^\s+Storage Swap size:\s+(\d+)\sKB/){
+    $res->{stor_swap_size} = $1 * 1024; 
+  } elsif ($line =~ m/^\s+Storage Swap capacity:\s+(\d+(\.\d+)?)% used, (\d+(\.\d+)?)% free/){
+    ($res->{stor_swap_used_percent}, $res->{stor_swap_free_percent}) = ($1 * 1, $3 * 1);
+  } elsif ($line =~ m/^\s+Storage Mem size:\s+(\d+)\sKB/){
+    $res->{stor_mem_size} = $1 * 1024;
+  } elsif ($line =~ m/^\s+Storage Mem capacity:\s+(\d+(\.\d+)?)% used, (\d+(\.\d+)?)% free/){
+    ($res->{stor_mem_used_percent}, $res->{stor_mem_free_percent}) = ($1 * 1, $3 * 1);
+  } elsif ($line =~ m/^\s+Mean Object Size:\s+(\d+(\.\d+)?)\sKB/){
+    $res->{mean_object_size} = int($1 * 1024);
+  } elsif ($line =~ m/^\s+CPU Time:\s+(\d+(\.\d+)?)\sseconds/){
+    $res->{cpu_time} = $1 * 1;
+  } elsif ($line =~ m/^\s+CPU Usage:\s+(\d+(\.\d+)?)%/){
+    $res->{cpu_usage} = $1 * 1;
+  } elsif ($line =~ m/^\s+CPU Usage, 5 minute avg:\s+(\d+(\.\d+)?)%/){
+    $res->{cpu_usage_avg_5min} = $1 * 1;
+  } elsif ($line =~ m/^\s+Maximum number of file descriptors:\s+(\d+)/){
+    $res->{fd_max} = $1 * 1;
+  } elsif ($line =~ m/^\s+Number of file desc currently in use:\s+(\d+)/){
+    $res->{fd_used} = $1 * 1;
+  }
+}
+
+if (defined $res->{fd_max} and defined $res->{fd_used}){
+  $res->{fd_used_percent} = int($res->{fd_used} * 100/ $res->{fd_max});
+}
+
+if ($help){
+  print "Valid keys are:\n\n";
+  print "$_\n" for keys %{$res};
+  exit 0;
+}
+
+if ($what eq 'all'){
+  print to_json($res, { pretty => $pretty });
+}
+elsif (defined $res->{$what}){
+  print $res->{$what};
+}
+else{
+  print 'ZBX_UNSUPPOTED';
+}
+exit 0;

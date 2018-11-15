@@ -1,0 +1,18 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use LWP::Simple;
+use JSON;
+
+my $json;
+@{$json->{data}} = ();
+
+my $status = get('http://127.0.0.1:3128/squid-internal-mgr/info');
+
+if ($status){
+  push @{$json->{data}}, {"{#SQUID_STATUS_URI}" => 'http://127.0.0.1:3128/squid-internal-mgr/info'};
+}
+
+print to_json($json);
+exit(0);
