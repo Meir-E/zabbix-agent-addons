@@ -45,9 +45,9 @@ if ($zpool){
   }
 }
 if ($what){
-  print ((defined $json->{$pool}->{$what}) ? $json->{$pool}->{$what} : 'ZBX_UNSUPORTED');
+  print ((defined $json->{$pool}->{$what}) ? $json->{$pool}->{$what} : 'ZBX_NOTSUPPORTED');
 } elsif ($pool){
-  print ((defined $json->{$pool}) ? to_json($json->{$pool}, { pretty => $pretty }) : 'ZBX_UNSUPORTED');
+  print ((defined $json->{$pool}) ? to_json($json->{$pool}, { pretty => $pretty }) : 'ZBX_NOTSUPPORTED');
 } else {
   print to_json($json, { pretty => $pretty });
 }

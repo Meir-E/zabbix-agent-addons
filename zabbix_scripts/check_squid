@@ -23,7 +23,7 @@ my $status = get($uri);
 
 
 unless ($status){
-  print 'ZBX_UNSUPPOTED';
+  print 'ZBX_NOTSUPPORTED';
   exit 1;
 }
 
@@ -82,6 +82,6 @@ elsif (defined $res->{$what}){
   print $res->{$what};
 }
 else{
-  print 'ZBX_UNSUPPOTED';
+  print 'ZBX_NOTSUPPORTED';
 }
 exit 0;

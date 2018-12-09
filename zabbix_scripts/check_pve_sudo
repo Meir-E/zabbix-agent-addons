@@ -114,7 +114,7 @@ if ($cluster){
     }
   }
 } else{
-  print 'ZBX_UNSUPORTED';
+  print 'ZBX_NOTSUPPORTED';
   exit 0;
 }
 

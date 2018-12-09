@@ -81,7 +81,7 @@ if (not defined $domain){
 $json->{$_} //= 0 foreach (qw/rbl pregreet/);
 
 if (defined $what and not defined $json->{$what}){
-  print 'ZBX_UNSUPORTED';
+  print 'ZBX_NOTSUPPORTED';
   exit 0;
 } elsif (defined $what){
   $resp = $json->{$what}
