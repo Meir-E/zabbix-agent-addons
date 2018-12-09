@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.58
+Version: 0.2.59
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -99,6 +99,9 @@ fi
 %endif
 
 %changelog
+* Sun Dec 09 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.59-1
+- Fix ZBX_NOTSUPPORTED string in several scripts (daniel@firewall-services.com)
+
 * Thu Nov 15 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.57-0.beta1
 - Add enhanced squid monitoring support (daniel@firewall-services.com)
 
