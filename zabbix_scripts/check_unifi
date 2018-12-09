@@ -65,7 +65,7 @@ die "Site $site not found\n" unless ($site_id);
 # Global info about the instance of Unifi
 if ($unifi){
   $resp = $ua->get($url . '/api/s/' . $site . '/stat/health');
-  die $resp->message . "\n" if $resp->is_error;
+  die "ZBX_NOTSUPPORTED\n" if $resp->is_error;
   foreach my $entry (@{from_json($resp->decoded_content)->{data}}){
     if ($entry->{subsystem} eq 'wlan'){
       $json->{wireless_clients} = $entry->{num_user};
@@ -86,7 +86,7 @@ if ($unifi){
                                 dev_pending dev_disabled num_ap num_sw
                                 num_gw/);
   $resp = $ua->get($url . '/api/s/' . $site . '/stat/sysinfo');
-  die $resp->message . "\n" if $resp->is_error;
+  die "ZBX_NOTSUPPORTED\n" if $resp->is_error;
   $json->{$_} = from_json($resp->decoded_content)->{data}->[0]->{$_}
     foreach (qw/version build update_available/);
 
@@ -95,13 +95,13 @@ if ($unifi){
     Content => to_json({ archived => 'false' }),
     Content_Type => 'application/json;charset=UTF-8'
   );
-  die $resp->message . "\n" if $resp->is_error;
+  die "ZBX_NOTSUPPORTED\n" if $resp->is_error;
   $json->{alarm} = scalar @{from_json($resp->decoded_content)->{data}};
 
 } elsif ($dev) {
   # Dev is identified by MAC
   $resp = $ua->get($url . '/api/s/' . $site . '/stat/device/' . $dev);
-  die $resp->message . "\n" if $resp->is_error;
+  die "ZBX_NOTSUPPORTED\n" if $resp->is_error;
   my $obj = from_json($resp->decoded_content)->{data}->[0];
   foreach (qw/sys_stats locating serial name num_sta user-num_sta
               guest-num_sta inform_url version model state type
@@ -127,7 +127,7 @@ if ($unifi){
     $json->{num_wlan} = scalar @{$obj->{radio_table}};
 
     $resp = $ua->get($url . '/api/s/' . $site . '/stat/sta');
-    die $resp->message . "\n" if $resp->is_error;
+    die "ZBX_NOTSUPPORTED\n" if $resp->is_error;
 
     foreach my $proto (@radio_proto){
       $json->{$_ . $proto} = 0 foreach (qw/num_sta_ avg_rx_rate_ avg_tx_rate_/);
@@ -158,7 +158,7 @@ if ($unifi){
 } elsif ($station) {
   # Client is identified by MAC
   $resp = $ua->get($url . '/api/s/' . $site . '/stat/sta/' . $station);
-  die $resp->message . "\n" if $resp->is_error;
+  die "ZBX_NOTSUPPORTED\n" if $resp->is_error;
   my $obj = from_json($resp->decoded_content)->{data}->[0];
   my @client_base = qw/rx_packets tx_packets rx_bytes tx_bytes hostname last_seen ip authorized oui is_guest/;
   foreach (@client_base){
@@ -175,14 +175,14 @@ if ($unifi){
     }
     # We have the MAC of the AP, lets try to find the name of this AP
     $resp = $ua->get($url . '/api/s/' . $site . '/stat/device/' . $json->{ap_mac});
-    die $resp->message . "\n" if $resp->is_error;
+    die "ZBX_NOTSUPPORTED\n" if $resp->is_error;
     $json->{ap} = from_json($resp->decoded_content)->{data}->[0]->{name};
   }
 
 } elsif ($wlan) {
   # Wlan is identified by ID
   $resp = $ua->get($url . '/api/s/' . $site . '/rest/wlanconf/' . $wlan);
-  die $resp->message . "\n" if $resp->is_error;
+  die "ZBX_NOTSUPPORTED\n" if $resp->is_error;
   my $obj = from_json($resp->decoded_content)->{data}->[0];
   foreach (qw/name security mac_filter_policy vlan/){
     $json->{$_} = $obj->{$_};
@@ -194,7 +194,7 @@ if ($unifi){
 
   # Now, we need to count stations for each SSID
   $resp = $ua->get($url . '/api/s/' . $site . '/stat/sta');
-  die $resp->message . "\n" if $resp->is_error;
+  die "ZBX_NOTSUPPORTED\n" if $resp->is_error;
 
   # Set default values to 0
   $json->{num_sta} = 0;
