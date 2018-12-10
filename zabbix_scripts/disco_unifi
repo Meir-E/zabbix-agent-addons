@@ -5,7 +5,10 @@ use warnings;
 use JSON;
 use Getopt::Long;
 use LWP::UserAgent;
+use HTTP::Cookies;
 use Data::Dumper;
+
+umask 077;
 
 my $user   = 'zabbix';
 my $pass   = 'secret';
@@ -32,21 +35,32 @@ GetOptions (
 $type = 'all' if ($type eq '');
 my $site_id;
 my $resp;
+my $username = $ENV{LOGNAME} || $ENV{USER} || getpwuid($<);
+my $cj = HTTP::Cookies->new(
+  file           => "/tmp/.unifi_$username.txt",
+  autosave       => 1,
+  ignore_discard => 1
+);
 my $ua = LWP::UserAgent->new(
-  ssl_opts => { verify_hostname => 0 },
-  cookie_jar => {}
+  ssl_opts   => { verify_hostname => 0 },
+  cookie_jar => $cj
 );
 
-# Login on the API
-$resp = $ua->post(
-  $url . '/api/login',
-  Content => to_json({ username => $user, password => $pass }),
-  Content_Type => 'application/json;charset=UTF-8'
-);
-die "Login failed: " . $resp->message . "\n" if $resp->is_error;
-# Now, we need to get the site ID
+# Check if we need to login
 $resp = $ua->get($url . '/api/self/sites');
-die $resp->message . "\n" if $resp->is_error;
+
+if ($resp->is_error){
+  # Login on the API
+  $resp = $ua->post(
+    $url . '/api/login',
+    Content => to_json({ username => $user, password => $pass }),
+    Content_Type => 'application/json;charset=UTF-8'
+  );
+  die "Login failed: " . $resp->message . "\n" if $resp->is_error;
+  $resp = $ua->get($url . '/api/self/sites');
+  die $resp->message . "\n" if $resp->is_error;
+}
+
 foreach (@{from_json($resp->decoded_content)->{data}}){
   if ($_->{name} eq $site || $_->{desc} eq $site){
     $site_id = $_->{_id};
