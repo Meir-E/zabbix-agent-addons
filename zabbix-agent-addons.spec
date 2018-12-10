@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.60
+Version: 0.2.61
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -99,6 +99,10 @@ fi
 %endif
 
 %changelog
+* Mon Dec 10 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.61-1
+- Save cookies to a file so we don't have to login at every invocation GLPI
+  #34449 (daniel@firewall-services.com)
+
 * Sun Dec 09 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.60-1
 - Print ZBX_NOTSUPPORTED in case of API error Prevent tons of error messages in
   Zabbix Server's logs (daniel@firewall-services.com)
