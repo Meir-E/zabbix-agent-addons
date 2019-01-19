@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.61
+Version: 0.2.62
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -100,6 +100,9 @@ fi
 %endif
 
 %changelog
+* Sat Jan 19 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.62-1
+- Add scripts to ping other hosts (daniel@firewall-services.com)
+
 * Mon Dec 10 2018 Daniel Berteaud <daniel@firewall-services.com> 0.2.61-1
 - Save cookies to a file so we don't have to login at every invocation GLPI
   #34449 (daniel@firewall-services.com)
