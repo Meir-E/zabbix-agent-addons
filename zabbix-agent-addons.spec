@@ -22,6 +22,7 @@ Requires: perl(POSIX)
 Requires: perl(MIME::Base64)
 Requires: perl(File::Which)
 Requires: perl(Config::Simple)
+Requires: fping
 %if ! 0%{?_without_selinux}
 Requires: policycoreutils
 BuildRequires: selinux-policy-devel

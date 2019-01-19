@@ -1,0 +1,45 @@
+#!/usr/bin/perl -w
+
+use warnings;
+use strict;
+use File::Which;
+use Getopt::Long;
+use JSON;
+
+my $fping = which('fping');
+
+unless ($fping){
+  die "ZBX_NOTSUPPOTED\n";
+}
+
+my $info       = 'all';
+my $pretty     = 0;
+my @valid_info = qw(all respond latency loss);
+my $host       = $ARGV[0];
+
+GetOptions(
+  'info=s' => \$info,
+  'pretty' => \$pretty
+);
+
+unless (grep { $info eq $_ } @valid_info){
+  die "Usage: $0 [--info=<respond|latency|loss>] host\n";
+}
+
+my $ping = qx($fping -c 5 -p 10 -q $host 2>&1);
+# Output looks like 10.29.254.2 : xmt/rcv/%loss = 5/5/0%, min/avg/max = 1.42/1.65/1.90
+if ($ping =~ m|^$host : xmt/rcv/%loss = 5/(\d)/(\d+(?:\.\d+)?)%(?:, min/avg/max = (?:\d+(?:\.\d+)?)/(\d+(\.\d+))/(?:\d+(?:\.\d+)?))?$|){
+  my $stat = {
+    respond => ($1 > 0) ? 1 : 0,
+    loss    => $2 + 0,
+    latency => (defined $3) ? $3 / 1000 : 0
+  };
+  if ($info ne 'all'){
+    print $stat->{$info} . "\n";
+  } else {
+    print to_json($stat, { pretty => $pretty }) . "\n";
+  }
+} else {
+  die "ZBX_NOTSUPPOTED\n";
+}
+exit 0;
