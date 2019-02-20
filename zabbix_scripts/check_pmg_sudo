@@ -8,18 +8,19 @@ use Data::Dumper;
 use PMG::DBTools;
 
 my $json = {
-  count_in     => 0,
-  count_out    => 0,
-  bytes_in     => 0,
-  bytes_out    => 0,
-  spam_in      => 0,
-  spam_out     => 0,
-  virus_in     => 0,
-  virus_out    => 0,
-  ptime_in     => 0,
-  ptime_out    => 0,
-  queue_hold   => 0,
-  queue_active => 0
+  count_in       => 0,
+  count_out      => 0,
+  bytes_in       => 0,
+  bytes_out      => 0,
+  spam_in        => 0,
+  spam_out       => 0,
+  virus_in       => 0,
+  virus_out      => 0,
+  ptime_in       => 0,
+  ptime_out      => 0,
+  queue_hold     => 0,
+  queue_active   => 0,
+  queue_deferred => 0
 };
 my $pretty = 0;
 my ($domain,$what) = undef;
@@ -79,10 +80,10 @@ if (not defined $domain){
   my $res = $sth->fetchrow_hashref;
   $json->{$_} = $res->{$_} foreach (qw/rbl pregreet/);
 
-  # Here we count email in the queue (active and hold queue)
+  # Here we count email in the queue (active, deferred and hold queues)
   foreach my $res (qx(postqueue -j)){
     $res = from_json($res);
-    foreach (qw/hold active/){
+    foreach (qw/hold active deferred/){
       $json->{'queue_' . $_} += 1 if ($res->{queue_name} eq $_);
     }
   }
