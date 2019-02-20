@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.62
+Version: 0.2.63
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -100,6 +100,10 @@ fi
 %endif
 
 %changelog
+* Wed Feb 20 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.63-1
+- Report number of email in the active and hold queues (daniel@firewall-
+  services.com)
+
 * Sat Jan 19 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.62-1
 - Add scripts to ping other hosts (daniel@firewall-services.com)
 
