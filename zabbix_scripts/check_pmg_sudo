@@ -8,16 +8,18 @@ use Data::Dumper;
 use PMG::DBTools;
 
 my $json = {
-  count_in  => 0,
-  count_out => 0,
-  bytes_in  => 0,
-  bytes_out => 0,
-  spam_in   => 0,
-  spam_out  => 0,
-  virus_in  => 0,
-  virus_out => 0,
-  ptime_in  => 0,
-  ptime_out => 0
+  count_in     => 0,
+  count_out    => 0,
+  bytes_in     => 0,
+  bytes_out    => 0,
+  spam_in      => 0,
+  spam_out     => 0,
+  virus_in     => 0,
+  virus_out    => 0,
+  ptime_in     => 0,
+  ptime_out    => 0,
+  queue_hold   => 0,
+  queue_active => 0
 };
 my $pretty = 0;
 my ($domain,$what) = undef;
@@ -69,13 +71,21 @@ $json->{$_} //= 0 foreach (qw/bytes_out count_out ptime_out spam_out virus_out
 $json->{ptime_in} = $json->{ptime_in} / $json->{count_in} / 1000 if ($json->{count_in} > 0);
 $json->{ptime_out} = $json->{ptime_out} / $json->{count_out} / 1000 if ($json->{count_out} > 0);
 
-# Now, only for general stats, count early rejects
+# Now, only for general stats, count early rejects, and queue stats
 if (not defined $domain){
   $query = "SELECT SUM(rblcount) AS rbl, SUM(pregreetcount) AS pregreet FROM localstat WHERE mtime > ?";
   $sth = $dbh->prepare($query);
   $sth->execute($since);
   my $res = $sth->fetchrow_hashref;
   $json->{$_} = $res->{$_} foreach (qw/rbl pregreet/);
+
+  # Here we count email in the queue (active and hold queue)
+  foreach my $res (qx(postqueue -j)){
+    $res = from_json($res);
+    foreach (qw/hold active/){
+      $json->{'queue_' . $_} += 1 if ($res->{queue_name} eq $_);
+    }
+  }
 }
 
 $json->{$_} //= 0 foreach (qw/rbl pregreet/);
