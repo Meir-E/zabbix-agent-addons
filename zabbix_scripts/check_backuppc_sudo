@@ -82,7 +82,8 @@ if ($what eq 'errors') {
       new_size      => $lastSizeNew,
       full_duration => $fullDur,
       duration      => $lastDuration,
-      last_type     => $lastType
+      last_type     => $lastType,
+      last_errors   => $lastXferErrors
     }
   );
 } else {
