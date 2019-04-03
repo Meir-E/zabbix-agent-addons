@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.64
+Version: 0.2.65
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -100,6 +100,13 @@ fi
 %endif
 
 %changelog
+* Wed Apr 03 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.65-1
+- Enhance backuppc reporting script Including reporting the new file size, and
+  sending all the info at once in JSON format (daniel@firewall-services.com)
+- Some coding style updates (daniel@firewall-services.com)
+- More compact BPCSTATUS (1/0 instead of enabled/disabled) (daniel@firewall-
+  services.com)
+
 * Wed Feb 20 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.64-1
 - Also report the number in the deferred queue (daniel@firewall-services.com)
 
