@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.65
+Version: 0.2.66
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -100,6 +100,10 @@ fi
 %endif
 
 %changelog
+* Wed Apr 03 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.66-1
+- Remove crazy and useless regex to exclude hosts from BackupPC
+  (daniel@firewall-services.com)
+
 * Wed Apr 03 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.65-1
 - Enhance backuppc reporting script Including reporting the new file size, and
   sending all the info at once in JSON format (daniel@firewall-services.com)
