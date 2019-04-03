@@ -17,6 +17,7 @@ my $host = $ARGV[0];
 my $what = $ARGV[1];
 
 my $bpc = BackupPC::Lib->new();
+
 my @backups = $bpc->BackupInfoRead($host);
 my $mainConf = $bpc->ConfigDataRead();
 my $hostConf = $bpc->ConfigDataRead($host);
@@ -34,8 +35,7 @@ for ( my $i = 0 ; $i < @backups ; $i++ ) {
             $fullSize = $backups[$i]{size};
             $fullDur  = $backups[$i]{endTime} - $backups[$i]{startTime};
         }
-    }
-    else {
+    }else {
         $incrCnt++;
         if ( $incrAge < 0 || $backups[$i]{startTime} > $incrAge ) {
             $incrAge = $backups[$i]{startTime};
@@ -44,14 +44,12 @@ for ( my $i = 0 ; $i < @backups ; $i++ ) {
 }
 if ( $fullAge > $incrAge && $fullAge >= 0 )  {
     $lastAge = $fullAge;
-}
-else {
+} else {
     $lastAge = $incrAge;
 }
 if ( $lastAge < 0 ) {
     $lastAge = "";
-}
-else {
+} else {
     $lastAge = sprintf("%.1f", (time - $lastAge) / (24 * 3600));
 }
 $lastXferErrors = $backups[@backups-1]{xferErrs} if ( @backups );
@@ -59,23 +57,17 @@ $maxErrors = $conf->{MaxXferError} if (defined $conf->{MaxXferError});
 
 if ($what eq 'errors'){
     print $lastXferErrors;
-}
-elsif ($what eq 'max_errors'){
+} elsif ($what eq 'max_errors'){
     print $maxErrors;
-}
-elsif ($what eq 'age'){
+} elsif ($what eq 'age'){
     print $lastAge;
-}
-elsif ($what eq 'size'){
+} elsif ($what eq 'size'){
     print $fullSize;
-}
-elsif ($what eq 'duration'){
+} elsif ($what eq 'duration'){
     print $fullDur;
-}
-elsif ($what eq 'notify'){
+} elsif ($what eq 'notify'){
     print $conf->{EMailNotifyOldBackupDays};
-}
-else{
+} else{
   print<<"EOF";
 
 Usage: $0 <host> [errors|age|size|duration]
