@@ -27,50 +27,68 @@ my $fullAge = $incrAge = $lastAge = -1;
 my $lastXferErrors = 0;
 my $maxErrors = 0;
 
-for ( my $i = 0 ; $i < @backups ; $i++ ) {
+if ( @backups ) {
+  for ( my $i = 0 ; $i < @backups ; $i++ ) {
     if ( $backups[$i]{type} eq "full" ) {
-        $fullCnt++;
-        if ( $fullAge < 0 || $backups[$i]{startTime} > $fullAge ) {
-            $fullAge  = $backups[$i]{startTime};
-            $fullSize = $backups[$i]{size};
-            $fullDur  = $backups[$i]{endTime} - $backups[$i]{startTime};
-        }
-    }else {
-        $incrCnt++;
-        if ( $incrAge < 0 || $backups[$i]{startTime} > $incrAge ) {
-            $incrAge = $backups[$i]{startTime};
-        }
+      $fullCnt++;
+      if ( $fullAge < 0 || $backups[$i]{startTime} > $fullAge ) {
+        $fullAge  = $backups[$i]{startTime};
+        $fullSize = $backups[$i]{size};
+        $fullDur  = $backups[$i]{endTime} - $backups[$i]{startTime};
+      }
+    } else {
+      $incrCnt++;
+      if ( $incrAge < 0 || $backups[$i]{startTime} > $incrAge ) {
+        $incrAge = $backups[$i]{startTime};
+      }
     }
-}
-if ( $fullAge > $incrAge && $fullAge >= 0 )  {
+  }
+  if ( $fullAge > $incrAge && $fullAge >= 0 )  {
     $lastAge = $fullAge;
-} else {
+  } else {
     $lastAge = $incrAge;
-}
-if ( $lastAge < 0 ) {
+  }
+  if ( $lastAge < 0 ) {
     $lastAge = "";
-} else {
+  } else {
     $lastAge = sprintf("%.1f", (time - $lastAge) / (24 * 3600));
+  }
+  $lastXferErrors = $backups[@backups-1]{xferErrs};
+  $lastSizeNew    = $backups[@backups-1]{sizeNew};
+  $lastDuration   = $backups[@backups-1]{endTime} - $backups[@backups-1]{startTime};
+  $lastType       = $backups[@backups-1]{type};
 }
-$lastXferErrors = $backups[@backups-1]{xferErrs} if ( @backups );
+
 $maxErrors = $conf->{MaxXferError} if (defined $conf->{MaxXferError});
 
-if ($what eq 'errors'){
-    print $lastXferErrors;
-} elsif ($what eq 'max_errors'){
-    print $maxErrors;
-} elsif ($what eq 'age'){
-    print $lastAge;
-} elsif ($what eq 'size'){
-    print $fullSize;
-} elsif ($what eq 'duration'){
-    print $fullDur;
-} elsif ($what eq 'notify'){
-    print $conf->{EMailNotifyOldBackupDays};
-} else{
+if ($what eq 'errors') {
+  print $lastXferErrors;
+} elsif ($what eq 'max_errors') {
+  print $maxErrors;
+} elsif ($what eq 'age') {
+  print $lastAge;
+} elsif ($what eq 'size') {
+  print $fullSize;
+} elsif ($what eq 'duration') {
+  print $lastDuration;
+} elsif ($what eq 'notify') {
+  print $conf->{EMailNotifyOldBackupDays};
+} elsif ($what eq 'all') {
+  print to_json(
+    {
+      max_errors    => $maxErrors,
+      last_age      => $lastAge,
+      full_size     => $fullSize,
+      new_size      => $lastSizeNew,
+      full_duration => $fullDur,
+      duration      => $lastDuration,
+      last_type     => $lastType
+    }
+  );
+} else {
   print<<"EOF";
 
-Usage: $0 <host> [errors|age|size|duration]
+Usage: $0 <host> [errors|age|size|duration|all]
 
 EOF
 }
