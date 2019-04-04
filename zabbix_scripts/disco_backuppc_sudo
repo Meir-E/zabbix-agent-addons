@@ -5,6 +5,15 @@ use BackupPC::Lib;
 use BackupPC::CGI::Lib;
 use POSIX;
 use JSON;
+use Getopt::Long;
+
+my $hosts = 1;
+my $entities = 0;
+
+GetOptions(
+  "hosts"    => \$hosts,
+  "entities" => \$entities
+);
 
 # We need to switch to backuppc UID/GID
 my $uid = getuid();
@@ -20,20 +29,30 @@ my $mainConf = $bpc->ConfigDataRead();
 my $json;
 @{$json->{data}} = ();
 
-foreach my $host (keys %$hosts){
-   my $hostConf   = $bpc->ConfigDataRead($host);
-   my $conf       = { %$mainConf, %$hostConf };
-   my $warning    = $conf->{EMailNotifyOldBackupDays};
-   my $errors     = (defined $conf->{MaxXferError}) ? $conf->{MaxXferError}: '0';
-   my $monitoring = $conf->{ZabbixMonitoring} || 1;
-   my $status     = ($conf->{BackupsDisable} eq '1' or $monitoring eq '0') ? '0' : '1';
-   push @{$json->{data}},
-       {  
-           "{#BPCHOST}" => $host,
-           "{#BPCNOBACKUPWARNING}" => $warning,
-           "{#BPCMAXERROR}" => $errors,
-           "{#BPCSTATUS}" => $status,
-       };
+if ($entities) {
+  my %entities = ();
+  foreach my $host (keys %$hosts){
+    if ($host =~ m/^(?:vm_)?([^_]+)_.*/) {
+      $entities{$1}= 1;
+    }
+  }
+  push @{$json->{data}}, { '{#BPC_ENTITY}' => $_ } foreach ( keys %entities );
+} elsif ($hosts){
+  foreach my $host (keys %$hosts){
+    my $hostConf   = $bpc->ConfigDataRead($host);
+    my $conf       = { %$mainConf, %$hostConf };
+    my $warning    = $conf->{EMailNotifyOldBackupDays};
+    my $errors     = (defined $conf->{MaxXferError}) ? $conf->{MaxXferError}: '0';
+    my $monitoring = $conf->{ZabbixMonitoring} || 1;
+    my $status     = ($conf->{BackupsDisable} gt 0 or $monitoring eq '0') ? '0' : '1';
+    push @{$json->{data}},
+        {
+            "{#BPCHOST}" => $host,
+            "{#BPCNOBACKUPWARNING}" => $warning,
+            "{#BPCMAXERROR}" => $errors,
+            "{#BPCSTATUS}" => $status,
+        };
+  }
 }
 print to_json($json);
 exit(0);

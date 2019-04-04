@@ -5,6 +5,18 @@ use BackupPC::Lib;
 use BackupPC::CGI::Lib;
 use POSIX;
 use JSON;
+use Getopt::Long;
+use Data::Dumper;
+
+my $host   = undef;
+my $entity = undef;
+my $pretty = 0;
+
+GetOptions(
+  "host=s"   => \$host,
+  "entity=s" => \$entity,
+  "pretty"   => \$pretty
+);
 
 # We need to switch to backuppc UID/GID
 my $uid = getuid();
@@ -13,84 +25,100 @@ my (undef,undef,$bkpuid,$bkpgid) = getpwnam('backuppc');
 setuid($bkpuid) if ($uid ne $bkpuid);
 setgid($bkpgid) if ($gid ne $bkpgid);
 
-my $host = $ARGV[0];
-my $what = $ARGV[1];
-
 my $bpc = BackupPC::Lib->new();
-
-my @backups = $bpc->BackupInfoRead($host);
 my $mainConf = $bpc->ConfigDataRead();
-my $hostConf = $bpc->ConfigDataRead($host);
-my $conf = { %$mainConf, %$hostConf };
-my $fullCnt = $incrCnt = 0;
-my $fullAge = $incrAge = $lastAge = -1;
-my $lastXferErrors = 0;
-my $maxErrors = 0;
+my $json = {};
 
-if ( @backups ) {
-  for ( my $i = 0 ; $i < @backups ; $i++ ) {
-    if ( $backups[$i]{type} eq "full" ) {
-      $fullCnt++;
-      if ( $fullAge < 0 || $backups[$i]{startTime} > $fullAge ) {
-        $fullAge  = $backups[$i]{startTime};
-        $fullSize = $backups[$i]{size};
-        $fullDur  = $backups[$i]{endTime} - $backups[$i]{startTime};
-      }
-    } else {
-      $incrCnt++;
-      if ( $incrAge < 0 || $backups[$i]{startTime} > $incrAge ) {
-        $incrAge = $backups[$i]{startTime};
-      }
+if ( $host ) {
+  my $hostConf = $bpc->ConfigDataRead($host);
+  my $conf = { %$mainConf, %$hostConf };
+  my $age = -1;
+
+  # Backup frequency
+  my $freq = ($conf->{FullPeriod} > $conf->{IncrPeriod}) ? $conf->{IncrPeriod} : $conf->{FullPeriod};
+
+  my $lastXferErrors = 0;
+  my $maxErrors = 0;
+  my $new_size_of_last_full = 0;
+
+  foreach my $backup ( $bpc->BackupInfoRead($host) ) {
+    # Skip partial or active backups
+    next if ( $backup->{type} !~ m/^full|incr$/ );
+    if ( $backup->{type} eq "full" ) {
+      $json->{full_size} = $backup->{size};
+      $new_size_of_last_full = $backup->{sizeNew};
     }
+    $json->{last_errors} = $backup->{xferErrs};
+    $json->{new_size}    = $backup->{sizeNew};
+    $json->{total_size} += $backup->{sizeNew};
+    $json->{duration}    = $backup->{endTime} - $backup->{startTime};
+    $json->{type}        = $backup->{type};
+    $json->{ratio}       = ( $backup->{sizeNew} > 0 ) ? sprintf( "%.2f", 100 - ( $backup->{sizeNewComp} * 100 / $backup->{sizeNew} ) ) : 0;
+    $age                 = $backup->{startTime};
   }
-  if ( $fullAge > $incrAge && $fullAge >= 0 )  {
-    $lastAge = $fullAge;
-  } else {
-    $lastAge = $incrAge;
-  }
-  if ( $lastAge < 0 ) {
-    $lastAge = "";
-  } else {
-    $lastAge = sprintf("%.1f", (time - $lastAge) / (24 * 3600));
-  }
-  $lastXferErrors = $backups[@backups-1]{xferErrs};
-  $lastSizeNew    = $backups[@backups-1]{sizeNew};
-  $lastDuration   = $backups[@backups-1]{endTime} - $backups[@backups-1]{startTime};
-  $lastType       = $backups[@backups-1]{type};
-}
+  $json->{enabled}     = ( $conf->{BackupsDisable} > 0 ) ? 0 : 1;
+  $json->{total_size} += $json->{full_size} - 2 * $new_size_of_last_full;
+  $json->{age} = time - $age;
 
-$maxErrors = $conf->{MaxXferError} if (defined $conf->{MaxXferError});
+  $json->{max_errors} = $conf->{MaxXferError} if (defined $conf->{MaxXferError});
+} elsif ( $entity ) {
 
-if ($what eq 'errors') {
-  print $lastXferErrors;
-} elsif ($what eq 'max_errors') {
-  print $maxErrors;
-} elsif ($what eq 'age') {
-  print $lastAge;
-} elsif ($what eq 'size') {
-  print $fullSize;
-} elsif ($what eq 'duration') {
-  print $lastDuration;
-} elsif ($what eq 'notify') {
-  print $conf->{EMailNotifyOldBackupDays};
-} elsif ($what eq 'all') {
-  print to_json(
-    {
-      max_errors    => $maxErrors,
-      last_age      => $lastAge,
-      full_size     => $fullSize,
-      new_size      => $lastSizeNew,
-      full_duration => $fullDur,
-      duration      => $lastDuration,
-      last_type     => $lastType,
-      last_errors   => $lastXferErrors
+  $json = {
+    perf  => 0,
+    size  => 0,
+    hosts => 0,
+    bkp   => 0,
+    ratio => 0
+  };
+
+  my $total_new  = 0;
+  my $total_comp = 0;
+
+  foreach my $host ( keys %{ $bpc->HostInfoRead } ) {
+    next unless $host =~ m/^(vm_)?\Q$entity\E_.*/;
+    my $full_size;
+
+    $json->{hosts}++;
+
+    my $hostConf = $bpc->ConfigDataRead($host);
+    my $conf     = { %$mainConf, %$hostConf };
+    my $freq     = ($conf->{FullPeriod} > $conf->{IncrPeriod}) ? $conf->{IncrPeriod} : $conf->{FullPeriod};
+    my $duration = 0;
+    my $bkp_num  = 0;
+
+    foreach my $backup ( $bpc->BackupInfoRead( $host ) ) {
+      next if ( $backup->{type} !~ m/^full|incr$/ );
+      # For the last full backup of this host, we do not count
+      # the new file size, but the total size
+      # We substract 2 times the new file size because we want the total size
+      if ( $backup->{type} eq 'full' ) {
+        $full_size  = $backup->{size} - 2 * $backup->{sizeNew};
+      }
+      $size       += $backup->{sizeNew};
+      $total_new  += $backup->{sizeNew};
+      $total_comp += $backup->{sizeNewComp};
+      $duration   += $backup->{endTime} - $backup->{startTime};
+      $bkp_num++;
+      $json->{bkp}++;
     }
-  );
+    # Compute the average cost as the number of hours per day spent
+    # to backup this host
+    $json->{perf} += ( $bkp_num > 0 ) ? $duration / ( 3600 * $bkp_num * $freq ) : 0;
+    $json->{size} += $size + $full_size;
+  }
+  $json->{ratio} = ( $total_new > 0 ) ? 100 - ( $total_comp * 100 / $total_new ) : 0;
+
+  # Round some values
+  foreach my $key ( qw(ratio perf) ) {
+    $json->{$key} = sprintf( "%.2f", $json->{$key} );
+  }
 } else {
   print<<"EOF";
 
-Usage: $0 <host> [errors|age|size|duration|all]
+Usage: $0 --host=<host> or --entity=<entity>
 
 EOF
 }
+
+print to_json( $json, { pretty => $pretty } );
 exit(0);
