@@ -85,7 +85,7 @@ if ( $host ) {
     my $freq     = ( $conf->{FullPeriod} > $conf->{IncrPeriod} ) ? $conf->{IncrPeriod} : $conf->{FullPeriod};
     my $duration = 0;
     my $bkp_num  = 0;
-    my $new_size_of_last_full = 0
+    my $new_size_of_last_full = 0;
 
     foreach my $backup ( $bpc->BackupInfoRead( $host ) ) {
       next if ( $backup->{type} !~ m/^full|incr$/ );
