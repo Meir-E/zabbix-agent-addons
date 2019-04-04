@@ -31,26 +31,26 @@ my $json;
 
 if ($entities) {
   my %entities = ();
-  foreach my $host (keys %$hosts){
-    if ($host =~ m/^(?:vm_)?([^_]+)_.*/) {
+  foreach my $host ( keys %$hosts ){
+    if ( $host =~ m/^(?:vm_)?([^_]+)_.*/ and $1 ne 'vm' ) {
       $entities{$1}= 1;
     }
   }
   push @{$json->{data}}, { '{#BPC_ENTITY}' => $_ } foreach ( keys %entities );
 } elsif ($hosts){
-  foreach my $host (keys %$hosts){
+  foreach my $host ( keys %$hosts ){
     my $hostConf   = $bpc->ConfigDataRead($host);
     my $conf       = { %$mainConf, %$hostConf };
     my $warning    = $conf->{EMailNotifyOldBackupDays};
-    my $errors     = (defined $conf->{MaxXferError}) ? $conf->{MaxXferError}: '0';
+    my $errors     = ( defined $conf->{MaxXferError} ) ? $conf->{MaxXferError}: '0';
     my $monitoring = $conf->{ZabbixMonitoring} || 1;
-    my $status     = ($conf->{BackupsDisable} gt 0 or $monitoring eq '0') ? '0' : '1';
+    my $status     = ( $conf->{BackupsDisable} gt 0 or $monitoring eq '0' ) ? '0' : '1';
     push @{$json->{data}},
         {
-            "{#BPCHOST}" => $host,
+            "{#BPCHOST}"            => $host,
             "{#BPCNOBACKUPWARNING}" => $warning,
-            "{#BPCMAXERROR}" => $errors,
-            "{#BPCSTATUS}" => $status,
+            "{#BPCMAXERROR}"        => $errors,
+            "{#BPCSTATUS}"          => $status,
         };
   }
 }
