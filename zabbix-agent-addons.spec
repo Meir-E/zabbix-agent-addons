@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.71
+Version: 0.2.72
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -100,6 +100,9 @@ fi
 %endif
 
 %changelog
+* Thu Apr 04 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.72-1
+- Fix reporting MaxXferError (daniel@firewall-services.com)
+
 * Thu Apr 04 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.71-1
 - Fix a typo in check_backuppc_sudo (daniel@firewall-services.com)
 
