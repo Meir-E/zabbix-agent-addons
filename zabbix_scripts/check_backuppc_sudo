@@ -82,29 +82,30 @@ if ( $host ) {
 
     my $hostConf = $bpc->ConfigDataRead($host);
     my $conf     = { %$mainConf, %$hostConf };
-    my $freq     = ($conf->{FullPeriod} > $conf->{IncrPeriod}) ? $conf->{IncrPeriod} : $conf->{FullPeriod};
+    my $freq     = ( $conf->{FullPeriod} > $conf->{IncrPeriod} ) ? $conf->{IncrPeriod} : $conf->{FullPeriod};
     my $duration = 0;
     my $bkp_num  = 0;
+    my $new_size_of_last_full = 0
 
     foreach my $backup ( $bpc->BackupInfoRead( $host ) ) {
       next if ( $backup->{type} !~ m/^full|incr$/ );
       # For the last full backup of this host, we do not count
       # the new file size, but the total size
-      # We substract 2 times the new file size because we want the total size
       if ( $backup->{type} eq 'full' ) {
-        $full_size  = $backup->{size} - 2 * $backup->{sizeNew};
+        $full_size             = $backup->{size};
+        $new_size_of_last_full = $backup->{sizeNew};
       }
-      $size       += $backup->{sizeNew};
-      $total_new  += $backup->{sizeNew};
-      $total_comp += $backup->{sizeNewComp};
-      $duration   += $backup->{endTime} - $backup->{startTime};
+      $json->{size} += $backup->{sizeNew};
+      $total_new    += $backup->{sizeNew};
+      $total_comp   += $backup->{sizeNewComp};
+      $duration     += $backup->{endTime} - $backup->{startTime};
       $bkp_num++;
       $json->{bkp}++;
     }
     # Compute the average cost as the number of hours per day spent
     # to backup this host
     $json->{perf} += ( $bkp_num > 0 ) ? $duration / ( 3600 * $bkp_num * $freq ) : 0;
-    $json->{size} += $size + $full_size;
+    $json->{size} += $full_size - 2 * $new_size_of_last_full;
   }
   $json->{ratio} = ( $total_new > 0 ) ? 100 - ( $total_comp * 100 / $total_new ) : 0;
 
