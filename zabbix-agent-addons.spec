@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.68
+Version: 0.2.69
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -100,6 +100,10 @@ fi
 %endif
 
 %changelog
+* Thu Apr 04 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.69-1
+- Don't count vm as an entity in BackupPC's entities discovery
+  (daniel@firewall-services.com)
+
 * Thu Apr 04 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.68-1
 - Update BackupPC's discovery and monitoring scripts (daniel@firewall-
   services.com)
