@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.67
+Version: 0.2.68
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -100,6 +100,10 @@ fi
 %endif
 
 %changelog
+* Thu Apr 04 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.68-1
+- Update BackupPC's discovery and monitoring scripts (daniel@firewall-
+  services.com)
+
 * Wed Apr 03 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.67-1
 - Add last_errors in backuppc JSON info (daniel@firewall-services.com)
 - Update conf for BackupPC (daniel@firewall-services.com)
