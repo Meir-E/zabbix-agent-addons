@@ -42,7 +42,7 @@ if ($entities) {
     my $hostConf   = $bpc->ConfigDataRead($host);
     my $conf       = { %$mainConf, %$hostConf };
     my $warning    = $conf->{EMailNotifyOldBackupDays};
-    my $errors     = ( defined $conf->{MaxXferError} ) ? $conf->{MaxXferError}: '0';
+    my $errors     = ( defined $conf->{MaxXferError} ) ? $conf->{MaxXferError} : '0';
     my $monitoring = $conf->{ZabbixMonitoring} || 1;
     my $status     = ( $conf->{BackupsDisable} gt 0 or $monitoring eq '0' ) ? '0' : '1';
     push @{$json->{data}},

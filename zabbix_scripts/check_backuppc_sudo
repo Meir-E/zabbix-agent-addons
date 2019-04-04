@@ -60,7 +60,8 @@ if ( $host ) {
   $json->{total_size} += $json->{full_size} - 2 * $new_size_of_last_full;
   $json->{age} = time - $age;
 
-  $json->{max_errors} = $conf->{MaxXferError} if (defined $conf->{MaxXferError});
+  $json->{max_errors} = $conf->{MaxXferError} || 0;
+
 } elsif ( $entity ) {
 
   $json = {
