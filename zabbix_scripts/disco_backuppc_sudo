@@ -7,12 +7,14 @@ use POSIX;
 use JSON;
 use Getopt::Long;
 
-my $hosts = 1;
+my $hosts    = 1;
 my $entities = 0;
+my $pretty   = 0;
 
 GetOptions(
   "hosts"    => \$hosts,
-  "entities" => \$entities
+  "entities" => \$entities,
+  "pretty"   => \$pretty
 );
 
 # We need to switch to backuppc UID/GID
@@ -39,20 +41,24 @@ if ($entities) {
   push @{$json->{data}}, { '{#BPC_ENTITY}' => $_ } foreach ( keys %entities );
 } elsif ($hosts){
   foreach my $host ( keys %$hosts ){
-    my $hostConf   = $bpc->ConfigDataRead($host);
-    my $conf       = { %$mainConf, %$hostConf };
-    my $warning    = $conf->{EMailNotifyOldBackupDays};
-    my $errors     = ( defined $conf->{MaxXferError} ) ? $conf->{MaxXferError} : '0';
-    my $monitoring = $conf->{ZabbixMonitoring} || 1;
-    my $status     = ( $conf->{BackupsDisable} gt 0 or $monitoring eq '0' ) ? '0' : '1';
+    my $hostConf           = $bpc->ConfigDataRead($host);
+    my $conf               = { %$mainConf, %$hostConf };
+    my $warning            = $conf->{EMailNotifyOldBackupDays};
+    my $errors             = ( defined $conf->{MaxXferError} ) ? $conf->{MaxXferError} : '0';
+    my $monitoring         = $conf->{ZabbixMonitoring} || 1;
+    my $sizeTooBigFactor   = $conf->{ZabbixSizeTooBigFactor} || 6;
+    my $sizeTooSmallFactor = $conf->{ZabbixSizeTooSmallFactore} || 3;
+    my $status             = ( $conf->{BackupsDisable} gt 0 or $monitoring eq '0' ) ? '0' : '1';
     push @{$json->{data}},
         {
-            "{#BPCHOST}"            => $host,
-            "{#BPCNOBACKUPWARNING}" => $warning,
-            "{#BPCMAXERROR}"        => $errors,
-            "{#BPCSTATUS}"          => $status,
+            "{#BPCHOST}"              => $host,
+            "{#BPCNOBACKUPWARNING}"   => $warning,
+            "{#BPCMAXERROR}"          => $errors,
+            "{#BPCSTATUS}"            => $status,
+            "{#BPC_TOO_BIG_FACTOR}"   => $sizeTooBigFactor,
+            "{#BPC_TOO_SMALL_FACTOR}" => $sizeTooSmallFactor,
         };
   }
 }
-print to_json($json);
+print to_json( $json, { pretty => $pretty } );
 exit(0);

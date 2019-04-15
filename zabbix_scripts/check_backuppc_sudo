@@ -6,6 +6,7 @@ use BackupPC::CGI::Lib;
 use POSIX;
 use JSON;
 use Getopt::Long;
+use Statistics::Descriptive;
 use Data::Dumper;
 
 my $host   = undef;
@@ -33,35 +34,61 @@ if ( $host ) {
   my $hostConf = $bpc->ConfigDataRead($host);
   my $conf = { %$mainConf, %$hostConf };
   my $age = -1;
+  $json = {
+    bkp             => 0,
+    full_size       => 0,
+    errors          => 0,
+    new_size        => 0,
+    new_size_avg    => 0,
+    new_size_median => 0,
+    new_size_q1     => 0,
+    new_size_q3     => 0,
+    duration        => 0,
+    comp_ratio      => 0
+  };
 
-  # Backup frequency
-  my $freq = ($conf->{FullPeriod} > $conf->{IncrPeriod}) ? $conf->{IncrPeriod} : $conf->{FullPeriod};
-
-  my $lastXferErrors = 0;
-  my $maxErrors = 0;
+  my $lastXferErrors        = 0;
+  my $maxErrors             = 0;
   my $new_size_of_last_full = 0;
+  my @bpc_info              = $bpc->BackupInfoRead($host);
+  my $sizes                 = new Statistics::Descriptive::Full;
 
-  foreach my $backup ( $bpc->BackupInfoRead($host) ) {
-    # Skip partial or active backups
-    next if ( $backup->{type} !~ m/^full|incr$/ );
-    if ( $backup->{type} eq "full" ) {
-      $json->{full_size} = $backup->{size};
-      $new_size_of_last_full = $backup->{sizeNew};
+  if ( scalar( @bpc_info ) ){
+    foreach my $backup ( @bpc_info ) {
+      # Skip partial or active backups
+      next if ( $backup->{type} !~ m/^full|incr$/ );
+      if ( $backup->{type} eq "full" ) {
+        $json->{full_size} = $backup->{size};
+        $new_size_of_last_full = $backup->{sizeNew};
+      }
+      # Push all the sizes in our data set to compute avg sizes
+      # Exclude backup N°0 as it'll always have much more new data than normal backups
+      $sizes->add_data($backup->{sizeNew}) unless ( $backup->{num} == 0 );
+      $json->{bkp}++;
     }
-    $json->{last_errors} = $backup->{xferErrs};
-    $json->{new_size}    = $backup->{sizeNew};
-    $json->{total_size} += $backup->{sizeNew};
-    $json->{duration}    = $backup->{endTime} - $backup->{startTime};
-    $json->{type}        = $backup->{type};
-    $json->{ratio}       = ( $backup->{sizeNew} > 0 ) ? sprintf( "%.2f", 100 - ( $backup->{sizeNewComp} * 100 / $backup->{sizeNew} ) ) : 0;
-    $age                 = $backup->{startTime};
+
+    # Ignore the last backup if it's not full or incr (which means it's either partial or active)
+    my $i = ( $bpc_info[-1]->{type} =~ m/^full|incr$/ ) ? -1 : -2;
+
+    $json->{errors}      = $bpc_info[$i]->{xferErrs};
+    $json->{new_size}    = $bpc_info[$i]->{sizeNew};
+    $json->{duration}    = $bpc_info[$i]->{endTime} - $bpc_info[$i]->{startTime};
+    $json->{type}        = $bpc_info[$i]->{type};
+    $json->{comp_ratio}  = ( $bpc_info[$i]->{sizeNew} > 0 ) ?
+        sprintf( "%.2f", 100 - ( $bpc_info[$i]->{sizeNewComp} * 100 / $bpc_info[$i]->{sizeNew} ) )
+          :
+        0;
+
+    $json->{new_size_avg}    = int $sizes->mean;
+    $json->{new_size_median} = int $sizes->median;
+    $json->{new_size_q1}     = int $sizes->quantile(1);
+    $json->{new_size_q3}     = int $sizes->quantile(3);
+    $json->{enabled}         = ( $conf->{BackupsDisable} > 0 ) ? 0 : 1;
+    $json->{total_size}      = $sizes->sum + $json->{full_size} - 2 * $new_size_of_last_full;
+    $json->{age}             = time - $bpc_info[$i]->{startTime};
+
+    $json->{max_errors} = $conf->{MaxXferError} || 0;
   }
-  $json->{enabled}     = ( $conf->{BackupsDisable} > 0 ) ? 0 : 1;
-  $json->{total_size} += $json->{full_size} - 2 * $new_size_of_last_full;
-  $json->{age} = time - $age;
-
-  $json->{max_errors} = $conf->{MaxXferError} || 0;
-
 } elsif ( $entity ) {
 
   $json = {
@@ -90,12 +117,13 @@ if ( $host ) {
 
     foreach my $backup ( $bpc->BackupInfoRead( $host ) ) {
       next if ( $backup->{type} !~ m/^full|incr$/ );
-      # For the last full backup of this host, we do not count
-      # the new file size, but the total size
+
+      # Save the total size of the last full backup
       if ( $backup->{type} eq 'full' ) {
         $full_size             = $backup->{size};
         $new_size_of_last_full = $backup->{sizeNew};
       }
+
       $json->{size} += $backup->{sizeNew};
       $total_new    += $backup->{sizeNew};
       $total_comp   += $backup->{sizeNewComp};
@@ -106,6 +134,10 @@ if ( $host ) {
     # Compute the average cost as the number of hours per day spent
     # to backup this host
     $json->{perf} += ( $bkp_num > 0 ) ? $duration / ( 3600 * $bkp_num * $freq ) : 0;
+
+    # $json->{size} represent the total size used by this host.
+    # But we want to substract the new size of the last full, as for this one we
+    # do not count sizeNew but size. As we've already added sizeNew we need to substract it 2 times
     $json->{size} += $full_size - 2 * $new_size_of_last_full;
   }
   $json->{ratio} = ( $total_new > 0 ) ? 100 - ( $total_comp * 100 / $total_new ) : 0;
@@ -114,6 +146,7 @@ if ( $host ) {
   foreach my $key ( qw(ratio perf) ) {
     $json->{$key} = sprintf( "%.2f", $json->{$key} );
   }
+
 } else {
   print<<"EOF";
 
