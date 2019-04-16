@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.73
+Version: 0.2.74
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -101,6 +101,10 @@ fi
 %endif
 
 %changelog
+* Tue Apr 16 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.74-1
+- Don't fail if Statistics::Descriptive doesn't support quantile
+  (daniel@firewall-services.com)
+
 * Mon Apr 15 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.73-1
 - More work on BackupPC's monitoring scripts (daniel@firewall-services.com)
 
