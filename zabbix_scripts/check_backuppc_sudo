@@ -81,8 +81,9 @@ if ( $host ) {
 
     $json->{new_size_avg}    = int $sizes->mean;
     $json->{new_size_median} = int $sizes->median;
-    $json->{new_size_q1}     = int $sizes->quantile(1);
-    $json->{new_size_q3}     = int $sizes->quantile(3);
+    # Some old versions of Statistics::Descriptive (eg, on el5) do not support quantile
+    $json->{new_size_q1}     = eval { int $sizes->quantile(1) } || 0;
+    $json->{new_size_q3}     = eval { int $sizes->quantile(3) } || 0;
     $json->{enabled}         = ( $conf->{BackupsDisable} > 0 ) ? 0 : 1;
     $json->{total_size}      = $sizes->sum + $json->{full_size} - 2 * $new_size_of_last_full;
     $json->{age}             = time - $bpc_info[$i]->{startTime};
