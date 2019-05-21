@@ -1,0 +1,45 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use JSON;
+use Getopt::Long;
+use File::Which;
+
+my $vdostats = which('vdostats');
+my $json     = {};
+my $pretty   = 0;
+my $volume   = undef;
+my $val      = undef;
+
+GetOptions(
+  'volume=s' => \$volume,
+  'value=s'  => \$val,
+  'pretty'   => \$pretty
+);
+
+if ($volume) {
+  if ($volume !~ m/^\w+$/){
+    die "Invalide volume name\n";
+  }
+  foreach my $line (qx($vdostats --all $volume)){
+    if ($line =~ m/^\s+([^:]+)\s+:\s+([\d\w]+)/){
+      my ($key,$val) = ($1,$2);
+      # Cleanup key
+      $key =~ s/\s+$//;
+      $key =~ s/\s+/_/g;
+      $key =~ s/\(|\)//g;
+      $key =~ s/%/pct/g;
+      $json->{lc $key} = $val;
+    }
+  }
+} else {
+  print 'ZBX_NOTSUPPORTED';
+  exit 0;
+}
+if (defined $val) {
+  print $json->{$val} || 'ZBX_NOTSUPPORTED';
+} else {
+  print to_json($json, { pretty => $pretty });
+}
+print "\n";

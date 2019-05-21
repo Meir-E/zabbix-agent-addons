@@ -1,0 +1,31 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use JSON;
+use File::Which;
+use Getopt::Long;
+
+my $json;
+@{$json->{data}} = ();
+
+my $what   = 'volumes';
+my $pretty = 0;
+
+GetOptions(
+  'what=s' => \$what,
+  'pretty' => \$pretty
+);
+
+my $vdostats = which('vdostats');
+
+if (defined $vdostats) {
+  foreach my $line (qx($vdostats)) {
+    if ($line =~ m|^/dev/mapper/([^\s]+)|) {
+      push @{$json->{data}}, {
+        '{#VDO_VOL}' => $1
+      };
+    }
+  }
+}
+print to_json($json, { pretty => $pretty }) . "\n";
