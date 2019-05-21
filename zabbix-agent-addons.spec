@@ -4,8 +4,8 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.74
-Release: 1%{?dist}
+Version: 0.2.75
+Release: 0.beta1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
 
@@ -101,6 +101,9 @@ fi
 %endif
 
 %changelog
+* Tue May 21 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.75-0.beta1
+- Add basic scripts to monitor VDO volumes (daniel@firewall-services.com)
+
 * Tue Apr 16 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.74-1
 - Don't fail if Statistics::Descriptive doesn't support quantile
   (daniel@firewall-services.com)
