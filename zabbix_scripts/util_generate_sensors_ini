@@ -297,6 +297,19 @@ if ($smartctl && -x $smartctl){
         print "Found a temperature sensor using smartctl: $block\n";
         last;
       }
+      # Format found on some NVMe SSD
+      elsif ($l =~ /Temperature:\s+(\d+(\.\d+)?)\sCelsius/){
+        $sensors->{$block} = {
+          description    => "$block temperature",
+          threshold_low  => $def_hd_temp_thres_high-$temp_hd_hyst,
+          threshold_high => $def_hd_temp_thres_high,
+          type           => 'temp',
+          unit           => '°C',
+          cmd            => "$smartctl -A /dev/$block | grep Temperature: | awk '{ print \$2 }'"
+        };
+        print "Found a temperature sensor using smartctl: $block\n";
+        last;
+      }
     }
   }
   # Some LSI based hardware RAID controller can report HDD temp
