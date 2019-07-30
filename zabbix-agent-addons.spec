@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.75
+Version: 0.2.76
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -101,6 +101,12 @@ fi
 %endif
 
 %changelog
+* Tue Jul 30 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.76-1
+- Add support for some NVMe temp sensors Found on OVH's Advanced servers for
+  example (daniel@firewall-services.com)
+- Fix when running on Debian buster Which fails with RC 25 when using
+  File::Spec devnull (daniel@firewall-services.com)
+
 * Tue May 21 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.75-1
 - Add basic scripts to monitor VDO volumes (daniel@firewall-services.com)
 
