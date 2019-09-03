@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.76
+Version: 0.2.77
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -101,6 +101,9 @@ fi
 %endif
 
 %changelog
+* Tue Sep 03 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.77-1
+- Skip self PVE node (daniel@firewall-services.com)
+
 * Tue Jul 30 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.76-1
 - Add support for some NVMe temp sensors Found on OVH's Advanced servers for
   example (daniel@firewall-services.com)
