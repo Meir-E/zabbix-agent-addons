@@ -5,6 +5,7 @@ use warnings;
 use JSON;
 use Getopt::Long;
 use File::Which;
+use Sys::Hostname;
 
 my $what = 'nodes';
 my $pretty = 0;
@@ -29,7 +30,8 @@ my $pvesh_opt = (system("$pvesh get /version --output-format=json >/dev/null 2>&
 if ($what eq 'nodes'){
   my $cluster_status = from_json(qx($pvesh get /cluster/status $pvesh_opt 2>/dev/null));
   foreach my $item (@{$cluster_status}){
-    next unless ($item->{type} eq 'node');
+    next if ($item->{type} ne 'node');
+    next if ($item->{name} eq hostname());
     push @{$json->{data}}, {
       '{#PVE_NODE_NAME}'  => $item->{name},
       '{#PVE_NODE_IP}'    => $item->{ip},
