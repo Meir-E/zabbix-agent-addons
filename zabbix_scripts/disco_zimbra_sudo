@@ -1,0 +1,60 @@
+#!/usr/bin/perl -w
+
+use JSON;
+use POSIX;
+use Getopt::Long;
+use Net::Domain qw(hostfqdn);
+use Data::Dumper;
+
+my $json;
+@{$json} = ();
+
+my $pretty   = 0;
+my $services = 1;
+my $servers  = 0;
+
+GetOptions(
+  "pretty"   => \$pretty,
+  "services" => \$services,
+  "servers"  => \$servers
+);
+
+if ($servers) {
+  $services = 0;
+}
+
+my $uid = getuid();
+my $gid = getgid();
+my (undef,undef,$zimuid,$zimgid) = getpwnam('zimbra');
+
+my $zmprov = '/opt/zimbra/bin/zmprov';
+my $hostname = hostfqdn();
+
+# If there's no zimbra user or no zmcontrol, just return an empty list
+if (not defined $zimuid or not defined $zimgid or not -e $zmprov){
+  print to_json({});
+  exit;
+}
+
+# Switch to Zimbra user
+setuid($zimuid) if ($uid ne $zimuid);
+setgid($zimgid) if ($gid ne $zimgid);
+
+if ($services){
+  foreach my $service (qx($zmprov getServer $hostname zimbraServiceEnabled)){
+    if ($service =~ m/^zimbraServiceEnabled:\s+(\w+)/){
+      push @{$json}, {
+        '{#ZM_SERVICE}' => $1
+      };
+    }
+  }
+} elsif ($servers){
+  foreach my $server (qx($zmprov getAllServers)){
+    chomp $server;
+    push @{$json}, {
+      '{#ZM_SERVER}' => $server
+    };
+  }
+}
+
+print to_json($json, { pretty => $pretty });

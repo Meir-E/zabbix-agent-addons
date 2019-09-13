@@ -1,0 +1,59 @@
+#!/usr/bin/perl -w
+
+use JSON;
+use POSIX;
+use Getopt::Long;
+use Net::Domain qw(hostfqdn);
+use Data::Dumper;
+
+my $pretty = 0;
+my $status = 'all';
+
+GetOptions(
+  "pretty"    => \$pretty,
+  "status=s"  => \$status
+);
+
+if (defined $service and $service !~ m/^\w+$/){
+  die "Invelid service name\n";
+}
+
+my $zmprov    = '/opt/zimbra/bin/zmprov';
+my $zmcontrol = '/opt/zimbra/bin/zmcontrol';
+my $hostname  = hostfqdn();
+
+# We need to switch to zimbra
+my $uid = getuid();
+my $gid = getgid();
+my (undef,undef,$zimuid,$zimgid) = getpwnam('zimbra');
+
+if (not defined $zimuid or not defined $zimgid or not -e $zmprov){
+  print 'ZBX_NOTSUPPOTED';
+  exit;
+}
+
+setuid($zimuid) if ($uid ne $zimuid);
+setgid($zimgid) if ($gid ne $zimgid);
+
+# If there's no zimbra user or no zmcontrol, return unsupported item
+if (not defined $zimuid or not defined $zimgid or not -e $zmprov){
+  print 'ZBX_NOTSUPPOTED';
+  exit 0;
+}
+
+my $output = {};
+
+if (defined $status){
+  foreach my $line (qx($zmcontrol status)){
+    if ($line =~ m/^\s+(\w+)\s+(Running|Stopped)/){
+      $output->{$1} = ($2 eq 'Running') ? 1 : 0;
+    }
+  }
+  if ($service eq 'all'){
+    print to_json($output, { pretty => $pretty });
+  } elsif (defined $output->{$status}){
+    print $output->{$status}
+  } else {
+    print 'ZBX_NOTSUPPORTED';
+  }
+}
