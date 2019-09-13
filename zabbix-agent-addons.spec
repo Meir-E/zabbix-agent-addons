@@ -4,8 +4,8 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.77
-Release: 1%{?dist}
+Version: 0.2.78
+Release: 0.beta1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
 
@@ -101,6 +101,9 @@ fi
 %endif
 
 %changelog
+* Fri Sep 13 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.78-0.beta1
+- Add simple Zabbix service status scripts (daniel@firewall-services.com)
+
 * Tue Sep 03 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.77-1
 - Skip self PVE node (daniel@firewall-services.com)
 
