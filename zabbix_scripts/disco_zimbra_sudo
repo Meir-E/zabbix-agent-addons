@@ -41,6 +41,10 @@ setuid($zimuid) if ($uid ne $zimuid);
 setgid($zimgid) if ($gid ne $zimgid);
 
 if ($services){
+  # zmconfigd is always enabled and should be running
+  push @{$json}, {
+    '{#ZM_SERVICE}' => 'zmconfigd'
+  };
   foreach my $service (qx($zmprov getServer $hostname zimbraServiceEnabled)){
     if ($service =~ m/^zimbraServiceEnabled:\s+(\w+)/){
       push @{$json}, {
