@@ -49,7 +49,7 @@ if (defined $status){
       $output->{$1} = ($2 eq 'Running') ? 1 : 0;
     }
   }
-  if ($service eq 'all'){
+  if ($status eq 'all'){
     print to_json($output, { pretty => $pretty });
   } elsif (defined $output->{$status}){
     print $output->{$status}
