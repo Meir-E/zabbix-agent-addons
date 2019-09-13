@@ -5,7 +5,7 @@
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
 Version: 0.2.79
-Release: 0.beta3%{?dist}
+Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
 
@@ -101,7 +101,7 @@ fi
 %endif
 
 %changelog
-* Fri Sep 13 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.79-0.beta3
+* Fri Sep 13 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.79-1
 - Add simple Zabbix service status scripts (daniel@firewall-services.com)
 
 * Tue Sep 03 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.77-1
