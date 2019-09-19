@@ -7,7 +7,7 @@ use Net::Domain qw(hostfqdn);
 use Data::Dumper;
 
 my $json;
-@{$json} = ();
+@{$json->{data}} = ();
 
 my $pretty   = 0;
 my $services = 1;
@@ -47,7 +47,7 @@ if ($services){
   };
   foreach my $service (qx($zmprov getServer $hostname zimbraServiceEnabled)){
     if ($service =~ m/^zimbraServiceEnabled:\s+(\w+)/){
-      push @{$json}, {
+      push @{$json->{data}}, {
         '{#ZM_SERVICE}' => $1
       };
     }
@@ -55,7 +55,7 @@ if ($services){
 } elsif ($servers){
   foreach my $server (qx($zmprov getAllServers)){
     chomp $server;
-    push @{$json}, {
+    push @{$json->{data}}, {
       '{#ZM_SERVER}' => $server
     };
   }
