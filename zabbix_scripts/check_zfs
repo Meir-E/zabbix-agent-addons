@@ -81,7 +81,7 @@ sub get_zpool_errors {
   };
   my $i = 0;
   my $index = {};
-  foreach my $line (qx($zpool status -p $pool)){
+  foreach my $line (qx($zpool status $pool)){
     # Output looks like
     #   pool: rpool
     #  state: ONLINE
@@ -110,17 +110,33 @@ sub get_zpool_errors {
       chomp($line);
       $line =~ s/\s+/ /g;
       $errors->{$index->{$i-1}} .= $line;
-    } elsif ($line =~ m/\s+[a-zA-Z0-9_\-]+\s+[A-Z]+\s+(?<read>\d+(\.\d+)?)\s+(?<write>\d+(\.\d+)?)\s+(?<cksum>\d+(\.\d+)?)/){
+    } elsif ($line =~ m/\s+[a-zA-Z0-9_\-]+\s+[A-Z]+\s+(?<read>\d+(\.\d+)?)(?<read_suffix>[KMT])?\s+(?<write>\d+(\.\d+)?)(?<write_suffix>[KMT])?\s+(?<cksum>\d+(\.\d+)?)(?<cksum_suffix>[KMT])?/){
       # And here, we count the number of read, write and checksum errors
-      $errors->{read_errors}  += $+{'read'};
-      $errors->{write_errors} += $+{'write'};
-      $errors->{cksum_errors} += $+{'cksum'};
+      $errors->{read_errors}  += convert_suffix($+{'read'},$+{'read_suffix'});
+      $errors->{write_errors} += convert_suffix($+{'write'},$+{'write_suffix'});
+      $errors->{cksum_errors} += convert_suffix($+{'write'},$+{'write_suffix'});
     }
     $i++;
   }
   # Ensure evey item returns something
   $errors->{$_} ||= '' foreach (qw(scan action status errors));
   return $errors;
+}
+
+# Error counter can be suffixed. Apply this suffix to get raw error numbers
+sub convert_suffix {
+  my $val = shift;
+  my $suf = shift;
+  if (!$suf){
+    return $val;
+  } elsif ($suf eq 'K'){
+    $val *= 1000;
+  } elsif ($suf eq 'M') {
+    $val *= 1000000;
+  } elsif ($suf eq 'T') {
+    $val *= 1000000000;
+  }
+  return $val;
 }
 
 sub get_zpool_stats {
