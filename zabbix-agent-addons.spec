@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.81
+Version: 0.2.82
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -101,6 +101,10 @@ fi
 %endif
 
 %changelog
+* Fri Sep 20 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.82-1
+- Remove trailing x for compressratio with ZoL < 0.8 (daniel@firewall-
+  services.com)
+
 * Fri Sep 20 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.81-1
 - Revert to suffix conversion for ZFS error count (daniel@firewall-
   services.com)
