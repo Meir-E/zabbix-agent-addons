@@ -63,6 +63,10 @@ if ($pool){
     chomp;
     my @parse = split /\t+/, $_;
     $json->{$parse[1]} = (defined $map->{$parse[2]}) ? $map->{$parse[2]} : $parse[2];
+    if ($parse[1] =~ m/compressratio$/){
+      # Remove trailing x for compressratio and refcompressratio as before 0.8.0 it can be like 1.23x
+      $json->{$parse[1]} =~ s/x$//;
+    }
   }
 } elsif ($sanoidsnap){
   print qx($sanoid --monitor-snapshot);
