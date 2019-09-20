@@ -4,15 +4,70 @@ use strict;
 use warnings;
 use JSON;
 use File::Which;
+use Getopt::Long;
 
 my $json;
 @{$json->{data}} = ();
-my $zpool = which('zpool');
+my $zpool  = which('zpool');
+my $zfs    = which('zfs');
+my $sanoid = which('sanoid');
 
-if ($zpool){
+if (not $zpool or not $zfs){
+  print 'ZBX_NOTSUPPOTED';
+  exit(0);
+}
+
+my $pools      = 1;
+my $fs         = 0;
+my $zvol       = 0;
+my $snap       = 0;
+my $sanoidsnap = 0;
+my $pretty     = 0;
+
+GetOptions(
+  "pools"           => \$pools,
+  "fs|filesystems"  => \$fs,
+  "zvols|volumes"   => \$zvol,
+  "snapshots"       => \$snap,
+  "sanoidsnap"      => \$sanoidsnap,
+  "pretty"          => \$pretty
+);
+
+if ($fs or $zvol or $snap or $sanoidsnap){
+  $pools = 0;
+}
+if ($pools + $fs + $zvol + $snap + $sanoidsnap != 1){
+  die "One and only one type of discovery should be provided\n";
+}
+if ($sanoidsnap and not $sanoid){
+  print to_json($json);
+  exit 0;
+}
+
+if ($pools){
   foreach (qx($zpool list -H -o name)){
     chomp;
     push @{$json->{data}}, { '{#ZPOOL}' => $_ };
   }
+} elsif ($fs){
+  foreach (qx($zfs list -H -o name -t filesystem)){
+    chomp;
+    push @{$json->{data}}, { '{#ZFS_FS}' => $_ };
+  }
+} elsif ($zvol){
+  foreach (qx($zfs list -H -o name -t volume)){
+    chomp;
+    push @{$json->{data}}, { '{#ZFS_ZVOL}' => $_ };
+  }
+} elsif ($snap){
+  foreach (qx($zfs list -H -o name -t snap)){
+    chomp;
+    # Remove @ as they are not allowed in item key names
+    # They will be converted back to @ by check_zfs script
+    $_ =~ s/\@/%40/g;
+    push @{$json->{data}}, { '{#ZFS_SNAP}' => $_ };
+  }
+} elsif ($sanoidsnap){
+  push @{$json->{data}}, { '{#ZFS_SANOID}' => 1 };
 }
-print to_json($json);
+print to_json($json, { pretty => $pretty });

@@ -6,52 +6,70 @@ use JSON;
 use File::Which;
 use Getopt::Long;
 
-my $json = {};
-my $pool = undef;
-my $what = undef;
-my $pretty = 0;
+my $json       = {};
+my $pool       = undef;
+my $dataset    = undef;
+my $sanoidsnap = undef;
+my $pretty     = 0;
 
 GetOptions(
   "zpool|pool=s" => \$pool,
-  "what=s" => \$what,
-  "pretty" => \$pretty
+  "dataset=s"    => \$dataset,
+  "sanoidsnap"   => \$sanoidsnap,
+  "pretty"       => \$pretty
 );
 
-my $zpool = which('zpool');
+my $zpool  = which('zpool');
+my $zfs    = which('zfs');
+my $sanoid = which('sanoid');
 
-if ($what and !$pool){
+if (not $zpool or not $zfs){
+  print 'ZBX_NOTSUPPOTED';
+  exit 0;
+}
+if ($sanoidsnap and not $sanoid){
+  die 'ZBX_NOTSUPPOTED';
+}
+
+if (not $pool and not $dataset and not $sanoidsnap){
   print <<_EOF;
 Usage:
-$0 [--zpool=<name>] [--what=<item>]
-
-<name> is an optional zpool name. If specified, will only output info for this zpool.
-<item> is one of size, alloc, frag, cap, dedup, health and if specified, will only output the corresponding value
-If --what is specified then --zpool is mandatory.
-The default (with no option) is to output all the info of all the zpool in a JSON format
+$0 [--zpool=<name>|--dataset=<fs zvol or snap>|--sanoidsnap]
 _EOF
   exit 1;
 }
 
-if ($zpool){
-  my $cmd = "$zpool list -p -H" . ( ($pool) ? " $pool" : "");
-  foreach (qx($cmd)){
-    #NAME    SIZE  ALLOC   FREE  EXPANDSZ   FRAG    CAP  DEDUP  HEALTH  ALTROOT
-    #rpool   464G  7.49G   457G         -     2%     1%  1.00x  ONLINE  -
-    if (m/^(?<pool>\w+)\s+(?<size>\d+)\s+(?<alloc>\d+)\s+(?<free>\d+)\s+.+\s+(?<frag>\d+(\.\d+)?)\s+(?<cap>\d+(\.\d+)?)\s+(?<dedup>\d+(\.\d+)?)\s+(?<health>\w+)/){
-      $json->{$+{pool}}->{$_} = $+{$_} foreach (grep { $_ ne 'pool' } keys %+);
-    }
-    $json->{$+{pool}}->{errors} = get_zpool_errors($+{pool});
-    $json->{$+{pool}}->{stats}  = get_zpool_stats($+{pool});
+# Value map. For Zabbix, we want 0 instead of none
+# We also prefer on/off represented as 1/0 as it's more efficient
+my $map = {
+  18446744073709551615 => 0, # See https://github.com/zfsonlinux/zfs/issues/9306
+  none                 => 0,
+  on                   => 1,
+  off                  => 0
+};
+
+if ($pool){
+  foreach (qx($zpool get all $pool -p -H)){
+    chomp;
+    my @parse = split /\t+/, $_;
+    $json->{$parse[1]} = (defined $map->{$parse[2]}) ? $map->{$parse[2]} : $parse[2];
+    $json->{errors} = get_zpool_errors($pool);
+    $json->{stats}  = get_zpool_stats($pool);
   }
+} elsif ($dataset){
+  # Convert %40 back to @ (we send them as %40 in the discovery because @ is not allowed in item keys
+  $dataset =~ s/%40/\@/g;
+  foreach (qx($zfs get all $dataset -p -H)){
+    chomp;
+    my @parse = split /\t+/, $_;
+    $json->{$parse[1]} = (defined $map->{$parse[2]}) ? $map->{$parse[2]} : $parse[2];
+  }
+} elsif ($sanoidsnap){
+  print qx($sanoid --monitor-snapshot);
+  exit 0;
 }
-if ($what){
-  print ((defined $json->{$pool}->{$what}) ? $json->{$pool}->{$what} : 'ZBX_NOTSUPPORTED');
-} elsif ($pool){
-  print ((defined $json->{$pool}) ? to_json($json->{$pool}, { pretty => $pretty }) : 'ZBX_NOTSUPPORTED');
-} else {
-  print to_json($json, { pretty => $pretty });
-}
-print "\n";
+
+print to_json($json, { pretty => $pretty }) . "\n";
 exit 0;
 
 sub get_zpool_errors {
@@ -63,7 +81,7 @@ sub get_zpool_errors {
   };
   my $i = 0;
   my $index = {};
-  foreach my $line (qx($zpool status $pool)){
+  foreach my $line (qx($zpool status -p $pool)){
     # Output looks like
     #   pool: rpool
     #  state: ONLINE
@@ -92,33 +110,17 @@ sub get_zpool_errors {
       chomp($line);
       $line =~ s/\s+/ /g;
       $errors->{$index->{$i-1}} .= $line;
-    } elsif ($line =~ m/\s+[a-zA-Z0-9_\-]+\s+[A-Z]+\s+(?<read>\d+(\.\d+)?)(?<read_suffix>[KMT])?\s+(?<write>\d+(\.\d+)?)(?<write_suffix>[KMT])?\s+(?<cksum>\d+(\.\d+)?)(?<cksum_suffix>[KMT])?/){
+    } elsif ($line =~ m/\s+[a-zA-Z0-9_\-]+\s+[A-Z]+\s+(?<read>\d+(\.\d+)?)\s+(?<write>\d+(\.\d+)?)\s+(?<cksum>\d+(\.\d+)?)/){
       # And here, we count the number of read, write and checksum errors
-      $errors->{read_errors}  += convert_suffix($+{'read'},$+{'read_suffix'});
-      $errors->{write_errors} += convert_suffix($+{'write'},$+{'write_suffix'});
-      $errors->{cksum_errors} += convert_suffix($+{'cksum'},$+{'cksum_suffix'});
+      $errors->{read_errors}  += $+{'read'};
+      $errors->{write_errors} += $+{'write'};
+      $errors->{cksum_errors} += $+{'cksum'};
     }
     $i++;
   }
   # Ensure evey item returns something
   $errors->{$_} ||= '' foreach (qw(scan action status errors));
   return $errors;
-}
-
-# Error counter can be suffixed. Apply this suffix to get raw error numbers
-sub convert_suffix {
-  my $val = shift;
-  my $suf = shift;
-  if (!$suf){
-    return $val;
-  } elsif ($suf eq 'K'){
-    $val *= 1000;
-  } elsif ($suf eq 'M') {
-    $val *= 1000000;
-  } elsif ($suf eq 'T') {
-    $val *= 1000000000;
-  }
-  return $val;
 }
 
 sub get_zpool_stats {
