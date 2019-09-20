@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.80
+Version: 0.2.81
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -101,6 +101,10 @@ fi
 %endif
 
 %changelog
+* Fri Sep 20 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.81-1
+- Revert to suffix conversion for ZFS error count (daniel@firewall-
+  services.com)
+
 * Fri Sep 20 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.80-1
 - Rewrite ZFS monitoring from scratch (daniel@firewall-services.com)
 - Set info in the data element for Zimbra discovery (daniel@firewall-
