@@ -21,7 +21,7 @@ my $pools      = 1;
 my $fs         = 0;
 my $zvol       = 0;
 my $snap       = 0;
-my $sanoidsnap = 0;
+my $sanoidmon  = 0;
 my $pretty     = 0;
 
 GetOptions(
@@ -29,17 +29,17 @@ GetOptions(
   "fs|filesystems"  => \$fs,
   "zvols|volumes"   => \$zvol,
   "snapshots"       => \$snap,
-  "sanoidsnap"      => \$sanoidsnap,
+  "sanoid"          => \$sanoidmon,
   "pretty"          => \$pretty
 );
 
 if ($fs or $zvol or $snap or $sanoidsnap){
   $pools = 0;
 }
-if ($pools + $fs + $zvol + $snap + $sanoidsnap != 1){
+if ($pools + $fs + $zvol + $snap + $sanoidmon != 1){
   die "One and only one type of discovery should be provided\n";
 }
-if ($sanoidsnap and not $sanoid){
+if ($sanoidmon and not $sanoid){
   print to_json($json);
   exit 0;
 }
@@ -67,7 +67,7 @@ if ($pools){
     $_ =~ s/\@/%40/g;
     push @{$json->{data}}, { '{#ZFS_SNAP}' => $_ };
   }
-} elsif ($sanoidsnap){
-  push @{$json->{data}}, { '{#ZFS_SANOID}' => 1 };
+} elsif ($sanoidmon){
+  push @{$json->{data}}, { '{#ZFS_SANOID}' => $_ } foreach (qw(snapshot capacity health));
 }
 print to_json($json, { pretty => $pretty });

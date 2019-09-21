@@ -9,13 +9,13 @@ use Getopt::Long;
 my $json       = {};
 my $pool       = undef;
 my $dataset    = undef;
-my $sanoidsnap = undef;
+my $sanoidmon  = undef;
 my $pretty     = 0;
 
 GetOptions(
   "zpool|pool=s" => \$pool,
   "dataset=s"    => \$dataset,
-  "sanoidsnap"   => \$sanoidsnap,
+  "sanoid=s"     => \$sanoidmon,
   "pretty"       => \$pretty
 );
 
@@ -27,14 +27,17 @@ if (not $zpool or not $zfs){
   print 'ZBX_NOTSUPPOTED';
   exit 0;
 }
-if ($sanoidsnap and not $sanoid){
+if ($sanoidmon and not $sanoid){
+  die 'ZBX_NOTSUPPOTED';
+}
+if (not grep { $_ eq $sanoidmon } qw(snapshot capacity health)){
   die 'ZBX_NOTSUPPOTED';
 }
 
-if (not $pool and not $dataset and not $sanoidsnap){
+if (not $pool and not $dataset and not $sanoidmon){
   print <<_EOF;
 Usage:
-$0 [--zpool=<name>|--dataset=<fs zvol or snap>|--sanoidsnap]
+$0 [--zpool=<name>|--dataset=<fs zvol or snap>|--sanoid=<snapshot|capacity|health>]
 _EOF
   exit 1;
 }
@@ -68,9 +71,9 @@ if ($pool){
       $json->{$parse[1]} =~ s/x$//;
     }
   }
-} elsif ($sanoidsnap){
-  print qx($sanoid --monitor-snapshot);
-  exit 0;
+} elsif ($sanoidmon){
+  print qx($sanoid --monitor-$sanoidmon);
+  exit $?;
 }
 
 print to_json($json, { pretty => $pretty }) . "\n";
@@ -116,6 +119,8 @@ sub get_zpool_errors {
       $errors->{$index->{$i-1}} .= $line;
     } elsif ($line =~ m/\s+[a-zA-Z0-9_\-]+\s+[A-Z]+\s+(?<read>\d+(\.\d+)?)(?<read_suffix>[KMT])?\s+(?<write>\d+(\.\d+)?)(?<write_suffix>[KMT])?\s+(?<cksum>\d+(\.\d+)?)(?<cksum_suffix>[KMT])?/){
       # And here, we count the number of read, write and checksum errors
+      # Note that on ZoL 0.8.0 we could use zpool status -p to get rid of the suffixes
+      # But -p is not supported on 0.7 and earlier, so, we just convert them manually
       $errors->{read_errors}  += convert_suffix($+{'read'},$+{'read_suffix'});
       $errors->{write_errors} += convert_suffix($+{'write'},$+{'write_suffix'});
       $errors->{cksum_errors} += convert_suffix($+{'write'},$+{'write_suffix'});
