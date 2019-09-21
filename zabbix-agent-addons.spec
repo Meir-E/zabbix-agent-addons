@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.82
+Version: 0.2.83
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -101,6 +101,9 @@ fi
 %endif
 
 %changelog
+* Sat Sep 21 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.83-1
+- Better sanoïd monitoring integration (daniel@firewall-services.com)
+
 * Fri Sep 20 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.82-1
 - Remove trailing x for compressratio with ZoL < 0.8 (daniel@firewall-
   services.com)
