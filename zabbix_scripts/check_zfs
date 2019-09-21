@@ -27,10 +27,10 @@ if (not $zpool or not $zfs){
   print 'ZBX_NOTSUPPOTED';
   exit 0;
 }
-if ($sanoidmon and not $sanoid){
+if (defined $sanoidmon and not $sanoid){
   die 'ZBX_NOTSUPPOTED';
 }
-if (not grep { $_ eq $sanoidmon } qw(snapshot capacity health)){
+if (defined $sanoidmon and not grep { $_ eq $sanoidmon } qw(snapshot capacity health)){
   die 'ZBX_NOTSUPPOTED';
 }
 
