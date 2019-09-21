@@ -33,7 +33,7 @@ GetOptions(
   "pretty"          => \$pretty
 );
 
-if ($fs or $zvol or $snap or $sanoidsnap){
+if ($fs or $zvol or $snap or $sanoidmon){
   $pools = 0;
 }
 if ($pools + $fs + $zvol + $snap + $sanoidmon != 1){
