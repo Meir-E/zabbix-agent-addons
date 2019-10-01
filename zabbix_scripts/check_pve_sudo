@@ -57,7 +57,7 @@ if ($cluster){
     my $n = from_json(qx($pvesh get /nodes/$node/status $pvesh_opt 2>/dev/null));
     # Here we gather (and sum) some info about individual nodes to get the total number of
     # CPU, the amount of memory etc...
-    $json->{memory}->{$_}  += $n->{memory}->{$_}  foreach(qw(free total used));
+    $json->{memory}->{$_}  += $n->{memory}->{$_}  foreach (qw(free total used));
     $json->{ksm}->{$_}     += $n->{ksm}->{$_}     foreach (qw(shared));
     $json->{cpuinfo}->{$_} += $n->{cpuinfo}->{$_} foreach (qw(cpus sockets));
     $json->{loadavg}[$_]   += $n->{loadavg}[$_]   foreach (0..2);
@@ -67,10 +67,10 @@ if ($cluster){
 
   my $guests = from_json(qx($pvesh get /cluster/resources --type=vm $pvesh_opt 2>/dev/null));
   foreach my $guest (@{$guests}){
-    $json->{network}->{in}  += $guest->{netin};
-    $json->{network}->{out} += $guest->{netout};
-    $json->{disk}->{read}   += $guest->{diskread};
-    $json->{disk}->{write}  += $guest->{diskwrite};
+    $json->{network}->{in}  += $guest->{netin}     || 0;
+    $json->{network}->{out} += $guest->{netout}    || 0;
+    $json->{disk}->{read}   += $guest->{diskread}  || 0;
+    $json->{disk}->{write}  += $guest->{diskwrite} || 0;
   }
 } elsif ($node){
   foreach my $item (qw(status version subscription)){
