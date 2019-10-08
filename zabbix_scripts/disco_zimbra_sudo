@@ -32,7 +32,7 @@ my $hostname = hostfqdn();
 
 # If there's no zimbra user or no zmcontrol, just return an empty list
 if (not defined $zimuid or not defined $zimgid or not -e $zmprov){
-  print to_json({});
+  print to_json($json);
   exit;
 }
 
