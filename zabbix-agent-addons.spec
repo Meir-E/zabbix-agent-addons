@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.87
+Version: 0.2.88
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -102,6 +102,9 @@ fi
 %endif
 
 %changelog
+* Fri Oct 11 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.88-1
+- Add Zabbix template for ZFS (daniel@firewall-services.com)
+
 * Fri Oct 11 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.87-1
 - Enhance ZFS monitoring scripts to retrieve ARC stats (daniel@firewall-
   services.com)
