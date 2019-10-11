@@ -90,6 +90,7 @@ fi
 %files
 %defattr(-,root,root,-)
 %doc README
+%doc zabbix_templates/*
 %dir %attr(0750,zabbix,zabbix) %{_localstatedir}/lib/zabbix/bin
 %{_localstatedir}/lib/zabbix/bin/*
 %{perl_vendorlib}
