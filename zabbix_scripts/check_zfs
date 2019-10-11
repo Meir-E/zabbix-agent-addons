@@ -10,12 +10,14 @@ my $json       = {};
 my $pool       = undef;
 my $dataset    = undef;
 my $sanoidmon  = undef;
+my $stats      = undef;
 my $pretty     = 0;
 
 GetOptions(
   "zpool|pool=s" => \$pool,
   "dataset=s"    => \$dataset,
   "sanoid=s"     => \$sanoidmon,
+  "stats=s"      => \$stats,
   "pretty"       => \$pretty
 );
 
@@ -34,7 +36,7 @@ if (defined $sanoidmon and not grep { $_ eq $sanoidmon } qw(snapshot capacity he
   die 'ZBX_NOTSUPPOTED';
 }
 
-if (not $pool and not $dataset and not $sanoidmon){
+if (not $pool and not $dataset and not $sanoidmon and not $stats){
   print <<_EOF;
 Usage:
 $0 [--zpool=<name>|--dataset=<fs zvol or snap>|--sanoid=<snapshot|capacity|health>]
@@ -74,6 +76,16 @@ if ($pool){
 } elsif ($sanoidmon){
   print qx($sanoid --monitor-$sanoidmon);
   exit $?;
+} elsif ($stats){
+  if (not -e '/proc/spl/kstat/zfs/' . $stats){
+    print 'ZBX_NOTSUPPORTED';
+    exit 0;
+  }
+  open STATS, '</proc/spl/kstat/zfs/' . $stats;
+  while (<STATS>){
+    next unless (m/^(\w+)\s+4\s+(\d+)$/);
+    $json->{$1} = $2;
+  }
 }
 
 print to_json($json, { pretty => $pretty }) . "\n";
