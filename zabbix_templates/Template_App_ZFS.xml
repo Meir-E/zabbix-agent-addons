@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>4.2</version>
-    <date>2019-10-11T15:08:42Z</date>
+    <date>2019-10-11T16:05:14Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -6671,7 +6671,7 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template_App_ZFS:vfs.zfs.stats[arcstats,demand_data_hits_pct].avg(900)}&lt;{$ZFS_ARC_HIT_DATA_PCT_WARN}</expression>
+            <expression>{Template_App_ZFS:vfs.zfs.stats[arcstats,demand_data_hits_pct].avg(1h)}&lt;{$ZFS_ARC_HIT_DATA_PCT_WARN}</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>ZFS: Low ARC data efficiency</name>
@@ -6687,7 +6687,7 @@
             <tags/>
         </trigger>
         <trigger>
-            <expression>{Template_App_ZFS:vfs.zfs.stats[arcstats,hits_pct].avg(900)}&lt;{$ZFS_ARC_HIT_PCT_WARN}</expression>
+            <expression>{Template_App_ZFS:vfs.zfs.stats[arcstats,hits_pct].avg(1h)}&lt;{$ZFS_ARC_HIT_PCT_WARN}</expression>
             <recovery_mode>0</recovery_mode>
             <recovery_expression/>
             <name>ZFS: Low ARC global efficiency</name>
