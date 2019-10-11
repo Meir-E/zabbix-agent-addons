@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.86
+Version: 0.2.87
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -101,6 +101,12 @@ fi
 %endif
 
 %changelog
+* Fri Oct 11 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.87-1
+- Enhance ZFS monitoring scripts to retrieve ARC stats (daniel@firewall-
+  services.com)
+- Send an empty data array when Zimbra is not installed (daniel@firewall-
+  services.com)
+
 * Tue Oct 01 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.86-1
 - Fix pve script when no net or disk stats are available (daniel@firewall-
   services.com)
