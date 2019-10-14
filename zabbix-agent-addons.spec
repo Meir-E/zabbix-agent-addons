@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.88
+Version: 0.2.89
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -102,6 +102,14 @@ fi
 %endif
 
 %changelog
+* Mon Oct 14 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.89-1
+- Add Zabbix template for GlusterFS (daniel@firewall-services.com)
+- Add Zabbix tempalte for DRBD (daniel@firewall-services.com)
+- Add Zabbix template for Proxmox Mail Gateway (daniel@firewall-services.com)
+- Add template to monitor a PVE cluster (daniel@firewall-services.com)
+- ZFS ARC low hit ratio for data and global are calculated for 1h
+  (daniel@firewall-services.com)
+
 * Fri Oct 11 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.88-1
 - Add Zabbix template for ZFS (daniel@firewall-services.com)
 
