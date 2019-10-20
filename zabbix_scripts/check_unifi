@@ -121,13 +121,6 @@ if ($unifi){
               cfgversion adopted avg_client_signal/){
     $json->{$_} = $obj->{$_} if (defined $obj->{$_});
   }
-  foreach (qw/guest-rx_packets guest-tx_packets guest-rx_bytes
-              guest-tx_bytes user-rx_packets user-tx_packets
-              user-rx_bytes user-tx_bytes rx_packets tx_packets
-              rx_bytes tx_bytes rx_errors tx_errors
-              rx_dropped tx_dropped/){
-    $json->{net_stats}->{$_} = $obj->{stat}->{$_} if (defined $obj->{stat}->{$_});
-  }
   # Convert last seen into a relative time
   $json->{last_seen} = time - $obj->{last_seen};
   # Add some more info in sys_stats
@@ -135,6 +128,14 @@ if ($unifi){
 
   # If this is an ap
   if ($obj->{type} eq 'uap'){
+
+    foreach (qw/guest-rx_packets guest-tx_packets guest-rx_bytes
+                guest-tx_bytes user-rx_packets user-tx_packets
+                user-rx_bytes user-tx_bytes rx_packets tx_packets
+                rx_bytes tx_bytes rx_errors tx_errors
+                rx_dropped tx_dropped/){
+      $json->{net_stats}->{$_} = $obj->{stat}->{ap}->{$_} if (defined $obj->{stat}->{ap}->{$_});
+    }
 
     # Count the number of SSID served
     $json->{num_wlan} = scalar @{$obj->{radio_table}};
@@ -166,6 +167,12 @@ if ($unifi){
       $json->{'avg_' . $_ . '_rate_' . $proto} = ($json->{'num_sta_' . $proto} == 0) ?
         undef : $json->{'avg_' . $_ . '_rate_' . $proto} / $json->{'num_sta_' . $proto}
                                                 foreach (qw/tx rx/);
+    }
+  } elsif ($obj->{type} eq 'usw'){
+    foreach (qw/rx_packets tx_packets
+                rx_bytes tx_bytes rx_errors tx_errors
+                rx_dropped tx_dropped/){
+      $json->{net_stats}->{$_} = $obj->{stat}->{sw}->{$_} if (defined $obj->{stat}->{sw}->{$_});
     }
   }
 } elsif ($station) {
