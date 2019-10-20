@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.89
+Version: 0.2.90
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -102,6 +102,10 @@ fi
 %endif
 
 %changelog
+* Sun Oct 20 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.90-1
+- Fix some unifi stats for uap/usw in recent unifi versions (daniel@firewall-
+  services.com)
+
 * Mon Oct 14 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.89-1
 - Add Zabbix template for GlusterFS (daniel@firewall-services.com)
 - Add Zabbix tempalte for DRBD (daniel@firewall-services.com)
