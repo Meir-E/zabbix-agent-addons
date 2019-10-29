@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>4.2</version>
-    <date>2019-10-11T16:05:14Z</date>
+    <date>2019-10-29T09:47:22Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -4566,12 +4566,6 @@
                                     <error_handler>0</error_handler>
                                     <error_handler_params/>
                                 </step>
-                                <step>
-                                    <type>20</type>
-                                    <params>3600</params>
-                                    <error_handler>0</error_handler>
-                                    <error_handler_params/>
-                                </step>
                             </preprocessing>
                             <jmx_endpoint/>
                             <timeout>3s</timeout>
@@ -4713,12 +4707,6 @@
                                 <step>
                                     <type>12</type>
                                     <params>$.fragmentation</params>
-                                    <error_handler>0</error_handler>
-                                    <error_handler_params/>
-                                </step>
-                                <step>
-                                    <type>20</type>
-                                    <params>3600</params>
                                     <error_handler>0</error_handler>
                                     <error_handler_params/>
                                 </step>
@@ -5621,45 +5609,24 @@
                             <show_3d>0</show_3d>
                             <percent_left>0.0000</percent_left>
                             <percent_right>0.0000</percent_right>
-                            <ymin_type_1>0</ymin_type_1>
-                            <ymax_type_1>0</ymax_type_1>
+                            <ymin_type_1>1</ymin_type_1>
+                            <ymax_type_1>2</ymax_type_1>
                             <ymin_item_1>0</ymin_item_1>
-                            <ymax_item_1>0</ymax_item_1>
+                            <ymax_item_1>
+                                <host>Template_App_ZFS</host>
+                                <key>vfs.zfs.zpool[{#ZPOOL},size]</key>
+                            </ymax_item_1>
                             <graph_items>
                                 <graph_item>
                                     <sortorder>0</sortorder>
                                     <drawtype>5</drawtype>
-                                    <color>1A7C11</color>
+                                    <color>FF0000</color>
                                     <yaxisside>0</yaxisside>
                                     <calc_fnc>2</calc_fnc>
                                     <type>0</type>
                                     <item>
                                         <host>Template_App_ZFS</host>
                                         <key>vfs.zfs.zpool[{#ZPOOL},allocated]</key>
-                                    </item>
-                                </graph_item>
-                                <graph_item>
-                                    <sortorder>1</sortorder>
-                                    <drawtype>0</drawtype>
-                                    <color>F63100</color>
-                                    <yaxisside>1</yaxisside>
-                                    <calc_fnc>2</calc_fnc>
-                                    <type>0</type>
-                                    <item>
-                                        <host>Template_App_ZFS</host>
-                                        <key>vfs.zfs.zpool[{#ZPOOL},fragmentation]</key>
-                                    </item>
-                                </graph_item>
-                                <graph_item>
-                                    <sortorder>2</sortorder>
-                                    <drawtype>0</drawtype>
-                                    <color>2774A4</color>
-                                    <yaxisside>1</yaxisside>
-                                    <calc_fnc>2</calc_fnc>
-                                    <type>0</type>
-                                    <item>
-                                        <host>Template_App_ZFS</host>
-                                        <key>vfs.zfs.zpool[{#ZPOOL},dedupratio]</key>
                                     </item>
                                 </graph_item>
                             </graph_items>
