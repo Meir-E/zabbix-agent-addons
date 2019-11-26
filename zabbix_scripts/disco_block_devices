@@ -15,7 +15,7 @@ foreach my $block (Zabbix::Agent::Addons::Disks::list_block_dev()){
     close SIZE;
     chomp($size);
   }
-  push @{$json->{data}}, { "{#BLOCKDEVICE}" => $block, "{#BLOCKSIZE}" => $size };
+  push @{$json->{data}}, { "{#BLOCKDEVICE}" => $block, "{#BLOCKSIZE}" => $size, "{#DEVNAME}" => $block };
 }
 print to_json($json);
 exit(0);
