@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.90
+Version: 0.2.91
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -102,6 +102,11 @@ fi
 %endif
 
 %changelog
+* Tue Nov 26 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.91-1
+- Add DEVNAME macro for vfs.dev.discovery to ease transition to 4.4
+  (daniel@firewall-services.com)
+- Minor update in ZFS template (daniel@firewall-services.com)
+
 * Sun Oct 20 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.90-1
 - Fix some unifi stats for uap/usw in recent unifi versions (daniel@firewall-
   services.com)
