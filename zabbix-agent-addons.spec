@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.91
+Version: 0.2.92
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -102,6 +102,10 @@ fi
 %endif
 
 %changelog
+* Wed Nov 27 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.92-1
+- Better compat with 4.4 vfs.dev.discovery (and use lsblk to get the list of
+  dev if available) (daniel@firewall-services.com)
+
 * Tue Nov 26 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.91-1
 - Add DEVNAME macro for vfs.dev.discovery to ease transition to 4.4
   (daniel@firewall-services.com)
