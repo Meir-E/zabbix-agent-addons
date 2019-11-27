@@ -4,18 +4,36 @@ use warnings;
 use strict;
 use Zabbix::Agent::Addons::Disks;
 use JSON;
+use File::Which;
+use Getopt::Long;
+
+my $pretty = 0;
+GetOptions(
+  'pretty' => \$pretty
+);
+
+my $lsblk = which('lsblk');
 
 my $json;
 @{$json->{data}} = ();
-foreach my $block (Zabbix::Agent::Addons::Disks::list_block_dev()){
-  my $size = 1;
-  if ( -e "/sys/block/$block/size"){
-    open SIZE, "/sys/block/$block/size";
-    $size = join "", <SIZE>;
-    close SIZE;
-    chomp($size);
+if (defined $lsblk){
+  foreach my $line (qx($lsblk -o KNAME,TYPE,SIZE -r -n -b)){
+    my ($block,$type,$size) = split(/\s+/, $line);
+    push @{$json->{data}}, {
+      "{#BLOCKDEVICE}" => $block,  # Compat with previous zabbix-agent-addons
+      "{#DEVNAME}"     => $block,  # New macro name for the native vfs.dev.discovery key in 4.4
+      "{#DEVTYPE}"     => $type,
+    };
   }
-  push @{$json->{data}}, { "{#BLOCKDEVICE}" => $block, "{#BLOCKSIZE}" => $size, "{#DEVNAME}" => $block };
+} else {
+  # Fallback if lsblk is not available
+  foreach my $block (Zabbix::Agent::Addons::Disks::list_block_dev()){
+    push @{$json->{data}}, {
+      "{#BLOCKDEVICE}" => $block,
+      "{#DEVNAME}"     => $block,
+      "{#DEVTYPE}"     => 'disk'
+    };
+  }
 }
-print to_json($json);
+print to_json($json, { pretty => $pretty });
 exit(0);
