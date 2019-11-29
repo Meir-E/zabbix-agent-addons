@@ -17,7 +17,6 @@ Requires: zabbix-agent
 Requires: perl(Getopt::Long)
 Requires: perl(Getopt::Std)
 Requires: perl(JSON)
-Requires: perl(Linux::LVM)
 Requires: perl(POSIX)
 Requires: perl(MIME::Base64)
 Requires: perl(File::Which)
