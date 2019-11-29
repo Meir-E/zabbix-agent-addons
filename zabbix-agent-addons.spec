@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.92
+Version: 0.2.93
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -101,6 +101,14 @@ fi
 %endif
 
 %changelog
+* Fri Nov 29 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.93-1
+- Don't use autoloader in our forked Linux::LVM (daniel@firewall-services.com)
+- Don't requires Linux::LVM anymore (daniel@firewall-services.com)
+- Replace Linux::LVM occurrences with Zabbix::Agent::Addons::LVM
+  (daniel@firewall-services.com)
+- Bundle a fork of Linux::LVM with support for LVM thin pools (daniel@firewall-
+  services.com)
+
 * Wed Nov 27 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.92-1
 - Better compat with 4.4 vfs.dev.discovery (and use lsblk to get the list of
   dev if available) (daniel@firewall-services.com)
