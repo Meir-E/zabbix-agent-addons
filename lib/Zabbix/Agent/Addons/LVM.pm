@@ -16,7 +16,7 @@ our @ISA = qw(Exporter);
 # names by default without a very good reason. Use EXPORT_OK instead.
 # Do not simply export all your public functions/methods/constants.
 
-# This allows declaration	use Linux::LVM ':all';
+# This allows declaration	use Zabbix::Agent::Addons::LVM ':all';
 # If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
 # will save memory.
 our %EXPORT_TAGS = ( 'all' => [ qw( get_volume_group_list
@@ -631,13 +631,13 @@ __END__
 
 =head1 NAME
 
-Linux::LVM - Perl extension for accessing Logical Volume Manager(LVM)
+Zabbix::Agent::Addons::LVM - Perl extension for accessing Logical Volume Manager(LVM)
              data structures on Linux.
 
 =head1 SYNOPSIS
 
-  use Linux::LVM;
-  Linux::LVM->units('G'); 
+  use Zabbix::Agent::Addons::LVM;
+  Zabbix::Agent::Addons::LVM->units('G'); 
 
 =head1 ABSTRACT
 
