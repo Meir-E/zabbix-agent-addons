@@ -1,8 +1,8 @@
 #!/usr/bin/perl -w
 
-use Linux::LVM;
+use Zabbix::Agent::Addons::LVM;
 
-Linux::LVM->units(B);
+Zabbix::Agent::Addons::LVM->units(B);
 
 if (@ARGV < 2){
     usage();
