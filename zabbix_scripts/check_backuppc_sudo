@@ -63,7 +63,9 @@ if ( $host ) {
       }
       # Push all the sizes in our data set to compute avg sizes
       # Exclude backup N°0 as it'll always have much more new data than normal backups
-      $sizes->add_data($backup->{sizeNew}) unless ( $backup->{num} == 0 );
+      # Also exclude if size is not defined. This can happen in BackupPC v3 when
+      # the link process is waiting for the nightly to finish
+      $sizes->add_data($backup->{sizeNew}) unless ( $backup->{num} == 0 || !$backup->{sizeNew} );
       $json->{bkp}++;
     }
 
