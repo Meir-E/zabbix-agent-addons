@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.93
+Version: 0.2.94
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -101,6 +101,10 @@ fi
 %endif
 
 %changelog
+* Wed Dec 11 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.94-1
+- Fix BackupPC script when BackuPPC_link is waiting for the nightly cleanup to
+  finish (daniel@firewall-services.com)
+
 * Fri Nov 29 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.93-1
 - Don't use autoloader in our forked Linux::LVM (daniel@firewall-services.com)
 - Don't requires Linux::LVM anymore (daniel@firewall-services.com)
