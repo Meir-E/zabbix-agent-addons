@@ -89,7 +89,8 @@ if ( $host ) {
 
     # For newSize, we need to wait for BackupPC_link to run, which can be delayed
     # if a nightly process is running. In this case, use the stats from the previous backup
-    $i = ( $backup->{sizeNew} ) ? -1 : -2;
+    # Except when we ave a single backup, in which case we read stats of this only backup
+    $i = ( $backup->{sizeNew} || scalar @bpc_info == 1 ) ? -1 : -2;
     $json->{new_size}   = $bpc_info[$i]->{sizeNew};
     $json->{comp_ratio} = ( $bpc_info[$i]->{sizeNew} > 0 ) ?
         sprintf( "%.2f", 100 - ( $bpc_info[$i]->{sizeNewComp} * 100 / $bpc_info[$i]->{sizeNew} ) )
