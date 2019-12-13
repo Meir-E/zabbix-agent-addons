@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.96
+Version: 0.2.97
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -101,6 +101,9 @@ fi
 %endif
 
 %changelog
+* Fri Dec 13 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.97-1
+- Include Zabbix template to monitor BackupPC (daniel@firewall-services.com)
+
 * Fri Dec 13 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.96-1
 - Enhanced stats for BackupPC's entity (daniel@firewall-services.com)
 
