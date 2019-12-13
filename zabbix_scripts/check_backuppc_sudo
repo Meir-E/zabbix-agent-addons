@@ -78,11 +78,13 @@ if ( $host ) {
 
     $json->{new_size_avg}    = int $sizes->mean;
     $json->{new_size_median} = int $sizes->median;
+
     # Some old versions of Statistics::Descriptive (eg, on el5) do not support quantile
     $json->{new_size_q1}     = eval { int $sizes->quantile(1) } || 0;
     $json->{new_size_q3}     = eval { int $sizes->quantile(3) } || 0;
     $json->{enabled}         = ( $conf->{BackupsDisable} > 0 ) ? 0 : 1;
     $json->{total_size}      = $sizes->sum + $json->{full_size} - 2 * $new_size_of_last_full;
+    $json->{history_size}    = $json->{total_size} - $json->{full_size};
     $json->{age}             = time - $bpc_info[$i]->{startTime};
 
     # For newSize, we need to wait for BackupPC_link to run, which can be delayed
@@ -106,8 +108,8 @@ if ( $host ) {
     ratio => 0
   };
 
-  my $total_new  = 0;
-  my $total_comp = 0;
+  my $entity_total_new  = 0;
+  my $entity_total_comp = 0;
 
   foreach my $host ( keys %{ $bpc->HostInfoRead } ) {
     next unless $host =~ m/^(vm_)?\Q$entity\E_.*/;
@@ -118,36 +120,44 @@ if ( $host ) {
     my $hostConf = $bpc->ConfigDataRead($host);
     my $conf     = { %$mainConf, %$hostConf };
     my $freq     = ( $conf->{FullPeriod} > $conf->{IncrPeriod} ) ? $conf->{IncrPeriod} : $conf->{FullPeriod};
-    my $duration = 0;
-    my $bkp_num  = 0;
-    my $new_size_of_last_full = 0;
+    my $host_duration = 0;
+    my $host_bkp_num  = 0;
+    my $host_new_size  = 0;
+    my $host_full_size = 0;
+    my $host_new_size_of_last_full = 0;
 
     foreach my $backup ( $bpc->BackupInfoRead( $host ) ) {
       next if ( $backup->{type} !~ m/^full|incr$/ );
 
       # Save the total size of the last full backup
       if ( $backup->{type} eq 'full' ) {
-        $full_size             = $backup->{size};
-        $new_size_of_last_full = $backup->{sizeNew};
+        $host_full_size             = $backup->{size};
+        $host_new_size_of_last_full = $backup->{sizeNew};
       }
+      $host_new_size += $backup->{sizeNew} unless ( $backup->{num} == 0 || !$backup->{sizeNew} );
 
-      $json->{size} += $backup->{sizeNew};
-      $total_new    += $backup->{sizeNew};
-      $total_comp   += $backup->{sizeNewComp};
-      $duration     += $backup->{endTime} - $backup->{startTime};
-      $bkp_num++;
+      $entity_total_new  += $backup->{sizeNew};
+      $entity_total_comp += $backup->{sizeNewComp};
+      $host_duration     += $backup->{endTime} - $backup->{startTime};
+      $host_bkp_num++;
       $json->{bkp}++;
     }
     # Compute the average cost as the number of hours per day spent
     # to backup this host
-    $json->{perf} += ( $bkp_num > 0 ) ? $duration / ( 3600 * $bkp_num * $freq ) : 0;
+    $json->{perf} += ( $host_bkp_num > 0 ) ? $host_duration / ( 3600 * $host_bkp_num * $freq ) : 0;
 
-    # $json->{size} represent the total size used by this host.
+    # $json->{size} represents the total size used by this host.
     # But we want to substract the new size of the last full, as for this one we
     # do not count sizeNew but size. As we've already added sizeNew we need to substract it 2 times
-    $json->{size} += $full_size - 2 * $new_size_of_last_full;
+    my $host_total_size = $host_new_size + $host_full_size - 2 * $host_new_size_of_last_full;
+
+    # This one is kept just for compatibility. New Zabbix template will use total_size
+    $json->{size}         += $host_total_size;
+    $json->{total_size}   += $host_total_size;
+    $json->{full_size}    += $host_full_size;
+    $json->{history_size} += $host_total_size - $host_full_size;
   }
-  $json->{ratio} = ( $total_new > 0 ) ? 100 - ( $total_comp * 100 / $total_new ) : 0;
+  $json->{ratio} = ( $entity_total_new > 0 ) ? 100 - ( $entity_total_comp * 100 / $entity_total_new ) : 0;
 
   # Round some values
   foreach my $key ( qw(ratio perf) ) {
