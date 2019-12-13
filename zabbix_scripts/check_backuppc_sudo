@@ -58,23 +58,23 @@ if ( $host ) {
       # Skip partial or active backups
       next if ( $backup->{type} !~ m/^full|incr$/ );
       if ( $backup->{type} eq "full" ) {
-        $json->{full_size} = $backup->{size};
-        $new_size_of_last_full = $backup->{sizeNew};
+        $json->{full_size}     = $backup->{size};
+        $new_size_of_last_full = $backup->{sizeNew} if $backup->{num} > 0;
       }
       # Push all the sizes in our data set to compute avg sizes
       # Exclude backup N°0 as it'll always have much more new data than normal backups
       # Also exclude if size is not defined. This can happen in BackupPC v3 when
       # the BackupPC_link process is waiting for the nightly to finish
-      $sizes->add_data($backup->{sizeNew}) unless ( $backup->{num} == 0 || !$backup->{sizeNew} );
+      $sizes->add_data($backup->{sizeNew}) if ( $backup->{num} > 0 && $backup->{sizeNew} );
       $json->{bkp}++;
     }
 
     # Ignore the last backup if it's not full or incr (which means it's either partial or active)
     my $i = ( $bpc_info[-1]->{type} =~ m/^full|incr$/ ) ? -1 : -2;
 
-    $json->{errors}      = $bpc_info[$i]->{xferErrs};
-    $json->{duration}    = $bpc_info[$i]->{endTime} - $bpc_info[$i]->{startTime};
-    $json->{type}        = $bpc_info[$i]->{type};
+    $json->{errors}          = $bpc_info[$i]->{xferErrs};
+    $json->{duration}        = $bpc_info[$i]->{endTime} - $bpc_info[$i]->{startTime};
+    $json->{type}            = $bpc_info[$i]->{type};
 
     $json->{new_size_avg}    = int $sizes->mean;
     $json->{new_size_median} = int $sizes->median;
@@ -90,8 +90,8 @@ if ( $host ) {
     # For newSize, we need to wait for BackupPC_link to run, which can be delayed
     # if a nightly process is running. In this case, use the stats from the previous backup
     $i = ( $backup->{sizeNew} ) ? -1 : -2;
-    $json->{new_size}    = $bpc_info[$i]->{sizeNew};
-    $json->{comp_ratio}  = ( $bpc_info[$i]->{sizeNew} > 0 ) ?
+    $json->{new_size}   = $bpc_info[$i]->{sizeNew};
+    $json->{comp_ratio} = ( $bpc_info[$i]->{sizeNew} > 0 ) ?
         sprintf( "%.2f", 100 - ( $bpc_info[$i]->{sizeNewComp} * 100 / $bpc_info[$i]->{sizeNew} ) )
           :
         0;
@@ -117,13 +117,13 @@ if ( $host ) {
 
     $json->{hosts}++;
 
-    my $hostConf = $bpc->ConfigDataRead($host);
-    my $conf     = { %$mainConf, %$hostConf };
-    my $freq     = ( $conf->{FullPeriod} > $conf->{IncrPeriod} ) ? $conf->{IncrPeriod} : $conf->{FullPeriod};
-    my $host_duration = 0;
-    my $host_bkp_num  = 0;
-    my $host_new_size  = 0;
-    my $host_full_size = 0;
+    my $hostConf                   = $bpc->ConfigDataRead($host);
+    my $conf                       = { %$mainConf, %$hostConf };
+    my $freq                       = ( $conf->{FullPeriod} > $conf->{IncrPeriod} ) ? $conf->{IncrPeriod} : $conf->{FullPeriod};
+    my $host_duration              = 0;
+    my $host_bkp_num               = 0;
+    my $host_new_size              = 0;
+    my $host_full_size             = 0;
     my $host_new_size_of_last_full = 0;
 
     foreach my $backup ( $bpc->BackupInfoRead( $host ) ) {
@@ -132,9 +132,9 @@ if ( $host ) {
       # Save the total size of the last full backup
       if ( $backup->{type} eq 'full' ) {
         $host_full_size             = $backup->{size};
-        $host_new_size_of_last_full = $backup->{sizeNew};
+        $host_new_size_of_last_full = $backup->{sizeNew} if $backup->{num} > 0;
       }
-      $host_new_size += $backup->{sizeNew} unless ( $backup->{num} == 0 || !$backup->{sizeNew} );
+      $host_new_size += $backup->{sizeNew} if ( $backup->{num} > 0 && $backup->{sizeNew} );
 
       $entity_total_new  += $backup->{sizeNew};
       $entity_total_comp += $backup->{sizeNewComp};
