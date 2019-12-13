@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.98
+Version: 0.2.99
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -101,6 +101,10 @@ fi
 %endif
 
 %changelog
+* Fri Dec 13 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.99-1
+- Fix when a host has a single backup with 0 new file size (daniel@firewall-
+  services.com)
+
 * Fri Dec 13 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.98-1
 - Fix backups total size computation when there's only one full
   (daniel@firewall-services.com)
