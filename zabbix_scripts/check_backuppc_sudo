@@ -36,6 +36,8 @@ if ( $host ) {
   $json = {
     bkp             => 0,
     full_size       => 0,
+    total_size      => 0,
+    history_size    => 0,
     errors          => 0,
     new_size        => 0,
     new_size_avg    => 0,
@@ -43,7 +45,11 @@ if ( $host ) {
     new_size_q1     => 0,
     new_size_q3     => 0,
     duration        => 0,
-    comp_ratio      => 0
+    comp_ratio      => 0,
+    enable          => 0,
+    max_errors      => 0,
+    age             => 0,
+    type            => 'none'
   };
 
   my $new_size_of_last_full = 0;
@@ -99,11 +105,14 @@ if ( $host ) {
 } elsif ( $entity ) {
 
   $json = {
-    perf  => 0,
-    size  => 0,
-    hosts => 0,
-    bkp   => 0,
-    ratio => 0
+    perf         => 0,
+    size         => 0,
+    full_size    => 0,
+    total_size   => 0,
+    history_size => 0,
+    hosts        => 0,
+    bkp          => 0,
+    ratio        => 0
   };
 
   my $entity_total_new  = 0;
