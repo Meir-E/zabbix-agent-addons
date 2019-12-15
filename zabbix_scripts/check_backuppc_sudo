@@ -33,7 +33,6 @@ my $json = {};
 if ( $host ) {
   my $hostConf = $bpc->ConfigDataRead($host);
   my $conf = { %$mainConf, %$hostConf };
-  my $age = -1;
   $json = {
     bkp             => 0,
     full_size       => 0,
@@ -47,8 +46,6 @@ if ( $host ) {
     comp_ratio      => 0
   };
 
-  my $lastXferErrors        = 0;
-  my $maxErrors             = 0;
   my $new_size_of_last_full = 0;
   my @bpc_info              = $bpc->BackupInfoRead($host);
   my $sizes                 = new Statistics::Descriptive::Full;
