@@ -46,7 +46,7 @@ if ( $host ) {
     new_size_q3     => 0,
     duration        => 0,
     comp_ratio      => 0,
-    enable          => 0,
+    enabled         => 0,
     max_errors      => 0,
     age             => 0,
     type            => 'none'
