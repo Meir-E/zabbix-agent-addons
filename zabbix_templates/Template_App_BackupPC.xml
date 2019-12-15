@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>4.4</version>
-    <date>2019-12-13T17:29:51Z</date>
+    <date>2019-12-15T18:12:47Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -231,6 +231,7 @@
                     <graph_prototypes>
                         <graph_prototype>
                             <name>BackupPC: Entity {#BPC_ENTITY}: Compression ratio and perf</name>
+                            <ymin_type_1>FIXED</ymin_type_1>
                             <graph_items>
                                 <graph_item>
                                     <drawtype>GRADIENT_LINE</drawtype>
@@ -645,28 +646,8 @@
                     </trigger_prototypes>
                     <graph_prototypes>
                         <graph_prototype>
-                            <name>BackupPC: Host {#BPCHOST}: Full / History sizes</name>
-                            <type>STACKED</type>
-                            <graph_items>
-                                <graph_item>
-                                    <color>4000FF</color>
-                                    <item>
-                                        <host>Template_App_BackupPC</host>
-                                        <key>backuppc.host[{#BPCHOST},full_size]</key>
-                                    </item>
-                                </graph_item>
-                                <graph_item>
-                                    <sortorder>1</sortorder>
-                                    <color>4DD0E1</color>
-                                    <item>
-                                        <host>Template_App_BackupPC</host>
-                                        <key>backuppc.host[{#BPCHOST},history_size]</key>
-                                    </item>
-                                </graph_item>
-                            </graph_items>
-                        </graph_prototype>
-                        <graph_prototype>
-                            <name>BackupPC: Host {#BPCHOST}: Performances</name>
+                            <name>BackupPC: Host {#BPCHOST}: Compression ratio and perf</name>
+                            <ymin_type_1>FIXED</ymin_type_1>
                             <graph_items>
                                 <graph_item>
                                     <drawtype>GRADIENT_LINE</drawtype>
@@ -693,6 +674,27 @@
                                     <item>
                                         <host>Template_App_BackupPC</host>
                                         <key>backuppc.host[{#BPCHOST},duration]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                        <graph_prototype>
+                            <name>BackupPC: Host {#BPCHOST}: Full / History sizes</name>
+                            <type>STACKED</type>
+                            <graph_items>
+                                <graph_item>
+                                    <color>4000FF</color>
+                                    <item>
+                                        <host>Template_App_BackupPC</host>
+                                        <key>backuppc.host[{#BPCHOST},full_size]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>1</sortorder>
+                                    <color>4DD0E1</color>
+                                    <item>
+                                        <host>Template_App_BackupPC</host>
+                                        <key>backuppc.host[{#BPCHOST},history_size]</key>
                                     </item>
                                 </graph_item>
                             </graph_items>
