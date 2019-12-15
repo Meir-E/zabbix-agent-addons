@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.100
+Version: 0.2.101
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -101,6 +101,11 @@ fi
 %endif
 
 %changelog
+* Sun Dec 15 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.101-1
+- Init complete JSON objects with default values in bheck_backuppc_sudo
+  (daniel@firewall-services.com)
+- Remove unused variables (daniel@firewall-services.com)
+
 * Sun Dec 15 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.100-1
 - Only substract $new_size_of_last_full once (daniel@firewall-services.com)
 
