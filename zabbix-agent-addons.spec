@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.102
+Version: 0.2.103
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -101,6 +101,9 @@ fi
 %endif
 
 %changelog
+* Sun Dec 15 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.103-1
+- Set min backup size to 0 in template (daniel@firewall-services.com)
+
 * Sun Dec 15 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.102-1
 - Fix key name for enabled value (daniel@firewall-services.com)
 
