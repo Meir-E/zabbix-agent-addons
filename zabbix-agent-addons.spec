@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.104
+Version: 0.2.105
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -101,6 +101,10 @@ fi
 %endif
 
 %changelog
+* Tue Dec 17 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.105-1
+- Fix ready sizeNew from last backup (except when link hasn't ran yet)
+  (daniel@firewall-services.com)
+
 * Sun Dec 15 2019 Daniel Berteaud <daniel@firewall-services.com> 0.2.104-1
 - Disable vfs.dev.discovery in default conf (daniel@firewall-services.com)
 
