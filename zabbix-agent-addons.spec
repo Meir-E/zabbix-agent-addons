@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.106
+Version: 0.2.107
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -101,6 +101,9 @@ fi
 %endif
 
 %changelog
+* Thu Jan 16 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.107-1
+- Add Zabbix template for Squid (daniel@firewall-services.com)
+
 * Thu Jan 16 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.106-1
 - Remove uri from UsereParam args for squid (daniel@firewall-services.com)
 
