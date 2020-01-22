@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.107
+Version: 0.2.108
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -101,6 +101,16 @@ fi
 %endif
 
 %changelog
+* Wed Jan 22 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.108-1
+- Only skip RAID volumes checks when in HBA mode, not physical disks checks
+  (daniel@firewall-services.com)
+- Declar variable in the correct scope for hba mode detection (daniel@firewall-
+  services.com)
+- Handle megaraid controlers in HBO/JBOD mode (skip RAID checks)
+  (daniel@firewall-services.com)
+- Use head -1 to be sure to get a single value for sensors (daniel@firewall-
+  services.com)
+
 * Thu Jan 16 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.107-1
 - Add Zabbix template for Squid (daniel@firewall-services.com)
 
