@@ -124,7 +124,7 @@ if ($ipmitool && -x $ipmitool){
       $sensor->{description}    = $name;
       $sensor->{type}           = 'temp';
       $sensor->{unit}           = '°C';
-      $sensor->{cmd}            = "$ipmitool sdr get '$name' | grep 'Sensor Reading' | awk '{print \$4}'";
+      $sensor->{cmd}            = "$ipmitool sdr get '$name' | grep 'Sensor Reading' | awk '{print \$4}' | head -1";
       my $id = sensor_name($name);
       $sensors->{$id} = $sensor;
       print "Found a temperature sensor using IPMI: $name\n";
@@ -174,7 +174,7 @@ if ($ipmitool && -x $ipmitool){
       $sensor->{description}    = $name;
       $sensor->{type}           = 'fan';
       $sensor->{unit}           = ($value =~ m/percent|%/ || $val < 100) ? '%' : 'rpm';
-      $sensor->{cmd}            = "$ipmitool sdr get '$name' | grep 'Sensor Reading' | awk '{print \$4}'";
+      $sensor->{cmd}            = "$ipmitool sdr get '$name' | grep 'Sensor Reading' | awk '{print \$4}' | head -1";
       my $id = sensor_name($name);
       $sensors->{$id} = $sensor;
       print "Found a fan sensor using IPMI: $name\n";
@@ -224,7 +224,7 @@ if ($ipmitool && -x $ipmitool){
         $sensor->{description}    = $name;
         $sensor->{type}           = 'power';
         $sensor->{unit}           = ($name =~ m/%/) ? '%' : 'Watt';
-        $sensor->{cmd}            = "$ipmitool sdr get '$name' | grep 'Sensor Reading' | awk '{print \$4}'";
+        $sensor->{cmd}            = "$ipmitool sdr get '$name' | grep 'Sensor Reading' | awk '{print \$4}' | head -1";
         my $id = sensor_name($name);
         $sensors->{$id} = $sensor;
         print "Found a power sensor using IPMI: $name\n";
@@ -271,7 +271,7 @@ if ($lmsensor && -x $lmsensor){
       $sensor->{description}    = $name;
       $sensor->{type}           = 'temp';
       $sensor->{unit}           = '°C';
-      $sensor->{cmd}            = "$lmsensor | grep '$name:' | cut -d+ -f2 | cut -d. -f1";
+      $sensor->{cmd}            = "$lmsensor | grep '$name:' | cut -d+ -f2 | cut -d. -f1 | head -1";
       my $id = sensor_name($name);
       $sensors->{$id} = $sensor;
       print "Found a temperature sensor using lm_sensors: $name\n";
