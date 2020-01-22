@@ -124,6 +124,25 @@ ADAPTER: for ( my $adp = 0; $adp < $adapters; $adp++ ) {
 		}
 	}
 	close LDGETNUM;
+
+	open (CFGDSPLY, "$megacli -CfgDsply -a$adp -NoLog |")
+		|| die "error: Could not execute $megacli -CfgDsply -a$adp -NoLog";
+
+	while (<CFGDSPLY>) {
+		my $hba = 0;
+		my $failgrouplist = 0;
+		if ( m/Failed to get Disk Group list/ ) {
+			$failgrouplist = 1;
+		}
+		if ( m/Product Name:.*(JBOD|HBA)/ ) {
+			$hba = 1;
+		}
+	}
+	close CFGDSPLY;
+	if ( $hba && $failgrouplist ) {
+		# Controler is in HBA mode, skip it
+		next ADAPTER;
+	}
 	
 	LDISK: for ( my $ld = 0; $ld < $ldnum; $ld++ ) {
 		# Get info on this particular logical drive
