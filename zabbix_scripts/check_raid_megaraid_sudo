@@ -139,46 +139,45 @@ ADAPTER: for ( my $adp = 0; $adp < $adapters; $adp++ ) {
 		}
 	}
 	close CFGDSPLY;
-	if ( $hba && $failgrouplist ) {
-		# Controler is in HBA mode, skip it
-		next ADAPTER;
-	}
-	
-	LDISK: for ( my $ld = 0; $ld < $ldnum; $ld++ ) {
-		# Get info on this particular logical drive
-		open (LDINFO, "$megacli -LdInfo -L$ld -a$adp -NoLog |") 
-			|| die "error: Could not execute $megacli -LdInfo -L$ld -a$adp -NoLog";
-			
-		my ($size, $unit, $raidlevel, $ldpdcount, $spandepth, $state);
-		while (<LDINFO>) {
-			if ( m/^Size\s*:\s*(\d+(\.\d+)?)\s*(MB|GB|TB)/ ) {
-				$size = $1;
-				$unit = $3;
-				# Adjust MB to GB if that's what we got
-				if ( $unit eq 'MB' ) {
-					$size = sprintf( "%.0f", ($size / 1024) );
-					$unit= 'GB';
+
+	# When controller is in HBA/JBOD mode, skip RAID volume checks
+	unless ($hba && $failgrouplist) {
+		LDISK: for ( my $ld = 0; $ld < $ldnum; $ld++ ) {
+			# Get info on this particular logical drive
+			open (LDINFO, "$megacli -LdInfo -L$ld -a$adp -NoLog |")
+				|| die "error: Could not execute $megacli -LdInfo -L$ld -a$adp -NoLog";
+
+			my ($size, $unit, $raidlevel, $ldpdcount, $spandepth, $state);
+			while (<LDINFO>) {
+				if ( m/^Size\s*:\s*(\d+(\.\d+)?)\s*(MB|GB|TB)/ ) {
+					$size = $1;
+					$unit = $3;
+					# Adjust MB to GB if that's what we got
+					if ( $unit eq 'MB' ) {
+						$size = sprintf( "%.0f", ($size / 1024) );
+						$unit= 'GB';
+					}
+				} elsif ( m/^State\s*:\s*(\w+(\s\w+)?)/ ) {
+					$state = $1;
+					if ( $state ne 'Optimal' ) {
+						$status = 'CRITICAL';
+					}
+				} elsif ( m/^Number Of Drives( per span)?\s*:\s*(\d+)/ ) {
+					$ldpdcount = $2;
+				} elsif ( m/^Span Depth\s*:\s*(\d+)/ ) {
+					$spandepth = $1;
+					$ldpdcount = $ldpdcount * $spandepth;
+				} elsif ( m/^RAID Level\s*:\s*Primary-(\d)/ ) {
+					$raidlevel = $1;
 				}
-			} elsif ( m/^State\s*:\s*(\w+(\s\w+)?)/ ) {
-				$state = $1;
-				if ( $state ne 'Optimal' ) {
-					$status = 'CRITICAL';
-				}
-			} elsif ( m/^Number Of Drives( per span)?\s*:\s*(\d+)/ ) {
-				$ldpdcount = $2;
-			} elsif ( m/^Span Depth\s*:\s*(\d+)/ ) {
-				$spandepth = $1;
-				$ldpdcount = $ldpdcount * $spandepth;
-			} elsif ( m/^RAID Level\s*:\s*Primary-(\d)/ ) {
-				$raidlevel = $1;
 			}
-		}
+			close LDINFO;
+
+			$result .= "$adp:$ld:RAID-$raidlevel:$ldpdcount drives:$size$unit:$state ";
+
+		} #LDISK
 		close LDINFO;
-		
-		$result .= "$adp:$ld:RAID-$raidlevel:$ldpdcount drives:$size$unit:$state ";
-		
-	} #LDISK
-	close LDINFO;
+	}
 	
 	# Get info on physical disks for this adapter
 	open (PDLIST, "$megacli -PdList  -a$adp -NoLog |") 
