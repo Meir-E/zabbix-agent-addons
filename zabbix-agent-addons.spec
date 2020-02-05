@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.108
+Version: 0.2.109
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -101,6 +101,9 @@ fi
 %endif
 
 %changelog
+* Wed Feb 05 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.109-1
+- Don't skip local node in PVE nodes discovery (daniel@firewall-services.com)
+
 * Wed Jan 22 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.108-1
 - Only skip RAID volumes checks when in HBA mode, not physical disks checks
   (daniel@firewall-services.com)
