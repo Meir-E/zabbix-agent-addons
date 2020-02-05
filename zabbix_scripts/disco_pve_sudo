@@ -31,7 +31,6 @@ if ($what eq 'nodes'){
   my $cluster_status = from_json(qx($pvesh get /cluster/status $pvesh_opt 2>/dev/null));
   foreach my $item (@{$cluster_status}){
     next if ($item->{type} ne 'node');
-    next if ($item->{name} eq hostname());
     push @{$json->{data}}, {
       '{#PVE_NODE_NAME}'  => $item->{name},
       '{#PVE_NODE_IP}'    => $item->{ip},
