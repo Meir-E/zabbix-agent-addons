@@ -47,7 +47,7 @@ if ($entities) {
     my $errors             = ( defined $conf->{MaxXferError} ) ? $conf->{MaxXferError} : '0';
     my $monitoring         = $conf->{ZabbixMonitoring} || 1;
     my $sizeTooBigFactor   = $conf->{ZabbixSizeTooBigFactor} || 6;
-    my $sizeTooSmallFactor = $conf->{ZabbixSizeTooSmallFactore} || 3;
+    my $sizeTooSmallFactor = $conf->{ZabbixSizeTooSmallFactor} || 3;
     my $status             = ( $conf->{BackupsDisable} gt 0 or $monitoring eq '0' ) ? '0' : '1';
     push @{$json->{data}},
         {
