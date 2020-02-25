@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.112
+Version: 0.2.113
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -101,8 +101,11 @@ fi
 %endif
 
 %changelog
-* Tue Feb 25 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.112-1
+* Tue Feb 25 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.113-1
 - Skip Core X temp sensors (daniel@firewall-services.com)
+
+* Wed Feb 19 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.112-1
+- drop stderrr for upsc commands (daniel@firewall-services.com)
 
 * Mon Feb 17 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.111-1
 - Update ZFS and BackupPC templates (daniel@firewall-services.com)
