@@ -256,6 +256,11 @@ if ($lmsensor && -x $lmsensor){
         next SENSOR;
       }
 
+      if ($name =~ m/^Core\s+\d+/){
+        print "Skipping individual core sensor $name\n";
+        next SENSOR;
+      }
+
       if ($thr =~ m/high\s+=\s+\+(\d+(\.\d+)?)/){
         $sensor->{threshold_high} = $1;
       }
