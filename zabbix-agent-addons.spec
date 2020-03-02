@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.115
+Version: 0.2.116
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -101,6 +101,10 @@ fi
 %endif
 
 %changelog
+* Mon Mar 02 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.116-1
+- Default to accept cached value up to 5 min old for check_pve_sudo
+  (daniel@firewall-services.com)
+
 * Mon Mar 02 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.115-1
 - Add a script to populate check_pve_sudo cache (daniel@firewall-services.com)
 - Enhance check_pve_sudo with a local cache support to speed up monitoring
