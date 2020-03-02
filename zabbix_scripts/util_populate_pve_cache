@@ -1,0 +1,28 @@
+#!/usr/bin/perl -w
+
+use JSON;
+
+# Ensure data are fresh in the cache for Zabbix to pick them quickly
+# You can add this script in a cron job every 5 min for example, so the cache will always be fresh
+# for Zabbix Agent can run check_pve_sudo quickly
+
+qx(/var/lib/zabbix/bin/check_pve_sudo --cluster --cache=120);
+
+my $nodes = from_json(qx(/var/lib/zabbix/bin/disco_pve_sudo --what=nodes));
+foreach my $node (@{$nodes->{data}}){
+  qx(/var/lib/zabbix/bin/check_pve_sudo --node=$node->{'{#PVE_NODE_NAME}'} --cache=120);
+}
+my $pools = from_json(qx(/var/lib/zabbix/bin/disco_pve_sudo --what=pools));
+foreach my $pool (@{$pools->{data}}){
+  qx(/var/lib/zabbix/bin/check_pve_sudo --pool=$pool->{'{#PVE_POOL_ID}'} --cache=120);
+}
+my $storages = from_json(qx(/var/lib/zabbix/bin/disco_pve_sudo --what=storage));
+foreach my $stor (@{$storages->{data}}){
+  qx(/var/lib/zabbix/bin/check_pve_sudo --storage=$stor->{'{#PVE_STOR_ID}'} --cache=120);
+}
+my $guests = from_json(qx(/var/lib/zabbix/bin/disco_pve_sudo --what=guests));
+foreach my $guest (@{$guests->{data}}){
+  print $guest->{'{#PVE_GUEST_ID}'} . "\n";
+  qx(/var/lib/zabbix/bin/check_pve_sudo --guest=$guest->{'{#PVE_GUEST_ID}'} --cache=120);
+}
+
