@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.116
+Version: 0.2.117
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -101,6 +101,16 @@ fi
 %endif
 
 %changelog
+* Mon Mar 02 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.117-1
+- Add basic SNMP templates (daniel@firewall-services.com)
+- Add Template_App_Unifi (daniel@firewall-services.com)
+- Add Template_OS_PfSense2 (daniel@firewall-services.com)
+- Add Template_Ping (daniel@firewall-services.com)
+- Fix cache when the same resource is queried with different options
+  (daniel@firewall-services.com)
+- Remove debug statement in util_populate_pve_cache (daniel@firewall-
+  services.com)
+
 * Mon Mar 02 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.116-1
 - Default to accept cached value up to 5 min old for check_pve_sudo
   (daniel@firewall-services.com)
