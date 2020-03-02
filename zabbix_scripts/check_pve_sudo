@@ -5,6 +5,8 @@ use warnings;
 use JSON;
 use Getopt::Long;
 use File::Which;
+use File::Path qw(make_path);
+use File::Basename;
 use Data::Dumper;
 
 my $pvesh = which('pvesh');
@@ -12,20 +14,38 @@ my $json = {};
 my $pretty = 0;
 my ($cluster,$guest,$node,$storage,$pool) = undef;
 
+# Max age of cached values
+my $cache = 60;
+my $cache_dir = '/tmp/zbx_pve_cache/';
+
 GetOptions(
-  'cluster'   => \$cluster,
-  'guest=i'   => \$guest,
-  'node=s'    => \$node,
-  'storage=s' => \$storage,
-  'pool=s'    => \$pool,
-  'pretty'    => \$pretty
+  'cluster'     => \$cluster,
+  'guest=i'     => \$guest,
+  'node=s'      => \$node,
+  'storage=s'   => \$storage,
+  'pool=s'      => \$pool,
+  'pretty'      => \$pretty,
+  'cache=i'     => \$cache,
+  'cache-dir=s' => \$cache_dir
 );
 
-# Are we using the new pvesh for which we have to specify the output format ?
-my $pvesh_opt = (system("$pvesh get /version --output-format=json >/dev/null 2>&1") == 0) ? '--output-format=json' : '';
+# Before Buster / PVE6, pvesh don't support (or need) --output-format=json
+# So try to detect previous version and adapt opt
+my $pvesh_opt = '--output-format=json';
+if (-f '/etc/os-release'){
+  open my $fh, '<', '/etc/os-release';
+  foreach my $line (<$fh>){
+    my ($var, $val) = split(/=/, $line);
+    $val =~ s/"(.*)"/$1/;
+    if ($var eq 'VERSION_ID' and int $val < 10){
+      $pvesh_opt = '';
+      last;
+    }
+  }
+}
 
 if ($cluster){
-  my $cluster = from_json(qx($pvesh get /cluster/status $pvesh_opt 2>/dev/null));
+  my $cluster = get_api_data('/cluster/status');
   # Set default values so monitoring works for single node, without cluster setup
   $json->{status} = {
     all_online => 1,
@@ -54,7 +74,7 @@ if ($cluster){
     }
   }
   foreach my $node (@nodes){
-    my $n = from_json(qx($pvesh get /nodes/$node/status $pvesh_opt 2>/dev/null));
+    my $n = get_api_data("/nodes/$node/status");
     # Here we gather (and sum) some info about individual nodes to get the total number of
     # CPU, the amount of memory etc...
     $json->{memory}->{$_}  += $n->{memory}->{$_}  foreach (qw(free total used));
@@ -65,7 +85,7 @@ if ($cluster){
   # We want average load avg of the cluster, not the sum of individual loads
   $json->{loadavg}[$_] = sprintf "%.2f", $json->{loadavg}[$_] / $json->{status}->{nodes} foreach (0..2);
 
-  my $guests = from_json(qx($pvesh get /cluster/resources --type=vm $pvesh_opt 2>/dev/null));
+  my $guests = get_api_data('/cluster/resources', '--type=vm');
   foreach my $guest (@{$guests}){
     $json->{network}->{in}  += $guest->{netin}     || 0;
     $json->{network}->{out} += $guest->{netout}    || 0;
@@ -74,18 +94,18 @@ if ($cluster){
   }
 } elsif ($node){
   foreach my $item (qw(status version subscription)){
-    $json->{$item} = from_json(qx(pvesh get /nodes/$node/$item $pvesh_opt 2>/dev/null));
+    $json->{$item} = get_api_data("/nodes/$node/$item");
   }
 } elsif ($guest){
-  my $guests = from_json(qx($pvesh get /cluster/resources --type=vm $pvesh_opt 2>/dev/null));
+  my $guests = get_api_data('/cluster/resources', '--type=vm');
   foreach my $g (@{$guests}){
     if ($g->{vmid} eq $guest){
       $json = $g;
       last;
     }
-  } 
+  }
 } elsif ($pool){
-  my $pool = from_json(qx($pvesh get /pools/$pool $pvesh_opt 2>/dev/null));
+  my $pool = get_api_data("/pools/$pool");
   $json->{comment} = $pool->{comment};
   foreach my $type (qw(qemu lxc)){
     $json->{$_}->{$type} = 0 foreach (qw(guests templates));
@@ -105,7 +125,7 @@ if ($cluster){
   $json->{templates}->{$_} //= 0 foreach (qw(maxdisk));
   $json->{guests}->{cpu} = ($json->{guests}->{maxcpu} == 0) ? 0 : $json->{guests}->{used_cpu} / $json->{guests}->{maxcpu};
 } elsif ($storage){
-  my $stores = from_json(qx($pvesh get /cluster/resources --type=storage $pvesh_opt 2>/dev/null));
+  my $stores = get_api_data('/cluster/resources', '--type=storage');
   foreach my $s (@{$stores}){
     if ($s->{storage} eq $storage){
       $json->{maxdisk} = $s->{maxdisk};
@@ -119,3 +139,33 @@ if ($cluster){
 }
 
 print to_json($json, { pretty => $pretty }) . "\n";
+
+# Helper which will either get data from
+# the cache if its fresh enough, or query the API
+# and save the result in the cache for later
+sub get_api_data {
+  my $path = shift;
+  my $query_opt = shift;
+  $query_opt ||= '';
+  my $res;
+  # Is the cache existing and fresh enough ?
+  if (-f $cache_dir . $path and int((-M $cache_dir . $path)*60*60*24) < $cache){
+    {
+      local $/; # Enable slurp
+      open my $fh, "<", $cache_dir . $path;
+      $res = <$fh>;
+      close $fh;
+    }
+  } else {
+    $res = qx($pvesh get $path $query_opt $pvesh_opt 2>/dev/null);
+    # Save the result in the cache for later retrival
+    eval{
+      my $dir = (fileparse($path))[1];
+      make_path($cache_dir . $dir, { chmod => 700 });
+    };
+    open my $fh, ">", $cache_dir . $path;
+    print $fh $res;
+    close $fh;
+  }
+  return from_json($res);
+}
