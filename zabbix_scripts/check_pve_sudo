@@ -144,15 +144,16 @@ print to_json($json, { pretty => $pretty }) . "\n";
 # the cache if its fresh enough, or query the API
 # and save the result in the cache for later
 sub get_api_data {
-  my $path = shift;
-  my $query_opt = shift;
+  my ($path, $query_opt) = @_;
   $query_opt ||= '';
+  my $opt_filename = $query_opt;
+  $opt_filename =~ s/[\-=]/_/g;
   my $res;
   # Is the cache existing and fresh enough ?
-  if (-f $cache_dir . $path and int((-M $cache_dir . $path)*60*60*24) < $cache){
+  if (-f $cache_dir . $path . $opt_filename and int((-M $cache_dir . $path . $opt_filename)*60*60*24) < $cache){
     {
       local $/; # Enable slurp
-      open my $fh, "<", $cache_dir . $path;
+      open my $fh, "<", $cache_dir . $path . $opt_filename;
       $res = <$fh>;
       close $fh;
     }
@@ -163,7 +164,7 @@ sub get_api_data {
       my $dir = (fileparse($path))[1];
       make_path($cache_dir . $dir, { chmod => 700 });
     };
-    open my $fh, ">", $cache_dir . $path;
+    open my $fh, ">", $cache_dir . $path . $opt_filename;
     print $fh $res;
     close $fh;
   }
