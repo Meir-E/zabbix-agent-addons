@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>4.4</version>
+    <date>2020-03-02T14:11:04Z</date>
+    <groups>
+        <group>
+            <name>Templates</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Model_Switch_Generic</template>
+            <name>Model_Switch_Generic</name>
+            <templates>
+                <template>
+                    <name>Model_SNMP_Interfaces</name>
+                </template>
+            </templates>
+            <groups>
+                <group>
+                    <name>Templates</name>
+                </group>
+            </groups>
+            <items>
+                <item>
+                    <name>IP Forwarding</name>
+                    <type>SNMPV2</type>
+                    <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                    <snmp_oid>IP-MIB::ipForwarding.0</snmp_oid>
+                    <key>ipForwarding</key>
+                    <delay>15m</delay>
+                    <history>30d</history>
+                    <trends>0</trends>
+                    <request_method>POST</request_method>
+                    <triggers>
+                        <trigger>
+                            <expression>{diff()}=1</expression>
+                            <name>La configuration de l'IP forwarding a changé</name>
+                            <priority>WARNING</priority>
+                        </trigger>
+                    </triggers>
+                </item>
+            </items>
+        </template>
+    </templates>
+</zabbix_export>
