@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>4.4</version>
+    <date>2020-03-02T14:07:54Z</date>
+    <groups>
+        <group>
+            <name>Modèles</name>
+        </group>
+        <group>
+            <name>Pena (privé)</name>
+        </group>
+        <group>
+            <name>Templates</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Template_Ping</template>
+            <name>Template_Ping</name>
+            <groups>
+                <group>
+                    <name>Modèles</name>
+                </group>
+                <group>
+                    <name>Pena (privé)</name>
+                </group>
+                <group>
+                    <name>Templates</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>Latency</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>Packet loss</name>
+                    <type>SIMPLE</type>
+                    <key>icmppingloss[,6,500,,1500]</key>
+                    <trends>1825d</trends>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <applications>
+                        <application>
+                            <name>Latency</name>
+                        </application>
+                    </applications>
+                    <request_method>POST</request_method>
+                    <triggers>
+                        <trigger>
+                            <expression>{avg(900)}&gt;{$LOST_WARN} and {avg(120)}&gt;0 and {avg(120)}&lt;100</expression>
+                            <name>High packet loss</name>
+                            <priority>AVERAGE</priority>
+                            <dependencies>
+                                <dependency>
+                                    <name>No ping response from {HOST.IP1}</name>
+                                    <expression>{$PING_INFO}=1 and {Template_Ping:icmpping[,2,,,2000].sum({$DOWN_WARN})}=0</expression>
+                                    <recovery_expression>{Template_Ping:icmpping[,2,,,2000].sum(180)}&gt;3</recovery_expression>
+                                </dependency>
+                                <dependency>
+                                    <name>No ping response from {HOST.IP1}</name>
+                                    <expression>{Template_Ping:icmpping[,2,,,2000].sum({$DOWN_CRITICAL})}=0 and {Template_Ping:icmpping[,2,,,2000].dayofweek(0)}&gt;={$PING_ALERT_FROM_DAY} and {Template_Ping:icmpping[,2,,,2000].dayofweek(0)}&lt;={$PING_ALERT_TO_DAY} and {Template_Ping:icmpping[,2,,,2000].time(0)}&gt;={$PING_ALERT_FROM_HOUR} and {Template_Ping:icmpping[,2,,,2000].time(0)}&lt;={$PING_ALERT_TO_HOUR}</expression>
+                                    <recovery_expression>{Template_Ping:icmpping[,2,,,2000].sum(180)}&gt;3</recovery_expression>
+                                </dependency>
+                            </dependencies>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>Latency</name>
+                    <type>SIMPLE</type>
+                    <key>icmppingsec</key>
+                    <trends>1825d</trends>
+                    <value_type>FLOAT</value_type>
+                    <units>s</units>
+                    <applications>
+                        <application>
+                            <name>Latency</name>
+                        </application>
+                    </applications>
+                    <request_method>POST</request_method>
+                    <triggers>
+                        <trigger>
+                            <expression>{avg(900)}&gt;{$MAX_LATENCY_15} or {avg(300)}&gt;{$MAX_LATENCY_5}</expression>
+                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                            <recovery_expression>{avg(900)}&lt;({$MAX_LATENCY_15}-{$MAX_LATENCY_15}/10) or {avg(300)}&lt;({$MAX_LATENCY_5}-{$MAX_LATENCY_15}/10)</recovery_expression>
+                            <name>High latency</name>
+                            <priority>INFO</priority>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>Ping response</name>
+                    <type>SIMPLE</type>
+                    <key>icmpping[,2,,,2000]</key>
+                    <delay>30s</delay>
+                    <trends>1825d</trends>
+                    <applications>
+                        <application>
+                            <name>Latency</name>
+                        </application>
+                    </applications>
+                    <request_method>POST</request_method>
+                    <triggers>
+                        <trigger>
+                            <expression>{$PING_INFO}=1 and {sum({$DOWN_WARN})}=0</expression>
+                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                            <recovery_expression>{sum(180)}&gt;3</recovery_expression>
+                            <name>No ping response from {HOST.IP1}</name>
+                            <priority>INFO</priority>
+                            <manual_close>YES</manual_close>
+                            <dependencies>
+                                <dependency>
+                                    <name>No ping response from {HOST.IP1}</name>
+                                    <expression>{Template_Ping:icmpping[,2,,,2000].sum({$DOWN_CRITICAL})}=0 and {Template_Ping:icmpping[,2,,,2000].dayofweek(0)}&gt;={$PING_ALERT_FROM_DAY} and {Template_Ping:icmpping[,2,,,2000].dayofweek(0)}&lt;={$PING_ALERT_TO_DAY} and {Template_Ping:icmpping[,2,,,2000].time(0)}&gt;={$PING_ALERT_FROM_HOUR} and {Template_Ping:icmpping[,2,,,2000].time(0)}&lt;={$PING_ALERT_TO_HOUR}</expression>
+                                    <recovery_expression>{Template_Ping:icmpping[,2,,,2000].sum(180)}&gt;3</recovery_expression>
+                                </dependency>
+                            </dependencies>
+                        </trigger>
+                        <trigger>
+                            <expression>{sum({$DOWN_CRITICAL})}=0 and {dayofweek(0)}&gt;={$PING_ALERT_FROM_DAY} and {dayofweek(0)}&lt;={$PING_ALERT_TO_DAY} and {time(0)}&gt;={$PING_ALERT_FROM_HOUR} and {time(0)}&lt;={$PING_ALERT_TO_HOUR}</expression>
+                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                            <recovery_expression>{sum(180)}&gt;3</recovery_expression>
+                            <name>No ping response from {HOST.IP1}</name>
+                            <priority>DISASTER</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
+                </item>
+            </items>
+            <macros>
+                <macro>
+                    <macro>{$DOWN_CRITICAL}</macro>
+                    <value>300</value>
+                </macro>
+                <macro>
+                    <macro>{$DOWN_WARN}</macro>
+                    <value>120</value>
+                </macro>
+                <macro>
+                    <macro>{$LOST_WARN}</macro>
+                    <value>10</value>
+                </macro>
+                <macro>
+                    <macro>{$MAX_LATENCY_5}</macro>
+                    <value>0.4</value>
+                </macro>
+                <macro>
+                    <macro>{$MAX_LATENCY_15}</macro>
+                    <value>0.2</value>
+                </macro>
+                <macro>
+                    <macro>{$PING_ALERT_FROM_DAY}</macro>
+                    <value>1</value>
+                </macro>
+                <macro>
+                    <macro>{$PING_ALERT_FROM_HOUR}</macro>
+                    <value>000000</value>
+                </macro>
+                <macro>
+                    <macro>{$PING_ALERT_TO_DAY}</macro>
+                    <value>7</value>
+                </macro>
+                <macro>
+                    <macro>{$PING_ALERT_TO_HOUR}</macro>
+                    <value>235959</value>
+                </macro>
+                <macro>
+                    <macro>{$PING_INFO}</macro>
+                    <value>1</value>
+                    <description>Info alert if no response, before critical alert</description>
+                </macro>
+            </macros>
+        </template>
+    </templates>
+    <graphs>
+        <graph>
+            <name>Network: Latency and packet loss</name>
+            <ymin_type_1>FIXED</ymin_type_1>
+            <graph_items>
+                <graph_item>
+                    <drawtype>FILLED_REGION</drawtype>
+                    <color>009900</color>
+                    <item>
+                        <host>Template_Ping</host>
+                        <key>icmppingsec</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <color>DD0000</color>
+                    <yaxisside>RIGHT</yaxisside>
+                    <item>
+                        <host>Template_Ping</host>
+                        <key>icmppingloss[,6,500,,1500]</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+    </graphs>
+</zabbix_export>
