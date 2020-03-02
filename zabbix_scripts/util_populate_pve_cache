@@ -22,7 +22,6 @@ foreach my $stor (@{$storages->{data}}){
 }
 my $guests = from_json(qx(/var/lib/zabbix/bin/disco_pve_sudo --what=guests));
 foreach my $guest (@{$guests->{data}}){
-  print $guest->{'{#PVE_GUEST_ID}'} . "\n";
   qx(/var/lib/zabbix/bin/check_pve_sudo --guest=$guest->{'{#PVE_GUEST_ID}'} --cache=120);
 }
 
