@@ -27,10 +27,22 @@ sub list_smart_hdd{
   my ($param) = shift || {};
   my @shd = ();
   if (-x "/usr/sbin/smartctl"){
-   foreach my $block (list_block_dev()){
+   BLOCK: foreach my $block (list_block_dev()){
       # Skip block we already know won't support SMART
       next if ($block =~ m/^(ram|loop|md|dm\-)\d+/);
-      next unless (system("/usr/sbin/smartctl -A /dev/$block >/dev/null 2>&1") == 0);
+      my $smart_enabled = 0;
+      my @smart_info = qx(/usr/sbin/smartctl -i /dev/$block);
+      next unless ($? == 0);
+      foreach my $line (@smart_info){
+        if ($line =~ m/^SMART support is:\s+Enabled/i){
+          $smart_enabled = 1;
+        } elsif ($line =~ m/^Transport protocol:\s+iSCSI/i){
+          # Skip iSCSI block
+          next BLOCK;
+        }
+      }
+      # Skip block unless S.M.A.R.T is advertized as enabled
+      next unless ($smart_enabled);
       if ($param->{skip_remouvable} && -e "/sys/block/$block/removable"){
         open REMOVABLE, "/sys/block/$block/removable";
         my $removable = join "", <REMOVABLE>;
