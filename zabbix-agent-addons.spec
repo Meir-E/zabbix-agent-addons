@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.119
+Version: 0.2.120
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -101,6 +101,9 @@ fi
 %endif
 
 %changelog
+* Fri Apr 03 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.120-1
+- Fix mdadm when we have spares (daniel@firewall-services.com)
+
 * Tue Mar 03 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.119-1
 - Better detection of smart capable drives (daniel@firewall-services.com)
 
