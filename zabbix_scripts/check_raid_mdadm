@@ -67,6 +67,7 @@ while (<FILE>) {
     }
     elsif ($2 eq "(S)") {
       $spare_devs{$dev} .= "$1,";
+      $devs_up++;
     }
     else {
       $active_devs{$dev} .= "$1,";
