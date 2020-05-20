@@ -29,20 +29,8 @@ GetOptions(
   'cache-dir=s' => \$cache_dir
 );
 
-# Before Buster / PVE6, pvesh don't support (or need) --output-format=json
-# So try to detect previous version and adapt opt
-my $pvesh_opt = '--output-format=json';
-if (-f '/etc/os-release'){
-  open my $fh, '<', '/etc/os-release';
-  foreach my $line (<$fh>){
-    my ($var, $val) = split(/=/, $line);
-    $val =~ s/"(.*)"/$1/;
-    if ($var eq 'VERSION_ID' and int $val < 10){
-      $pvesh_opt = '';
-      last;
-    }
-  }
-}
+# Old versions do not support, nore need --output-format=json
+my $pvesh_opt = (system("$pvesh ls / --output-format=json 2>&1 > /dev/null") == 0) ? '--output-format=json' : '';
 
 if ($cluster){
   my $cluster = get_api_data('/cluster/status');
