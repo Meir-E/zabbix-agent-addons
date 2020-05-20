@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.120
+Version: 0.2.121
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -101,6 +101,10 @@ fi
 %endif
 
 %changelog
+* Wed May 20 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.121-1
+- Do not rely on distrib version to check if --output-format is needed for
+  check_pve_sudo (daniel@firewall-services.com)
+
 * Fri Apr 03 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.120-1
 - Fix mdadm when we have spares (daniel@firewall-services.com)
 
