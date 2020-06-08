@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>4.4</version>
+    <date>2020-06-08T07:31:25Z</date>
+    <groups>
+        <group>
+            <name>Templates</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Template_OS_Windows_Serveur</template>
+            <name>Template_OS_Windows_Serveur</name>
+            <templates>
+                <template>
+                    <name>Template_OS_Windows_Minimal</name>
+                </template>
+                <template>
+                    <name>Template_Ping</name>
+                </template>
+            </templates>
+            <groups>
+                <group>
+                    <name>Templates</name>
+                </group>
+            </groups>
+            <macros>
+                <macro>
+                    <macro>{$LOAD_COEF}</macro>
+                    <value>1</value>
+                </macro>
+                <macro>
+                    <macro>{$MAX_PROCESSES}</macro>
+                    <value>200</value>
+                </macro>
+                <macro>
+                    <macro>{$REBOOT_WARN}</macro>
+                    <value>21600</value>
+                </macro>
+                <macro>
+                    <macro>{$ZBX_UNREACHABLE_TIMEOUT}</macro>
+                    <value>900</value>
+                </macro>
+            </macros>
+        </template>
+    </templates>
+    <triggers>
+        <trigger>
+            <expression>({Template_OS_Windows_Serveur:system.cpu.load[,avg1].avg(900)}&gt;({Template_OS_Windows_Serveur:system.cpu.num[].last(0)}*3*{$LOAD_COEF})) or ({Template_OS_Windows_Serveur:system.cpu.load[,avg1].avg(1800)}&gt;({Template_OS_Windows_Serveur:system.cpu.num[].last(0)}*2.5*{$LOAD_COEF})) or ({Template_OS_Windows_Serveur:system.cpu.load[,avg1].avg(7200)}&gt;({Template_OS_Windows_Serveur:system.cpu.num[].last(0)}*1.2*{$LOAD_COEF}))</expression>
+            <name>High CPU load</name>
+            <priority>INFO</priority>
+        </trigger>
+        <trigger>
+            <expression>{Template_OS_Windows_Serveur:proc.num[].last(0)}&gt;{$MAX_PROCESSES}</expression>
+            <name>Too many processes</name>
+            <priority>AVERAGE</priority>
+        </trigger>
+        <trigger>
+            <expression>{Template_OS_Windows_Serveur:agent.ping.nodata({$ZBX_UNREACHABLE_TIMEOUT})}=1</expression>
+            <name>Zabbix agent unavailable</name>
+            <priority>DISASTER</priority>
+            <dependencies>
+                <dependency>
+                    <name>No ping response from {HOST.IP1}</name>
+                    <expression>{Template_OS_Windows_Serveur:icmpping[,2,,,2000].sum({$DOWN_CRITICAL})}=0 and {Template_OS_Windows_Serveur:icmpping[,2,,,2000].dayofweek(0)}&gt;={$PING_ALERT_FROM_DAY} and {Template_OS_Windows_Serveur:icmpping[,2,,,2000].dayofweek(0)}&lt;={$PING_ALERT_TO_DAY} and {Template_OS_Windows_Serveur:icmpping[,2,,,2000].time(0)}&gt;={$PING_ALERT_FROM_HOUR} and {Template_OS_Windows_Serveur:icmpping[,2,,,2000].time(0)}&lt;={$PING_ALERT_TO_HOUR}</expression>
+                    <recovery_expression>{Template_OS_Windows_Serveur:icmpping[,2,,,2000].sum(180)}&gt;3</recovery_expression>
+                </dependency>
+            </dependencies>
+        </trigger>
+        <trigger>
+            <expression>{Template_OS_Windows_Serveur:system.uptime.last(0)}&lt;{$REBOOT_WARN}</expression>
+            <name>{HOSTNAME} rebooted {ITEM.LASTVALUE1} ago</name>
+            <priority>INFO</priority>
+        </trigger>
+    </triggers>
+</zabbix_export>
