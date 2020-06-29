@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>4.4</version>
+    <date>2020-06-29T21:21:17Z</date>
+    <groups>
+        <group>
+            <name>Templates</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Template_vhost</template>
+            <name>Template_vhost</name>
+            <groups>
+                <group>
+                    <name>Templates</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>web</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>SSL Certificate info</name>
+                    <type>EXTERNAL</type>
+                    <key>check_cert.pl[&quot;--url={$VHOST_URL}&quot;]</key>
+                    <delay>30m</delay>
+                    <history>3600</history>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <request_method>POST</request_method>
+                </item>
+                <item>
+                    <name>Certificate request code</name>
+                    <type>DEPENDENT</type>
+                    <key>vhost.ssl.code</key>
+                    <delay>0</delay>
+                    <trends>1825d</trends>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.code</params>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>check_cert.pl[&quot;--url={$VHOST_URL}&quot;]</key>
+                    </master_item>
+                    <request_method>POST</request_method>
+                    <triggers>
+                        <trigger>
+                            <expression>{last()}=500</expression>
+                            <name>{$VHOST_URL} a répondu par un code {ITEM.VALUE1}</name>
+                            <priority>WARNING</priority>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>Certificate status</name>
+                    <type>DEPENDENT</type>
+                    <key>vhost.ssl.status</key>
+                    <delay>0</delay>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.status</params>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>check_cert.pl[&quot;--url={$VHOST_URL}&quot;]</key>
+                    </master_item>
+                    <request_method>POST</request_method>
+                    <triggers>
+                        <trigger>
+                            <expression>{str(ok)}=0 and {str(unable to get local issuer certificate)}=0</expression>
+                            <name>le certificat de {$VHOST_URL} a le statut {ITEM.VALUE1}</name>
+                            <priority>WARNING</priority>
+                            <dependencies>
+                                <dependency>
+                                    <name>{$VHOST_URL} a répondu par un code {ITEM.VALUE1}</name>
+                                    <expression>{Template_vhost:vhost.ssl.code.last()}=500</expression>
+                                </dependency>
+                            </dependencies>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>Certificate validity</name>
+                    <type>DEPENDENT</type>
+                    <key>vhost.ssl.validity</key>
+                    <delay>0</delay>
+                    <trends>1825d</trends>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.days_left</params>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>check_cert.pl[&quot;--url={$VHOST_URL}&quot;]</key>
+                    </master_item>
+                    <request_method>POST</request_method>
+                    <triggers>
+                        <trigger>
+                            <expression>{last()}&lt;{$VHOST_SSL_WARN_EXPIRE}</expression>
+                            <name>Le certificat {$VHOST_URL} expire dans {ITEM.VALUE1} jours</name>
+                            <priority>WARNING</priority>
+                        </trigger>
+                    </triggers>
+                </item>
+            </items>
+            <httptests>
+                <httptest>
+                    <name>{$VHOST_URL}</name>
+                    <application>
+                        <name>web</name>
+                    </application>
+                    <delay>5m</delay>
+                    <steps>
+                        <step>
+                            <name>index</name>
+                            <url>{$VHOST_URL}</url>
+                            <status_codes>200,401</status_codes>
+                        </step>
+                    </steps>
+                </httptest>
+            </httptests>
+            <macros>
+                <macro>
+                    <macro>{$VHOST_RESP_NIGHT_WARN}</macro>
+                    <value>5</value>
+                </macro>
+                <macro>
+                    <macro>{$VHOST_RESP_WARN}</macro>
+                    <value>4</value>
+                </macro>
+                <macro>
+                    <macro>{$VHOST_SPEED_COEF}</macro>
+                    <value>4</value>
+                </macro>
+                <macro>
+                    <macro>{$VHOST_SSL_WARN_EXPIRE}</macro>
+                    <value>25</value>
+                </macro>
+                <macro>
+                    <macro>{$VHOST_URL}</macro>
+                    <value>https://</value>
+                </macro>
+            </macros>
+        </template>
+    </templates>
+    <triggers>
+        <trigger>
+            <expression>{Template_vhost:web.test.error[{$VHOST_URL}].strlen()}&gt;0  and {Template_vhost:web.test.fail[{$VHOST_URL}].min(#2)}&gt;0</expression>
+            <name>Erreur lors de la vérification de {$VHOST_URL}: {ITEM.VALUE1}</name>
+            <priority>WARNING</priority>
+        </trigger>
+        <trigger>
+            <expression>({Template_vhost:web.test.in[{$VHOST_URL},index,bps].avg(7200)}*{$VHOST_SPEED_COEF}&lt;{Template_vhost:web.test.in[{$VHOST_URL},index,bps].avg(604800)}) or ({Template_vhost:web.test.time[{$VHOST_URL},index,resp].avg(7200)}&gt;{$VHOST_SPEED_COEF}*{Template_vhost:web.test.time[{$VHOST_URL},index,resp].avg(604800)})</expression>
+            <name>{$VHOST_URL} est significativement plus lent que d'habitude</name>
+            <priority>INFO</priority>
+        </trigger>
+        <trigger>
+            <expression>({Template_vhost:web.test.time[{$VHOST_URL},index,resp].time()} &gt;= 060000 and {Template_vhost:web.test.time[{$VHOST_URL},index,resp].time()} &lt; 210000 and {Template_vhost:web.test.time[{$VHOST_URL},index,resp].avg(#5)}&gt;{$VHOST_RESP_WARN})&#13;
+or&#13;
+({Template_vhost:web.test.time[{$VHOST_URL},index,resp].time()} &lt; 060000 and {Template_vhost:web.test.time[{$VHOST_URL},index,resp].time()} &gt;= 210000 and {Template_vhost:web.test.time[{$VHOST_URL},index,resp].avg(#5)}&gt;{$VHOST_RESP_NIGHT_WARN})</expression>
+            <name>{$VHOST_URL} semble lent à répondre ({ITEM.VALUE1})</name>
+            <priority>WARNING</priority>
+        </trigger>
+    </triggers>
+</zabbix_export>
