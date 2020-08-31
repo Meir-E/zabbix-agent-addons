@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.123
+Version: 0.2.124
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -101,6 +101,9 @@ fi
 %endif
 
 %changelog
+* Mon Aug 31 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.124-1
+- Update Template_App_MySQL (daniel@firewall-services.com)
+
 * Mon Aug 31 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.123-1
 - check_mysql needs sudo permissions (daniel@firewall-services.com)
 
