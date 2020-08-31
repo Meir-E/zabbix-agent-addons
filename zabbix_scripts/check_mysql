@@ -1,0 +1,101 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use JSON;
+use Data::Dumper;
+use Getopt::Long;
+
+my $what     = 'all';
+my $defaults = undef;
+my $host     = undef;
+my $port     = undef;
+my $user     = undef;
+my $password = undef;
+my $help     = 0;
+my $pretty   = 0;
+my $exit     = 0;
+
+my $json = {
+  zbx_error => "none"
+};
+
+GetOptions(
+  "what=s"     => \$what,
+  "help"       => \$help,
+  "defaults=s" => \$defaults,
+  "host=s"     => \$host,
+  "port=s"     => \$port,
+  "user=s"     => \$user,
+  "password=s" => \$password,
+  "pretty"     => \$pretty
+);
+
+# Basic input checks
+if (defined $defaults and $defaults ne '' and not -e $defaults){
+  $json->{zbx_error} = "File $defaults doesn't exist";
+  $exit = 1;
+} elsif (defined $host and $host ne '' and $host !~ m/^[\w\-\.]+$/){
+  $json->{zbx_error} = "Bad value for --host";
+  $exit = 1;
+} elsif (defined $port and $port ne '' and ($port !~ m/^\d+$/ or $port lt 1 or $port gt 65535)){
+  $json->{zbx_error} = "Bad value for --port";
+  $exit = 1;
+} elsif (defined $user and $user ne '' and $user !~ m/^[\w\-\.]+$/){
+  $json->{zbx_error} = "Bad value for --user";
+  $exit = 1;
+} elsif (defined $password and $password ne '') {
+  # Just escape quotes as will protect the password with
+  $password =~ s/'/\\'/g;
+}
+
+if ($help){
+  print <<_EOF;
+Usage: $0 [--what=key] [--help] [--pretty]
+
+  * --what : if a key is given (eg --what=Bytes_received) will print only this value.
+             Else, all the stats are printed in a json format.
+             Run once without --what to get a list of available keys
+
+  * --help : print this help and exit
+
+  * --defaults : set the file from which mysql will read defaults
+
+  * --host : set the hostname to connect to
+
+  * --user : set the user to connect as
+
+  * --password : set the password to use
+
+  * --pretty : prints JSON in a pretty, human readable format. Has no use when --what is also given
+_EOF
+  exit 0;
+}
+
+if ($exit eq 0){
+  my $opt = "";
+  $opt .= " --defaults-file=$defaults" if (defined $defaults and $defaults ne '');
+  $opt .= " --host=$host" if (defined $host and $host ne '');
+  $opt .= " --user=$user" if (defined $user and $user ne '');
+  $opt .= " --password='$password'" if (defined $password and $password ne '');
+  my @status = qx(mysql $opt --batch --execute 'show global status;' 2>&1);
+  if ($? != 0){
+    $exit = $?;
+    $json->{zbx_error} = join '', @status;
+  } else {
+    foreach (@status){
+      chomp;
+      my ($key, $val) = split(/\t/, $_);
+      $json->{$key} = $val;
+    }
+  }
+}
+
+if ($what ne 'all' and defined $json->{$what}){
+  print $json->{$what} . "\n";
+} else {
+  print to_json($json, { pretty => $pretty });
+}
+
+exit $exit;
+
