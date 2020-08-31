@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.121
+Version: 0.2.122
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -101,6 +101,13 @@ fi
 %endif
 
 %changelog
+* Mon Aug 31 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.122-1
+- Add MySQL monitoring script and template (daniel@firewall-services.com)
+- Add Template_Vhost (daniel@firewall-services.com)
+- Add templates for Windows (minimal and server) (daniel@firewall-services.com)
+- Add /usr/local/BackupPC/lib as lib dir for BackupPC scripts (daniel@firewall-
+  services.com)
+
 * Wed May 20 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.121-1
 - Do not rely on distrib version to check if --output-format is needed for
   check_pve_sudo (daniel@firewall-services.com)
