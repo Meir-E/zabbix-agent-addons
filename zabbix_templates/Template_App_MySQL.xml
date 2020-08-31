@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-08-31T13:00:19Z</date>
+    <date>2020-08-31T15:37:35Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -125,15 +125,6 @@
                     <master_item>
                         <key>db.mysql[{$MYSQL_HOST},{$MYSQL_PORT},{$MYSQL_USER},{$MYSQL_PASSWORD},{$MYSQL_DEFAULTS},all]</key>
                     </master_item>
-                    <triggers>
-                        <trigger>
-                            <expression>{change()}=1</expression>
-                            <recovery_mode>NONE</recovery_mode>
-                            <name>MySQL users modified</name>
-                            <priority>WARNING</priority>
-                            <manual_close>YES</manual_close>
-                        </trigger>
-                    </triggers>
                 </item>
                 <item>
                     <name>MySQL: $1</name>
@@ -245,6 +236,114 @@
                     </master_item>
                 </item>
                 <item>
+                    <name>MySQL: ALTER USER commands</name>
+                    <type>DEPENDENT</type>
+                    <key>db.mysql[Com_alter_user]</key>
+                    <delay>0</delay>
+                    <history>30d</history>
+                    <trends>1825d</trends>
+                    <units>!qps</units>
+                    <applications>
+                        <application>
+                            <name>mysql</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.Com_alter_user</params>
+                        </step>
+                        <step>
+                            <type>CHANGE_PER_SECOND</type>
+                            <params/>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>db.mysql[{$MYSQL_HOST},{$MYSQL_PORT},{$MYSQL_USER},{$MYSQL_PASSWORD},{$MYSQL_DEFAULTS},all]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>MySQL: BEGIN commands</name>
+                    <type>DEPENDENT</type>
+                    <key>db.mysql[Com_begin]</key>
+                    <delay>0</delay>
+                    <history>30d</history>
+                    <trends>1825d</trends>
+                    <units>!qps</units>
+                    <applications>
+                        <application>
+                            <name>mysql</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.Com_begin</params>
+                        </step>
+                        <step>
+                            <type>CHANGE_PER_SECOND</type>
+                            <params/>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>db.mysql[{$MYSQL_HOST},{$MYSQL_PORT},{$MYSQL_USER},{$MYSQL_PASSWORD},{$MYSQL_DEFAULTS},all]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>MySQL: COMMIT commands</name>
+                    <type>DEPENDENT</type>
+                    <key>db.mysql[Com_commit]</key>
+                    <delay>0</delay>
+                    <history>30d</history>
+                    <trends>1825d</trends>
+                    <units>!qps</units>
+                    <applications>
+                        <application>
+                            <name>mysql</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.Com_commit</params>
+                        </step>
+                        <step>
+                            <type>CHANGE_PER_SECOND</type>
+                            <params/>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>db.mysql[{$MYSQL_HOST},{$MYSQL_PORT},{$MYSQL_USER},{$MYSQL_PASSWORD},{$MYSQL_DEFAULTS},all]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>MySQL: CREATE USER commands</name>
+                    <type>DEPENDENT</type>
+                    <key>db.mysql[Com_create_user]</key>
+                    <delay>0</delay>
+                    <history>30d</history>
+                    <trends>1825d</trends>
+                    <units>!qps</units>
+                    <applications>
+                        <application>
+                            <name>mysql</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.Com_create_user</params>
+                        </step>
+                        <step>
+                            <type>CHANGE_PER_SECOND</type>
+                            <params/>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>db.mysql[{$MYSQL_HOST},{$MYSQL_PORT},{$MYSQL_USER},{$MYSQL_PASSWORD},{$MYSQL_DEFAULTS},all]</key>
+                    </master_item>
+                </item>
+                <item>
                     <name>MySQL: DELETE commands</name>
                     <type>DEPENDENT</type>
                     <key>db.mysql[Com_delete]</key>
@@ -315,6 +414,33 @@
                         <step>
                             <type>JSONPATH</type>
                             <params>$.Com_prepare_sql</params>
+                        </step>
+                        <step>
+                            <type>CHANGE_PER_SECOND</type>
+                            <params/>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>db.mysql[{$MYSQL_HOST},{$MYSQL_PORT},{$MYSQL_USER},{$MYSQL_PASSWORD},{$MYSQL_DEFAULTS},all]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>MySQL: ROLLBACK commands</name>
+                    <type>DEPENDENT</type>
+                    <key>db.mysql[Com_rollback]</key>
+                    <delay>0</delay>
+                    <history>30d</history>
+                    <trends>1825d</trends>
+                    <units>!qps</units>
+                    <applications>
+                        <application>
+                            <name>mysql</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.Com_rollback</params>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
@@ -937,21 +1063,16 @@
             </macros>
         </template>
     </templates>
+    <triggers>
+        <trigger>
+            <expression>{Template_App_MySQL:db.mysql[Acl_users].change()}=1 or {Template_App_MySQL:db.mysql[Com_alter_user].last()}&gt;0 or {Template_App_MySQL:db.mysql[Com_create_user].last()}&gt;0</expression>
+            <recovery_mode>NONE</recovery_mode>
+            <name>MySQL users modified</name>
+            <priority>WARNING</priority>
+            <manual_close>YES</manual_close>
+        </trigger>
+    </triggers>
     <graphs>
-        <graph>
-            <name>MySQL : CPU Time</name>
-            <graph_items>
-                <graph_item>
-                    <sortorder>1</sortorder>
-                    <drawtype>GRADIENT_LINE</drawtype>
-                    <color>F44336</color>
-                    <item>
-                        <host>Template_App_MySQL</host>
-                        <key>db.mysql[Cpu_time]</key>
-                    </item>
-                </graph_item>
-            </graph_items>
-        </graph>
         <graph>
             <name>MySQL : InnoDB buffer pool</name>
             <graph_items>
@@ -1004,22 +1125,6 @@
             <graph_items>
                 <graph_item>
                     <sortorder>1</sortorder>
-                    <color>F63100</color>
-                    <item>
-                        <host>Template_App_MySQL</host>
-                        <key>db.mysql[Com_prepare_sql]</key>
-                    </item>
-                </graph_item>
-                <graph_item>
-                    <sortorder>2</sortorder>
-                    <color>1A7C11</color>
-                    <item>
-                        <host>Template_App_MySQL</host>
-                        <key>db.mysql[Com_delete]</key>
-                    </item>
-                </graph_item>
-                <graph_item>
-                    <sortorder>3</sortorder>
                     <color>C5E1A5</color>
                     <item>
                         <host>Template_App_MySQL</host>
@@ -1027,15 +1132,7 @@
                     </item>
                 </graph_item>
                 <graph_item>
-                    <sortorder>4</sortorder>
-                    <color>FFE082</color>
-                    <item>
-                        <host>Template_App_MySQL</host>
-                        <key>db.mysql[Com_update]</key>
-                    </item>
-                </graph_item>
-                <graph_item>
-                    <sortorder>5</sortorder>
+                    <sortorder>2</sortorder>
                     <color>BBDEFB</color>
                     <item>
                         <host>Template_App_MySQL</host>
@@ -1043,7 +1140,55 @@
                     </item>
                 </graph_item>
                 <graph_item>
+                    <sortorder>3</sortorder>
+                    <color>FFE082</color>
+                    <item>
+                        <host>Template_App_MySQL</host>
+                        <key>db.mysql[Com_update]</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>4</sortorder>
+                    <color>0097A7</color>
+                    <item>
+                        <host>Template_App_MySQL</host>
+                        <key>db.mysql[Com_begin]</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>5</sortorder>
+                    <color>B0BEC5</color>
+                    <item>
+                        <host>Template_App_MySQL</host>
+                        <key>db.mysql[Com_commit]</key>
+                    </item>
+                </graph_item>
+                <graph_item>
                     <sortorder>6</sortorder>
+                    <color>F230E0</color>
+                    <item>
+                        <host>Template_App_MySQL</host>
+                        <key>db.mysql[Com_rollback]</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>7</sortorder>
+                    <color>F63100</color>
+                    <item>
+                        <host>Template_App_MySQL</host>
+                        <key>db.mysql[Com_prepare_sql]</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>8</sortorder>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>Template_App_MySQL</host>
+                        <key>db.mysql[Com_delete]</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>9</sortorder>
                     <color>6C59DC</color>
                     <item>
                         <host>Template_App_MySQL</host>
@@ -1053,7 +1198,7 @@
             </graph_items>
         </graph>
         <graph>
-            <name>MySQL : slow and total queries</name>
+            <name>MySQL : Slow and total queries</name>
             <graph_items>
                 <graph_item>
                     <sortorder>1</sortorder>
