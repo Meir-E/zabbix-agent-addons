@@ -88,6 +88,14 @@ if ($exit eq 0){
       my ($key, $val) = split(/\t/, $_);
       $json->{$key} = $val;
     }
+    # Some older MySQL do not have all the variables we might want
+    if (not defined $json->{Acl_users}){
+      $json->{Acl_users} = qx(mysql $opt --batch --skip-column-names --execute 'select count(user) from user;' mysql);
+      chomp $json->{Acl_users};
+    }
+    if (not defined $json->{Max_statement_time_exceeded} and defined $json->{Max_execution_time_exceeded}){
+      $json->{Max_statement_time_exceeded} = $json->{Max_execution_time_exceeded}
+    }
   }
 }
 
