@@ -1,30 +1,31 @@
 #!/usr/bin/perl -w
 
 use strict;
+use File::Which;
 use JSON;
 
 my $json;
 @{$json->{data}} = ();
 
-my $hpacucli = '/usr/sbin/hpacucli';
+my $cli = which('hpacucli') || which('ssacli');
 
-# the hpacucli utility is needed
-unless (-x $hpacucli){
-    print to_json($json);
-    exit(0);
+# hpacucli or ssacli utility is needed
+if (not defined $cli){
+  print to_json($json);
+  exit(0);
 }
 
-open( HPACUCLI, "$hpacucli controller all show status|" )
-  or die "An error occured while running $hpacucli: $!";
+open( CLI, "$cli controller all show status|" )
+  or die "An error occured while running $cli: $!";
 
-foreach my $line (<HPACUCLI>){
-    if ( $line =~ m/Another instance of hpacucli is running! Stop it first\./i ){
-        die "Another instance of hpacucli is running\n";
-    }
-    elsif ( $line =~  m/(.*) in Slot (\d+)/i ) {
-        push @{$json->{data}}, {"{#MODEL}" => $1, "{#SLOT}" => $2};
-    }
+foreach my $line (<CLI>){
+  if ( $line =~ m/Another instance of hpacucli is running! Stop it first\./i ){
+    die "Another instance of hpacucli is running\n";
+  }
+  elsif ( $line =~  m/(.*) in Slot (\d+)/i ) {
+    push @{$json->{data}}, {"{#MODEL}" => $1, "{#SLOT}" => $2};
+  }
 }
-close HPACUCLI;
+close CLI;
 print to_json($json);
 exit(0);
