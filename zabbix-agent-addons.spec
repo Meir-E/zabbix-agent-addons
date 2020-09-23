@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.126
+Version: 0.2.127
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -101,6 +101,10 @@ fi
 %endif
 
 %changelog
+* Wed Sep 23 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.127-1
+- Update scripts to work with ssacli (in adition to hpacucli) (daniel@firewall-
+  services.com)
+
 * Fri Sep 04 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.126-1
 - Add some compatibility for older MySQL servers (daniel@firewall-services.com)
 
