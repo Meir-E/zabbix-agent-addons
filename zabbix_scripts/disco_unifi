@@ -80,7 +80,7 @@ if ($what eq 'devices'){
       '{#UNIFI_DEV_ID}'      => $entry->{device_id},
       '{#UNIFI_DEV_ADOPTED}' => $entry->{adopted},
       '{#UNIFI_DEV_MODEL}'   => $entry->{model},
-      '{#UNIFI_DEV_NAME}'    => $entry->{name},
+      '{#UNIFI_DEV_NAME}'    => $entry->{name} || $entry->{mac},
       '{#UNIFI_DEV_MAC}'     => $entry->{mac},
       '{#UNIFI_DEV_TYPE}'    => $entry->{type}
     };
