@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.128
+Version: 0.2.129
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -101,6 +101,10 @@ fi
 %endif
 
 %changelog
+* Tue Oct 20 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.129-1
+- Add scripts to discover and check multipath devices (daniel@firewall-
+  services.com)
+
 * Tue Sep 29 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.128-1
 - Use MAC of device if no name is defined in Unifi device discovery
   (daniel@firewall-services.com)
