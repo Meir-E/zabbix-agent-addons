@@ -1,0 +1,31 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use JSON;
+use Getopt::Long;
+use File::Which;
+
+my $mpath  = 1;
+my $pretty = 0;
+my $json   = [];
+
+GetOptions(
+  "mpath"  => \$mpath,
+  "pretty" => \$pretty
+);
+
+my $multipath = which('multipath');
+
+if (not defined $multipath){
+  print to_json($json, { pretty => $pretty });
+  exit 0;
+}
+
+foreach (qx($multipath -l -v1)){
+  chomp;
+  push @{$json}, { '{#MPATH_DEV}' => $_ };
+}
+
+print to_json($json, { pretty => $pretty });
+exit 0;
