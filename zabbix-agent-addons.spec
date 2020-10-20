@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.129
+Version: 0.2.130
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -101,6 +101,10 @@ fi
 %endif
 
 %changelog
+* Tue Oct 20 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.130-1
+- Add App_Multipath template (daniel@firewall-services.com)
+- Add Linux_Server template (daniel@firewall-services.com)
+
 * Tue Oct 20 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.129-1
 - Add scripts to discover and check multipath devices (daniel@firewall-
   services.com)
