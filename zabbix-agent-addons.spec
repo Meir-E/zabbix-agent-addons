@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.130
+Version: 0.2.131
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -101,6 +101,10 @@ fi
 %endif
 
 %changelog
+* Thu Oct 22 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.131-1
+- Don't return garbage in mpath discovery if command failed (daniel@firewall-
+  services.com)
+
 * Tue Oct 20 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.130-1
 - Add App_Multipath template (daniel@firewall-services.com)
 - Add Linux_Server template (daniel@firewall-services.com)
