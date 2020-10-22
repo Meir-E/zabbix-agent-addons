@@ -22,7 +22,13 @@ if (not defined $multipath){
   exit 0;
 }
 
-foreach (qx($multipath -l -v1)){
+my @dev = qx($multipath -l -v1);
+# If command failed (eg no /etc/multipath.conf), then return an empty result
+if ($? ne 0){
+  print to_json($json, { pretty => $pretty });
+  exit 1;
+}
+foreach (@dev){
   chomp;
   push @{$json}, { '{#MPATH_DEV}' => $_ };
 }
