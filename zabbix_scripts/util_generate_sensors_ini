@@ -366,7 +366,7 @@ if ($upsc && -x $upsc){
           threshold_high => $def_ups_temp_thres_high,
           threshold_low  => $def_ups_temp_thres_high-$temp_ups_hyst,
           unit           => '°C',
-          cmd            => "$upsc $ups ups.temperature"
+          cmd            => "$upsc $ups ups.temperature 2>/dev/null"
         };
         print "Found a temperature sensor for ups $ups\n";
         last;
@@ -378,7 +378,7 @@ if ($upsc && -x $upsc){
           threshold_high => $def_pwr_rel_thres_high,
           threshold_low  => $def_pwr_rel_thres_high-$pwr_rel_hyst,
           unit           => '%',
-          cmd            => "$upsc $ups ups.load"
+          cmd            => "$upsc $ups ups.load 2>/dev/null"
         };
       }
     }
