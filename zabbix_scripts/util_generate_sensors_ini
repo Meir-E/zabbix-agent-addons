@@ -78,7 +78,7 @@ if ($ipmitool && -x $ipmitool){
       chomp $l;
       # Looks like
       # Inlet Temp       | 04h | ok  |  7.1 | 25 degrees C
-      if ($l !~ m/^(\w+[\s\w]+?\w+)\s*\|.*\|\s*([\w\.\s]+)\s*\|.*\|\s*([\-\w\.\s]+)$/){
+      if ($l !~ m/^(\w+[\s\w\/\-]+?\w+)\s*\|.*\|\s*([\w\.\s]+)\s*\|.*\|\s*([\-\w\.\s]+)$/){
         next SENSOR;
       }
       my $name = $1;
@@ -396,7 +396,7 @@ $cfg->write($output);
 sub sensor_name{
   my $desc = shift;
   my $id = lc $desc;
-  $id =~ s/\s/_/g;
+  $id =~ s/[^\w]/_/g;
   $id =~ s/%/percent/g;
   $id =~ s/_rpm$//;
   return $id;
