@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.131
+Version: 0.2.132
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -101,6 +101,10 @@ fi
 %endif
 
 %changelog
+* Mon Oct 26 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.132-1
+- Run upsc commands with 2>/de/null (daniel@firewall-services.com)
+- IPMI sensors can have / and - in their name (daniel@firewall-services.com)
+
 * Thu Oct 22 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.131-1
 - Don't return garbage in mpath discovery if command failed (daniel@firewall-
   services.com)
