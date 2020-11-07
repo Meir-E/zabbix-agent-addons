@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.132
+Version: 0.2.133
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -102,6 +102,9 @@ fi
 %endif
 
 %changelog
+* Sat Nov 07 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.133-1
+- Add perl in BuildReq for el8 (daniel@firewall-services.com)
+
 * Mon Oct 26 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.132-1
 - Run upsc commands with 2>/de/null (daniel@firewall-services.com)
 - IPMI sensors can have / and - in their name (daniel@firewall-services.com)
