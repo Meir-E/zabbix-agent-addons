@@ -23,6 +23,7 @@ Requires: perl(File::Which)
 Requires: perl(Config::Simple)
 Requires: perl(Statistics::Descriptive)
 Requires: fping
+BuildRequires: perl
 %if ! 0%{?_without_selinux}
 Requires: policycoreutils
 BuildRequires: selinux-policy-devel
