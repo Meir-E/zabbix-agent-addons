@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.133
+Version: 0.2.134
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -102,6 +102,9 @@ fi
 %endif
 
 %changelog
+* Tue Dec 01 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.134-1
+- Possibility to check certificate for Unifi API (daniel@firewall-services.com)
+
 * Sat Nov 07 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.133-1
 - Add perl in BuildReq for el8 (daniel@firewall-services.com)
 
