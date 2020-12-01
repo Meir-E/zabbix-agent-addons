@@ -6,17 +6,19 @@ use JSON;
 use Getopt::Long;
 use LWP::UserAgent;
 use HTTP::Cookies;
+use URI;
 use Data::Dumper;
 
 umask 077;
 
-my $user   = 'zabbix';
-my $pass   = 'secret';
-my $site   = 'default';
-my $url    = 'https://localhost:8443';
-my $what   = 'devices';
-my $type   = 'all';
-my $pretty = 0;
+my $user      = 'zabbix';
+my $pass      = 'secret';
+my $site      = 'default';
+my $url       = 'https://localhost:8443';
+my $certcheck = 1;
+my $what      = 'devices';
+my $type      = 'all';
+my $pretty    = 0;
 
 my $json = {};
 @{$json->{data}} = ();
@@ -26,6 +28,7 @@ GetOptions (
   'password|p=s' => \$pass,
   'site=s'       => \$site,
   'url=s'        => \$url,
+  'cert-check!'  => \$certcheck,
   'what=s'       => \$what,
   'type:s'       => \$type,
   'pretty'       => \$pretty
@@ -33,6 +36,13 @@ GetOptions (
 
 # An empty type is the same as all
 $type = 'all' if ($type eq '');
+
+# If connecting to localhost, no need to check certificate
+my $uri = URI->new($url);
+if ($uri->host =~ m/^localhost|127\.0\.0/){
+  $certcheck = 0;
+}
+
 my $site_id;
 my $resp;
 my $username = $ENV{LOGNAME} || $ENV{USER} || getpwuid($<);
@@ -41,8 +51,14 @@ my $cj = HTTP::Cookies->new(
   autosave       => 1,
   ignore_discard => 1
 );
+
+my $sslopts = {};
+if (not $certcheck){
+  $sslopts = { verify_hostname => 0, SSL_verify_mode => 0 }
+}
+
 my $ua = LWP::UserAgent->new(
-  ssl_opts   => { verify_hostname => 0 },
+  ssl_opts   => $sslopts,
   cookie_jar => $cj
 );
 
