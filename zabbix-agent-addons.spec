@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.134
+Version: 0.2.135
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -102,6 +102,10 @@ fi
 %endif
 
 %changelog
+* Thu Dec 17 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.135-1
+- Update Template_App_MySQL (daniel@firewall-services.com)
+- Update Template_App_ZFS (daniel@firewall-services.com)
+
 * Tue Dec 01 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.134-1
 - Possibility to check certificate for Unifi API (daniel@firewall-services.com)
 
