@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-08-31T15:37:35Z</date>
+    <date>2020-12-17T15:29:59Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -56,7 +56,7 @@
                     <delay>0</delay>
                     <history>30d</history>
                     <trends>1825d</trends>
-                    <units>!connections</units>
+                    <units>!conn</units>
                     <applications>
                         <application>
                             <name>mysql</name>
@@ -91,8 +91,9 @@
                     </applications>
                     <preprocessing>
                         <step>
-                            <type>JSONPATH</type>
-                            <params>$.Access_denied_errors</params>
+                            <type>JAVASCRIPT</type>
+                            <params>json = JSON.parse(value);
+return json.Access_denied_errors || 0;</params>
                         </step>
                         <step>
                             <type>SIMPLE_CHANGE</type>
@@ -118,36 +119,9 @@
                     </applications>
                     <preprocessing>
                         <step>
-                            <type>JSONPATH</type>
-                            <params>$.Acl_users</params>
-                        </step>
-                    </preprocessing>
-                    <master_item>
-                        <key>db.mysql[{$MYSQL_HOST},{$MYSQL_PORT},{$MYSQL_USER},{$MYSQL_PASSWORD},{$MYSQL_DEFAULTS},all]</key>
-                    </master_item>
-                </item>
-                <item>
-                    <name>MySQL: $1</name>
-                    <type>DEPENDENT</type>
-                    <key>db.mysql[Busy_time]</key>
-                    <delay>0</delay>
-                    <history>30d</history>
-                    <trends>1825d</trends>
-                    <value_type>FLOAT</value_type>
-                    <units>s</units>
-                    <applications>
-                        <application>
-                            <name>mysql</name>
-                        </application>
-                    </applications>
-                    <preprocessing>
-                        <step>
-                            <type>JSONPATH</type>
-                            <params>$.Busy_time</params>
-                        </step>
-                        <step>
-                            <type>CHANGE_PER_SECOND</type>
-                            <params/>
+                            <type>JAVASCRIPT</type>
+                            <params>json = JSON.parse(value);
+return json.Acl_users || 0;</params>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -250,8 +224,9 @@
                     </applications>
                     <preprocessing>
                         <step>
-                            <type>JSONPATH</type>
-                            <params>$.Com_alter_user</params>
+                            <type>JAVASCRIPT</type>
+                            <params>json = JSON.parse(value);
+return json.Com_alter_user || 0;</params>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
@@ -512,7 +487,7 @@
                     <delay>0</delay>
                     <history>30d</history>
                     <trends>1825d</trends>
-                    <units>!connections</units>
+                    <units>!conn</units>
                     <applications>
                         <application>
                             <name>mysql</name>
@@ -525,61 +500,6 @@
                         </step>
                         <step>
                             <type>SIMPLE_CHANGE</type>
-                            <params/>
-                        </step>
-                    </preprocessing>
-                    <master_item>
-                        <key>db.mysql[{$MYSQL_HOST},{$MYSQL_PORT},{$MYSQL_USER},{$MYSQL_PASSWORD},{$MYSQL_DEFAULTS},all]</key>
-                    </master_item>
-                </item>
-                <item>
-                    <name>MySQL: CPU Time</name>
-                    <type>DEPENDENT</type>
-                    <key>db.mysql[Cpu_time]</key>
-                    <delay>0</delay>
-                    <history>30d</history>
-                    <trends>1825d</trends>
-                    <value_type>FLOAT</value_type>
-                    <units>s</units>
-                    <applications>
-                        <application>
-                            <name>mysql</name>
-                        </application>
-                    </applications>
-                    <preprocessing>
-                        <step>
-                            <type>JSONPATH</type>
-                            <params>$.Cpu_time</params>
-                        </step>
-                        <step>
-                            <type>SIMPLE_CHANGE</type>
-                            <params/>
-                        </step>
-                    </preprocessing>
-                    <master_item>
-                        <key>db.mysql[{$MYSQL_HOST},{$MYSQL_PORT},{$MYSQL_USER},{$MYSQL_PASSWORD},{$MYSQL_DEFAULTS},all]</key>
-                    </master_item>
-                </item>
-                <item>
-                    <name>MySQL: Number of queries returning no results</name>
-                    <type>DEPENDENT</type>
-                    <key>db.mysql[Empty_queries]</key>
-                    <delay>0</delay>
-                    <history>30d</history>
-                    <trends>1825d</trends>
-                    <units>!qps</units>
-                    <applications>
-                        <application>
-                            <name>mysql</name>
-                        </application>
-                    </applications>
-                    <preprocessing>
-                        <step>
-                            <type>JSONPATH</type>
-                            <params>$.Empty_queries</params>
-                        </step>
-                        <step>
-                            <type>CHANGE_PER_SECOND</type>
                             <params/>
                         </step>
                     </preprocessing>
@@ -648,8 +568,13 @@
                     </applications>
                     <preprocessing>
                         <step>
-                            <type>JSONPATH</type>
-                            <params>$.Innodb_buffer_pool_load_status</params>
+                            <type>JAVASCRIPT</type>
+                            <params>json = JSON.parse(value);
+return json.Innodb_buffer_pool_load_status || 'Buffer pool(s) load completed at';</params>
+                        </step>
+                        <step>
+                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                            <params>6h</params>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -657,7 +582,7 @@
                     </master_item>
                     <triggers>
                         <trigger>
-                            <expression>{str(&quot;Buffer pool(s) load completed at&quot;)}=0</expression>
+                            <expression>{str(&quot;Buffer pool(s) load completed at&quot;)}=0 and {str(&quot;not started&quot;)}=0</expression>
                             <name>MySQL InnoDB buffer pool is not ready</name>
                             <priority>WARNING</priority>
                         </trigger>
@@ -680,6 +605,10 @@
                         <step>
                             <type>JSONPATH</type>
                             <params>$.Innodb_buffer_pool_reads</params>
+                        </step>
+                        <step>
+                            <type>CHANGE_PER_SECOND</type>
+                            <params/>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -755,8 +684,9 @@
                     </applications>
                     <preprocessing>
                         <step>
-                            <type>JSONPATH</type>
-                            <params>$.Max_statement_time_exceeded</params>
+                            <type>JAVASCRIPT</type>
+                            <params>json = JSON.parse(value);
+return json.Max_statement_time_exceeded || 0;</params>
                         </step>
                         <step>
                             <type>CHANGE_PER_SECOND</type>
@@ -782,8 +712,9 @@
                     </applications>
                     <preprocessing>
                         <step>
-                            <type>JSONPATH</type>
-                            <params>$.Memory_used</params>
+                            <type>JAVASCRIPT</type>
+                            <params>json = JSON.parse(value);
+return json.Memory_used || 0;</params>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -891,7 +822,7 @@
                     </master_item>
                     <triggers>
                         <trigger>
-                            <expression>{avg(900)}&gt;4*{avg(24h)}</expression>
+                            <expression>{avg(1h)}&gt;10*{avg(24h)}</expression>
                             <name>More MySQL queries than usual</name>
                             <priority>INFO</priority>
                         </trigger>
@@ -938,7 +869,7 @@
                     <delay>0</delay>
                     <history>30d</history>
                     <trends>1825d</trends>
-                    <units>!thread</units>
+                    <units>!conn</units>
                     <applications>
                         <application>
                             <name>mysql</name>
@@ -1092,6 +1023,28 @@
                     <item>
                         <host>Template_App_MySQL</host>
                         <key>db.mysql[Innodb_buffer_pool_bytes_data]</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name>MySQL : InnoDB fsyncs</name>
+            <type>STACKED</type>
+            <graph_items>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <color>7E57C2</color>
+                    <item>
+                        <host>Template_App_MySQL</host>
+                        <key>db.mysql[Innodb_data_fsyncs]</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>2</sortorder>
+                    <color>81D4FA</color>
+                    <item>
+                        <host>Template_App_MySQL</host>
+                        <key>db.mysql[Innodb_os_log_fsyncs]</key>
                     </item>
                 </graph_item>
             </graph_items>
