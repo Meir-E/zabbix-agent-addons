@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-    <version>4.4</version>
-    <date>2020-02-17T07:55:13Z</date>
+    <version>5.0</version>
+    <date>2020-12-17T15:28:00Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -62,17 +62,29 @@
                 </item>
                 <item>
                     <name>ZFS: ARC: compression win</name>
-                    <type>CALCULATED</type>
+                    <type>DEPENDENT</type>
                     <key>vfs.zfs.stats[arcstats,compress_win]</key>
-                    <delay>300</delay>
+                    <delay>0</delay>
                     <trends>1825d</trends>
                     <units>B</units>
-                    <params>last(&quot;vfs.zfs.stats[arcstats,uncompressed_size]&quot;)-last(&quot;vfs.zfs.stats[arcstats,compressed_size]&quot;)</params>
                     <applications>
                         <application>
                             <name>Memory</name>
                         </application>
                     </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JAVASCRIPT</type>
+                            <params>json = JSON.parse(value);
+uncomp = json.uncompressed_size;
+comp = json.compressed_size;
+diff = uncomp - comp;
+return (diff &lt; 0 ? 0 : diff);</params>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>vfs.zfs.stats.all[arcstats]</key>
+                    </master_item>
                 </item>
                 <item>
                     <name>ZFS: ARC: $2</name>
@@ -308,7 +320,7 @@
                     </applications>
                     <triggers>
                         <trigger>
-                            <expression>{avg(1h)}&gt;(100-{$ZFS_ARC_HIT_METADATA_PCT_WARN})</expression>
+                            <expression>{avg(900)}&gt;(100-{$ZFS_ARC_HIT_METADATA_PCT_WARN})</expression>
                             <name>ZFS: Low ARC metadata efficiency</name>
                             <priority>INFO</priority>
                         </trigger>
@@ -1084,12 +1096,11 @@
                         </item_prototype>
                         <item_prototype>
                             <name>ZFS: fs {#ZFS_FS} compression win</name>
-                            <type>CALCULATED</type>
+                            <type>DEPENDENT</type>
                             <key>vfs.zfs.dataset[{#ZFS_FS},fs,compression_win]</key>
-                            <delay>300s</delay>
+                            <delay>0</delay>
                             <trends>1825d</trends>
                             <units>B</units>
-                            <params>last(&quot;vfs.zfs.dataset[{#ZFS_FS},fs,logicalused]&quot;)-last(&quot;vfs.zfs.dataset[{#ZFS_FS},fs,used]&quot;)</params>
                             <applications>
                                 <application>
                                     <name>Storage</name>
@@ -1097,10 +1108,16 @@
                             </applications>
                             <preprocessing>
                                 <step>
-                                    <type>MULTIPLIER</type>
-                                    <params>1</params>
+                                    <type>JAVASCRIPT</type>
+                                    <params>json = JSON.parse(value);
+logicalused = json.logicalused;
+used = json.used;
+return (logicalused &gt; used ? logicalused - used : 0);</params>
                                 </step>
                             </preprocessing>
+                            <master_item>
+                                <key>vfs.zfs.dataset.info[{#ZFS_FS},fs]</key>
+                            </master_item>
                         </item_prototype>
                         <item_prototype>
                             <name>ZFS: fs {#ZFS_FS} compression ratio</name>
@@ -1942,7 +1959,8 @@
                         <item_prototype>
                             <name>ZFS: Sanoid {#ZFS_SANOID}</name>
                             <key>vfs.zfs.sanoid.check[{#ZFS_SANOID}]</key>
-                            <delay>322s</delay>
+                            <delay>300s</delay>
+                            <history>30d</history>
                             <trends>0</trends>
                             <value_type>CHAR</value_type>
                             <applications>
@@ -1954,6 +1972,11 @@
                                 <step>
                                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
                                     <params>1800</params>
+                                </step>
+                                <step>
+                                    <type>NOT_MATCHES_REGEX</type>
+                                    <params>^print</params>
+                                    <error_handler>DISCARD_VALUE</error_handler>
                                 </step>
                             </preprocessing>
                             <trigger_prototypes>
@@ -1987,17 +2010,28 @@
                         </item_prototype>
                         <item_prototype>
                             <name>ZFS: Zvol {#ZFS_ZVOL} compression win</name>
-                            <type>CALCULATED</type>
+                            <type>DEPENDENT</type>
                             <key>vfs.zfs.dataset[{#ZFS_ZVOL},zvol,compression_win]</key>
-                            <delay>300s</delay>
+                            <delay>0</delay>
                             <value_type>FLOAT</value_type>
                             <units>B</units>
-                            <params>last(&quot;vfs.zfs.dataset[{#ZFS_ZVOL},zvol,logicalused]&quot;)-last(&quot;vfs.zfs.dataset[{#ZFS_ZVOL},zvol,used]&quot;)</params>
                             <applications>
                                 <application>
                                     <name>Storage</name>
                                 </application>
                             </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>JAVASCRIPT</type>
+                                    <params>json = JSON.parse(value);
+logicalused = json.logicalused;
+used = json.used;
+return (logicalused &gt; used ? logicalused - used : 0);</params>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>vfs.zfs.dataset.info[{#ZFS_ZVOL},zvol]</key>
+                            </master_item>
                         </item_prototype>
                         <item_prototype>
                             <name>ZFS: Zvol {#ZFS_ZVOL} compression ratio</name>
@@ -2214,7 +2248,7 @@
                 </macro>
                 <macro>
                     <macro>{$ZFS_POOL_ALLOC_WARN}</macro>
-                    <value>75</value>
+                    <value>80</value>
                 </macro>
             </macros>
         </template>
