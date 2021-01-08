@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-    <version>4.4</version>
-    <date>2020-03-02T15:26:38Z</date>
+    <version>5.0</version>
+    <date>2021-01-08T12:03:11Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -201,6 +201,50 @@
                     <request_method>POST</request_method>
                 </item>
                 <item>
+                    <name>PVE Cluster: Number of LXC guests</name>
+                    <type>DEPENDENT</type>
+                    <key>pve.check[cluster,lxc]</key>
+                    <delay>0</delay>
+                    <trends>1825d</trends>
+                    <units>!container(s)</units>
+                    <applications>
+                        <application>
+                            <name>Vitualization</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.guests.lxc</params>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>pve.check.all[cluster]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>PVE Cluster: Number of running LXC guests</name>
+                    <type>DEPENDENT</type>
+                    <key>pve.check[cluster,lxc_running]</key>
+                    <delay>0</delay>
+                    <trends>1825d</trends>
+                    <units>!container(s)</units>
+                    <applications>
+                        <application>
+                            <name>Vitualization</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.guests.lxc_running</params>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>pve.check.all[cluster]</key>
+                    </master_item>
+                </item>
+                <item>
                     <name>PVE Cluster: Free memory</name>
                     <type>DEPENDENT</type>
                     <key>pve.check[cluster,mem_free]</key>
@@ -366,6 +410,50 @@
                             <priority>INFO</priority>
                         </trigger>
                     </triggers>
+                </item>
+                <item>
+                    <name>PVE Cluster: Number of QEMU guests</name>
+                    <type>DEPENDENT</type>
+                    <key>pve.check[cluster,qemu]</key>
+                    <delay>0</delay>
+                    <trends>1825d</trends>
+                    <units>!vm</units>
+                    <applications>
+                        <application>
+                            <name>Vitualization</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.guests.qemu</params>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>pve.check.all[cluster]</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>PVE Cluster: Number of running QEMU guests</name>
+                    <type>DEPENDENT</type>
+                    <key>pve.check[cluster,qemu_running]</key>
+                    <delay>0</delay>
+                    <trends>1825d</trends>
+                    <units>!vm</units>
+                    <applications>
+                        <application>
+                            <name>Vitualization</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.guests.qemu_running</params>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>pve.check.all[cluster]</key>
+                    </master_item>
                 </item>
                 <item>
                     <name>PVE Cluster: Quorate</name>
@@ -964,6 +1052,40 @@
                             <request_method>POST</request_method>
                         </item_prototype>
                         <item_prototype>
+                            <name>PVE Node: {#PVE_NODE_NAME} LXC guests</name>
+                            <type>DEPENDENT</type>
+                            <key>pve.check[node,{#PVE_NODE_NAME},lxc]</key>
+                            <delay>0</delay>
+                            <trends>1825d</trends>
+                            <units>!container(s)</units>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <params>$.guests.lxc</params>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>pve.check.all[node,{#PVE_NODE_NAME}]</key>
+                            </master_item>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>PVE Node: {#PVE_NODE_NAME} running LXC guests</name>
+                            <type>DEPENDENT</type>
+                            <key>pve.check[node,{#PVE_NODE_NAME},lxc_running]</key>
+                            <delay>0</delay>
+                            <trends>1825d</trends>
+                            <units>!container(s)</units>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <params>$.guests.lxc_running</params>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>pve.check.all[node,{#PVE_NODE_NAME}]</key>
+                            </master_item>
+                        </item_prototype>
+                        <item_prototype>
                             <name>PVE Node: {#PVE_NODE_NAME} free memory</name>
                             <type>DEPENDENT</type>
                             <key>pve.check[node,{#PVE_NODE_NAME},mem_free]</key>
@@ -1053,6 +1175,40 @@
                                 <key>pve.check.all[node,{#PVE_NODE_NAME}]</key>
                             </master_item>
                             <request_method>POST</request_method>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>PVE Node: {#PVE_NODE_NAME} QEMU guests</name>
+                            <type>DEPENDENT</type>
+                            <key>pve.check[node,{#PVE_NODE_NAME},qemu]</key>
+                            <delay>0</delay>
+                            <trends>1825d</trends>
+                            <units>!vm</units>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <params>$.guests.qemu</params>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>pve.check.all[node,{#PVE_NODE_NAME}]</key>
+                            </master_item>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>PVE Node: {#PVE_NODE_NAME} running QEMU guests</name>
+                            <type>DEPENDENT</type>
+                            <key>pve.check[node,{#PVE_NODE_NAME},qemu_running]</key>
+                            <delay>0</delay>
+                            <trends>1825d</trends>
+                            <units>!vm</units>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <params>$.guests.qemu_running</params>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>pve.check.all[node,{#PVE_NODE_NAME}]</key>
+                            </master_item>
                         </item_prototype>
                         <item_prototype>
                             <name>PVE Node: {#PVE_NODE_NAME} uptime</name>
@@ -1501,6 +1657,28 @@
                     </item_prototypes>
                     <graph_prototypes>
                         <graph_prototype>
+                            <name>PVE: Pool: {#PVE_POOL_ID}: Disk I/O</name>
+                            <graph_items>
+                                <graph_item>
+                                    <drawtype>GRADIENT_LINE</drawtype>
+                                    <color>00BB00</color>
+                                    <item>
+                                        <host>Template_App_PVE_Cluster</host>
+                                        <key>pve.check[pool,{#PVE_POOL_ID},diskread]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>1</sortorder>
+                                    <drawtype>GRADIENT_LINE</drawtype>
+                                    <color>EE0000</color>
+                                    <item>
+                                        <host>Template_App_PVE_Cluster</host>
+                                        <key>pve.check[pool,{#PVE_POOL_ID},diskwrite]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                        <graph_prototype>
                             <name>PVE: Pool: {#PVE_POOL_ID}: Disk space allocation</name>
                             <type>STACKED</type>
                             <ymin_type_1>FIXED</ymin_type_1>
@@ -1518,6 +1696,29 @@
                                     <item>
                                         <host>Template_App_PVE_Cluster</host>
                                         <key>pve.check[pool,{#PVE_POOL_ID},template_maxdisk]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                        <graph_prototype>
+                            <name>PVE: Pool: {#PVE_POOL_ID}: Memory usage</name>
+                            <ymin_type_1>FIXED</ymin_type_1>
+                            <graph_items>
+                                <graph_item>
+                                    <drawtype>GRADIENT_LINE</drawtype>
+                                    <color>00AA00</color>
+                                    <item>
+                                        <host>Template_App_PVE_Cluster</host>
+                                        <key>pve.check[pool,{#PVE_POOL_ID},mem]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>1</sortorder>
+                                    <drawtype>BOLD_LINE</drawtype>
+                                    <color>EE0000</color>
+                                    <item>
+                                        <host>Template_App_PVE_Cluster</host>
+                                        <key>pve.check[pool,{#PVE_POOL_ID},maxmem]</key>
                                     </item>
                                 </graph_item>
                             </graph_items>
@@ -1564,51 +1765,6 @@
                                     <item>
                                         <host>Template_App_PVE_Cluster</host>
                                         <key>pve.check[pool,{#PVE_POOL_ID},maxcpu]</key>
-                                    </item>
-                                </graph_item>
-                            </graph_items>
-                        </graph_prototype>
-                        <graph_prototype>
-                            <name>PVE: Pool: {#PVE_POOL_ID} Disk I/O</name>
-                            <graph_items>
-                                <graph_item>
-                                    <drawtype>GRADIENT_LINE</drawtype>
-                                    <color>00BB00</color>
-                                    <item>
-                                        <host>Template_App_PVE_Cluster</host>
-                                        <key>pve.check[pool,{#PVE_POOL_ID},diskread]</key>
-                                    </item>
-                                </graph_item>
-                                <graph_item>
-                                    <sortorder>1</sortorder>
-                                    <drawtype>GRADIENT_LINE</drawtype>
-                                    <color>EE0000</color>
-                                    <item>
-                                        <host>Template_App_PVE_Cluster</host>
-                                        <key>pve.check[pool,{#PVE_POOL_ID},diskwrite]</key>
-                                    </item>
-                                </graph_item>
-                            </graph_items>
-                        </graph_prototype>
-                        <graph_prototype>
-                            <name>PVE: Pool: {#PVE_POOL_ID} Memory usage</name>
-                            <ymin_type_1>FIXED</ymin_type_1>
-                            <graph_items>
-                                <graph_item>
-                                    <drawtype>GRADIENT_LINE</drawtype>
-                                    <color>00AA00</color>
-                                    <item>
-                                        <host>Template_App_PVE_Cluster</host>
-                                        <key>pve.check[pool,{#PVE_POOL_ID},mem]</key>
-                                    </item>
-                                </graph_item>
-                                <graph_item>
-                                    <sortorder>1</sortorder>
-                                    <drawtype>BOLD_LINE</drawtype>
-                                    <color>EE0000</color>
-                                    <item>
-                                        <host>Template_App_PVE_Cluster</host>
-                                        <key>pve.check[pool,{#PVE_POOL_ID},maxmem]</key>
                                     </item>
                                 </graph_item>
                             </graph_items>
@@ -1819,6 +1975,28 @@
                     <item>
                         <host>Template_App_PVE_Cluster</host>
                         <key>pve.check[cluster,netout]</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name>PVE Cluster: Guests</name>
+            <type>STACKED</type>
+            <graph_items>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <color>F63100</color>
+                    <item>
+                        <host>Template_App_PVE_Cluster</host>
+                        <key>pve.check[cluster,lxc_running]</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>2</sortorder>
+                    <color>1A7C11</color>
+                    <item>
+                        <host>Template_App_PVE_Cluster</host>
+                        <key>pve.check[cluster,qemu_running]</key>
                     </item>
                 </graph_item>
             </graph_items>

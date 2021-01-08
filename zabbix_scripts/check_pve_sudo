@@ -51,6 +51,12 @@ if ($cluster){
     read  => 0,
     write => 0
   };
+  $json->{guests} = {
+    qemu         => 0,
+    qemu_running => 0,
+    lxc          => 0,
+    lxc_running  => 0
+  };
   my @nodes = ();
   foreach my $item (@{$cluster}){
     if ($item->{type} eq 'cluster'){
@@ -79,10 +85,26 @@ if ($cluster){
     $json->{network}->{out} += $guest->{netout}    || 0;
     $json->{disk}->{read}   += $guest->{diskread}  || 0;
     $json->{disk}->{write}  += $guest->{diskwrite} || 0;
+    my $type = $guest->{type};
+    $json->{guests}->{$type}++;
+    $json->{guests}->{$type . '_running'}++ if ($guest->{status} eq 'running');
   }
 } elsif ($node){
+  $json->{guests} = {
+    qemu         => 0,
+    qemu_running => 0,
+    lxc          => 0,
+    lxc_running  => 0
+  };
   foreach my $item (qw(status version subscription)){
     $json->{$item} = get_api_data("/nodes/$node/$item");
+  }
+  my $guests = get_api_data('/cluster/resources', '--type=vm');
+  foreach my $guest (@{$guests}){
+    next if ($guest->{node} ne $node);
+    my $type = $guest->{type};
+    $json->{guests}->{$type}++;
+    $json->{guests}->{$type . '_running'}++ if ($guest->{status} eq 'running');
   }
 } elsif ($guest){
   my $guests = get_api_data('/cluster/resources', '--type=vm');
