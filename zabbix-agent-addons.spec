@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.135
+Version: 0.2.136
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -102,6 +102,9 @@ fi
 %endif
 
 %changelog
+* Fri Jan 08 2021 Daniel Berteaud <daniel@firewall-services.com> 0.2.136-1
+- Add guest counter for PVE cluster and node (daniel@firewall-services.com)
+
 * Thu Dec 17 2020 Daniel Berteaud <daniel@firewall-services.com> 0.2.135-1
 - Update Template_App_MySQL (daniel@firewall-services.com)
 - Update Template_App_ZFS (daniel@firewall-services.com)
