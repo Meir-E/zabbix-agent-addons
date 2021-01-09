@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.136
+Version: 0.2.137
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -102,6 +102,9 @@ fi
 %endif
 
 %changelog
+* Sat Jan 09 2021 Daniel Berteaud <daniel@firewall-services.com> 0.2.137-1
+- Add scripts and template to monitor Samba 4 DC (daniel@firewall-services.com)
+
 * Fri Jan 08 2021 Daniel Berteaud <daniel@firewall-services.com> 0.2.136-1
 - Add guest counter for PVE cluster and node (daniel@firewall-services.com)
 
