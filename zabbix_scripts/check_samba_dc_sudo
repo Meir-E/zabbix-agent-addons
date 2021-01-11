@@ -28,6 +28,10 @@ GetOptions(
   'audit-auth-log=s' => \$audit_auth_log
 );
 
+if ($since !~ m/^\d+$/){
+  die "Invalid value for since\n";
+}
+
 my $json = {
   accounts => {
     users          => 0,
