@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-01-11T08:26:21Z</date>
+    <date>2021-01-11T08:38:19Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -653,6 +653,14 @@
                     <name>Templates</name>
                 </group>
             </groups>
+            <applications>
+                <application>
+                    <name>Samba</name>
+                </application>
+                <application>
+                    <name>samba</name>
+                </application>
+            </applications>
             <items>
                 <item>
                     <name>Samba: Aggregated number of failed computers authentications</name>
@@ -662,6 +670,11 @@
                     <history>60d</history>
                     <trends>1825d</trends>
                     <units>auth</units>
+                    <applications>
+                        <application>
+                            <name>Samba</name>
+                        </application>
+                    </applications>
                 </item>
                 <item>
                     <name>Samba: Aggregated number of successful computers authentications</name>
@@ -671,6 +684,11 @@
                     <history>60d</history>
                     <trends>1825d</trends>
                     <units>auth</units>
+                    <applications>
+                        <application>
+                            <name>Samba</name>
+                        </application>
+                    </applications>
                 </item>
                 <item>
                     <name>Samba: Aggregated number of failed users authentications</name>
@@ -680,6 +698,11 @@
                     <history>60d</history>
                     <trends>1825d</trends>
                     <units>auth</units>
+                    <applications>
+                        <application>
+                            <name>Samba</name>
+                        </application>
+                    </applications>
                 </item>
                 <item>
                     <name>Samba: Aggregated number of successful users authentications</name>
@@ -689,6 +712,11 @@
                     <history>60d</history>
                     <trends>1825d</trends>
                     <units>auth</units>
+                    <applications>
+                        <application>
+                            <name>Samba</name>
+                        </application>
+                    </applications>
                 </item>
                 <item>
                     <name>Samba: Aggregated number of computers authorization requests</name>
@@ -698,6 +726,11 @@
                     <history>60d</history>
                     <trends>1825d</trends>
                     <units>auth</units>
+                    <applications>
+                        <application>
+                            <name>Samba</name>
+                        </application>
+                    </applications>
                 </item>
                 <item>
                     <name>Samba: Aggregated number of users authorization requests</name>
@@ -707,6 +740,11 @@
                     <history>60d</history>
                     <trends>1825d</trends>
                     <units>auth</units>
+                    <applications>
+                        <application>
+                            <name>Samba</name>
+                        </application>
+                    </applications>
                 </item>
             </items>
             <macros>
