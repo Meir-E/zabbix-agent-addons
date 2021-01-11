@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.137
+Version: 0.2.138
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -102,6 +102,11 @@ fi
 %endif
 
 %changelog
+* Mon Jan 11 2021 Daniel Berteaud <daniel@firewall-services.com> 0.2.138-1
+- Add missing Samba application name for aggregated items (daniel@firewall-
+  services.com)
+- Minor fixes for samba script and template (daniel@firewall-services.com)
+
 * Sat Jan 09 2021 Daniel Berteaud <daniel@firewall-services.com> 0.2.137-1
 - Add scripts and template to monitor Samba 4 DC (daniel@firewall-services.com)
 
