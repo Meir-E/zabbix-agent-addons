@@ -13,6 +13,9 @@ my $pdbedit = which('pdbedit');
 # Number of seconds in the past to count authentications
 my $since = 300;
 my $pretty = 0;
+my $general = 1;
+my $ou = undef;
+
 # This log is expected to be in JSON format. For example, in smb.conf :
 # log level = 1 auth_audit:3 auth_json_audit:4@/var/log/samba/audit_auth.log
 my $audit_auth_log = '/var/log/samba/audit_auth.log';
@@ -25,132 +28,150 @@ if (not defined $samba_tool or not defined $pdbedit){
 GetOptions(
   'pretty'           => \$pretty,
   'since=i'          => \$since,
-  'audit-auth-log=s' => \$audit_auth_log
+  'audit-auth-log=s' => \$audit_auth_log,
+  'general'          => \$general,
+  'ou=s'             => \$ou
 );
 
 if ($since !~ m/^\d+$/){
   die "Invalid value for since\n";
 }
 
-my $json = {
-  accounts => {
-    users          => 0,
-    inactive_users => 0,
-    active_users   => 0,
-    groups         => 0,
-    computers      => 0
-  },
-  replication => 'UNKNWON',
-  processes => {
-    cldap_server => 0,
-    kccsrv          => 0,
-    dreplsrv        => 0,
-    ldap_server     => 0,
-    kdc_server      => 0,
-    dnsupdate       => 0,
-    'notify-daemon' => 0,
-    rpc_server      => 0,
-    winbind_server  => 0,
-    nbt_server      => 0,
-    dnssrv          => 0,
-    samba           => 0,
-  },
-  gpo => 0,
-  ou => 0,
-  activity => {
-    authentications => {
-      users => {
-        success => 0,
-        failure => 0
+my $json = {};
+
+if (defined $ou){
+  $json = {
+    objects => 0
+  };
+  if ($ou !~ m/^(?<RDN>(?<Key>(?:\\[0-9A-Fa-f]{2}|\\\[^=\,\\]|[^=\,\\]+)+)\=(?<Value>(?:\\[0-9A-Fa-f]{2}|\\\[^=\,\\]|[^=\,\\]+)+))(?:\s*\,\s*(?<RDN>(?<Key>(?:\\[0-9A-Fa-f]{2}|\\\[^=\,\\]|[^=\,\\]+)+)\=(?<Value>(?:\\[0-9A-Fa-f]{2}|\\\[^=\,\\]|[^=\,\\]+)+)))*$/){
+    die "Invalid OU\n";
+  }
+  foreach (qx($samba_tool ou listobjects '$ou')){
+    die "Error while counting objects of OU $ou\n" if ($? != 0);
+    chomp;
+    $json->{objects}++;
+  }
+} elsif ($general){
+  $json = {
+    accounts => {
+      users          => 0,
+      inactive_users => 0,
+      active_users   => 0,
+      groups         => 0,
+      computers      => 0
+    },
+    replication => 'UNKNWON',
+    processes => {
+      cldap_server => 0,
+      kccsrv          => 0,
+      dreplsrv        => 0,
+      ldap_server     => 0,
+      kdc_server      => 0,
+      dnsupdate       => 0,
+      'notify-daemon' => 0,
+      rpc_server      => 0,
+      winbind_server  => 0,
+      nbt_server      => 0,
+      dnssrv          => 0,
+      samba           => 0,
+    },
+    gpo => 0,
+    ou => 0,
+    activity => {
+      authentications => {
+        users => {
+          success => 0,
+          failure => 0
+        },
+        computers => {
+          success => 0,
+          failure => 0
+        }
       },
-      computers => {
-        success => 0,
-        failure => 0
-      }
-    },
-    authorizations => {
-      users     => 0,
-      computers => 0
-    },
-    since => $since
-  }
-};
-
-# Get the numbers of users. pdbedit is prefered here because we can
-# differentiate active and inactive users, which samba-tool can't do
-# While at it, also get the computers
-foreach (qx($pdbedit -L -v)){
-  next unless (m/^Account Flags:\s+\[(.*)\]/);
-  my $flags = $1;
-  if ($flags =~ m/U/){
-    $json->{accounts}->{users}++;
-    if ($flags =~ m/D/){
-      $json->{accounts}->{inactive_users}++;
-    } else {
-      $json->{accounts}->{active_users}++;
+      authorizations => {
+        users     => 0,
+        computers => 0
+      },
+      since => $since
     }
-  } elsif ($flags =~ m/W/){
-    $json->{accounts}->{computers}++;
-  }
-}
+  };
 
-# Now count groups
-foreach (qx($samba_tool group list)){
-  $json->{accounts}->{groups}++;
-}
-
-# Get replication status
-# We want just a quick summary, so only output the first line
-# manual checks will be needed to get the details, but if this field doesn't contains [ALL GOOD],
-# then something is probably wrong
-$json->{replication} = (split(/\n/, qx($samba_tool drs showrepl --summary)))[0];
-
-# Get the list of workers
-foreach (qx($samba_tool processes)){
-  if (/^([^\(\s]+).+\d+$/){
-    $json->{processes}->{$1}++;
-  }
-}
-
-# Get the number of GPO
-foreach (qx($samba_tool gpo listall)){
-  next unless (/^GPO/);
-  $json->{gpo}++;
-}
-
-# Get the number of OU
-foreach (qx($samba_tool ou list)){
-  $json->{ou}++;
-}
-
-if (-e $audit_auth_log){
-  open (my $auth_log, '<', $audit_auth_log) or die "Couldn't open $audit_auth_log : $!\n";
-  foreach my $line (<$auth_log>){
-    my $event = from_json($line);
-    my $type = $event->{type};
-    # We're only interested in Authentication and Authorization messages
-    next if ($type ne 'Authentication' and $type ne 'Authorization');
-    # Parse the date in the timstamp field
-    my $timestamp = str2time($event->{timestamp});
-
-    # Only look at lines from the last $since seconds. Skip if date couldn't be parsed
-    next if (not defined $timestamp or time() - $timestamp > $since);
-  
-    my $subject;
-    if ($type eq 'Authentication'){
-      # Accounts ending with $ are for computers
-      $subject = ($event->{$type}->{mappedAccount} =~ m/\$$/) ? 'computers' : 'users';
-      if ($event->{Authentication}->{status} eq 'NT_STATUS_OK'){
-        $json->{activity}->{authentications}->{$subject}->{success}++;
+  # Get the numbers of users. pdbedit is prefered here because we can
+  # differentiate active and inactive users, which samba-tool can't do
+  # While at it, also get the computers
+  foreach (qx($pdbedit -L -v)){
+    next unless (m/^Account Flags:\s+\[(.*)\]/);
+    my $flags = $1;
+    if ($flags =~ m/U/){
+      $json->{accounts}->{users}++;
+      if ($flags =~ m/D/){
+        $json->{accounts}->{inactive_users}++;
       } else {
-        $json->{activity}->{authentications}->{$subject}->{failure}++;
+        $json->{accounts}->{active_users}++;
       }
-    } else {
-      $subject = ($event->{$type}->{account} =~ m/\$$/) ? 'computers' : 'users';
-      $json->{activity}->{authorizations}->{$subject}++;
+    } elsif ($flags =~ m/W/){
+      $json->{accounts}->{computers}++;
     }
   }
-  close $auth_log;
+
+  # Now count groups
+  foreach (qx($samba_tool group list)){
+    $json->{accounts}->{groups}++;
+  }
+
+  # Get replication status
+  # We want just a quick summary, so only output the first line
+  # manual checks will be needed to get the details, but if this field doesn't contains [ALL GOOD],
+  # then something is probably wrong
+  $json->{replication} = (split(/\n/, qx($samba_tool drs showrepl --summary)))[0];
+
+  # Get the list of workers
+  foreach (qx($samba_tool processes)){
+    if (/^([^\(\s]+).+\d+$/){
+      $json->{processes}->{$1}++;
+    }
+  }
+
+  # Get the number of GPO
+  foreach (qx($samba_tool gpo listall)){
+    next unless (/^GPO/);
+    $json->{gpo}++;
+  }
+
+  # Get the number of OU
+  foreach (qx($samba_tool ou list)){
+    $json->{ou}++;
+  }
+
+  if (-e $audit_auth_log){
+    open (my $auth_log, '<', $audit_auth_log) or die "Couldn't open $audit_auth_log : $!\n";
+    foreach my $line (<$auth_log>){
+      my $event = from_json($line);
+      my $type = $event->{type};
+      # We're only interested in Authentication and Authorization messages
+      next if ($type ne 'Authentication' and $type ne 'Authorization');
+      # Parse the date in the timstamp field
+      my $timestamp = str2time($event->{timestamp});
+
+      # Only look at lines from the last $since seconds. Skip if date couldn't be parsed
+      next if (not defined $timestamp or time() - $timestamp > $since);
+
+      my $subject;
+      if ($type eq 'Authentication'){
+        # Accounts ending with $ are for computers
+        $subject = ($event->{$type}->{mappedAccount} =~ m/\$$/) ? 'computers' : 'users';
+        if ($event->{Authentication}->{status} eq 'NT_STATUS_OK'){
+          $json->{activity}->{authentications}->{$subject}->{success}++;
+        } else {
+          $json->{activity}->{authentications}->{$subject}->{failure}++;
+        }
+      } else {
+        $subject = ($event->{$type}->{account} =~ m/\$$/) ? 'computers' : 'users';
+        $json->{activity}->{authorizations}->{$subject}++;
+      }
+    }
+    close $auth_log;
+  }
 }
 
 print to_json($json, { pretty => $pretty });

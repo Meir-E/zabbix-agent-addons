@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-01-11T08:38:19Z</date>
+    <date>2021-01-11T15:08:31Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -644,6 +644,51 @@
                     </triggers>
                 </item>
             </items>
+            <discovery_rules>
+                <discovery_rule>
+                    <name>Samba:OU discovery</name>
+                    <key>samba_dc.discovery[ou]</key>
+                    <delay>1h</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>Samba: Number of objects in {#SAMBA_OU}</name>
+                            <type>DEPENDENT</type>
+                            <key>samba_dc.ou[{#SAMBA_OU},objects]</key>
+                            <delay>0</delay>
+                            <history>60d</history>
+                            <trends>1825d</trends>
+                            <units>!objects</units>
+                            <applications>
+                                <application>
+                                    <name>Samba</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <params>$.objects</params>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>samba_dc.ou[{#SAMBA_OU}]</key>
+                            </master_item>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Samba: Info for {#SAMBA_OU}</name>
+                            <key>samba_dc.ou[{#SAMBA_OU}]</key>
+                            <delay>5m</delay>
+                            <history>0</history>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <applications>
+                                <application>
+                                    <name>Samba</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+            </discovery_rules>
         </template>
         <template>
             <template>Template_App_Samba_DC_Aggregate</template>

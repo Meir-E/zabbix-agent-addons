@@ -1,0 +1,34 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use JSON;
+use Getopt::Long;
+use File::Which;
+
+my $what = 'ou';
+my $pretty = 0;
+my $json = [];
+
+my $samba_tool = which('samba-tool');
+
+if (not defined $samba_tool){
+  print $json;
+  exit 0;
+}
+
+GetOptions(
+  'what=s' => \$what,
+  'pretty' => \$pretty
+);
+
+if ($what eq 'ou'){
+  foreach (qx($samba_tool ou list)){
+    chomp;
+    push @{$json}, {
+      '{#SAMBA_OU}' => $_
+    }
+  }
+}
+
+print to_json($json, { pretty => $pretty });
