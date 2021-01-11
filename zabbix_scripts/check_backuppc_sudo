@@ -10,11 +10,13 @@ use Getopt::Long;
 use Statistics::Descriptive;
 use Data::Dumper;
 
-my $host   = undef;
-my $entity = undef;
-my $pretty = 0;
+my $general = 0;
+my $host    = undef;
+my $entity  = undef;
+my $pretty  = 0;
 
 GetOptions(
+  "general"  => \$general,
   "host=s"   => \$host,
   "entity=s" => \$entity,
   "pretty"   => \$pretty
@@ -103,7 +105,7 @@ if ( $host ) {
 
     $json->{max_errors} = $conf->{MaxXferError} || 0;
   }
-} elsif ( $entity ) {
+} elsif ( $entity or $general) {
 
   $json = {
     perf         => 0,
@@ -120,7 +122,7 @@ if ( $host ) {
   my $entity_total_comp = 0;
 
   foreach my $host ( keys %{ $bpc->HostInfoRead } ) {
-    next unless $host =~ m/^(vm_)?\Q$entity\E_.*/;
+    next unless ($host =~ m/^(vm_)?\Q$entity\E_.*/ or $general);
     my $full_size;
 
     $json->{hosts}++;
@@ -171,7 +173,6 @@ if ( $host ) {
   foreach my $key ( qw(ratio perf) ) {
     $json->{$key} = sprintf( "%.2f", $json->{$key} );
   }
-
 } else {
   print<<"EOF";
 
