@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.140
+Version: 0.2.141
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -102,6 +102,10 @@ fi
 %endif
 
 %changelog
+* Tue Jan 12 2021 Daniel Berteaud <daniel@firewall-services.com> 0.2.141-1
+- Small fixes in check_samba_dc (skip unparsable logs, and handle message with
+  NT_STATUS_NO_SUCH_USER (daniel@firewall-services.com)
+
 * Mon Jan 11 2021 Daniel Berteaud <daniel@firewall-services.com> 0.2.140-1
 - Add general stats to BackupPC monitoring script (daniel@firewall-
   services.com)
