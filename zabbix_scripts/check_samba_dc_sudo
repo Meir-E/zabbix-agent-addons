@@ -147,6 +147,8 @@ if (defined $ou){
     open (my $auth_log, '<', $audit_auth_log) or die "Couldn't open $audit_auth_log : $!\n";
     foreach my $line (<$auth_log>){
       my $event = from_json($line);
+      # Skip the log entry if we can't parse JSON
+      next if (not defined $event);
       my $type = $event->{type};
       # We're only interested in Authentication and Authorization messages
       next if ($type ne 'Authentication' and $type ne 'Authorization');
@@ -159,7 +161,7 @@ if (defined $ou){
       my $subject;
       if ($type eq 'Authentication'){
         # Accounts ending with $ are for computers
-        $subject = ($event->{$type}->{mappedAccount} =~ m/\$$/) ? 'computers' : 'users';
+        $subject = (($event->{$type}->{mappedAccount} || $event->{$type}->{clientAccount} || '')=~ m/\$$/) ? 'computers' : 'users';
         if ($event->{Authentication}->{status} eq 'NT_STATUS_OK'){
           $json->{activity}->{authentications}->{$subject}->{success}++;
         } else {
