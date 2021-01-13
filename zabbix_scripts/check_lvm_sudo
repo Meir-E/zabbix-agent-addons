@@ -1,49 +1,72 @@
 #!/usr/bin/perl -w
 
 use Zabbix::Agent::Addons::LVM;
+use Getopt::Long;
+use JSON;
 
 Zabbix::Agent::Addons::LVM->units(B);
 
-if (@ARGV < 2){
-    usage();
-    exit(1);
+my $vg     = undef;
+my $lv    = undef;
+my $what   = undef;
+my $pretty = 0;
+
+GetOptions(
+  'vg=s'   => \$vg,
+  'lv=s'   => \$lv,
+  'what:s' => \$what,
+  "pretty" => \$pretty
+);
+
+if (not defined $lv and not defined $vg){
+  $lv  ||= $ARGV[0];
+  $what ||= $ARGV[1];
 }
 
-my $vol = $ARGV[0];
-my $what = $ARGV[1];
+if (not defined $lv and not defined $vg){
+  usage();
+  exit 1;
+}
 
 sub usage {
     print<<"EOF";
 
 Usage: $0 <logical volume> [size|allocation|allocation_pool_data|allocation_metadata|status]
+       $0 --lv=<logical volume>
+       $0 --lv=<logical volume> --what=<size|allocation|allocation_pool_data|allocation_metadata|status|etc.>
+       $0 --vg=<volume group>
+       $0 --vg=<volume group> --what=<alloc_pe_size|vg_size|etc.>
 
 EOF
 }
 
-my %info = get_lv_info($vol);
+my $json;
+if (defined $vg){
+  %{$json} = get_volume_group_information($vg);
+} elsif (defined $lv) {
+  %{$json} = get_lv_info($lv);
+} else{
+  usage();
+}
 
-if ($what eq 'size'){
-    print $info{size};
+# Normalize float values
+foreach (qw(allocated_to_snapshot allocated_pool_data allocated_meta_data)){
+  $json->{$_} =~ s/,/./g if (defined $json->{$_});
 }
-elsif ($what eq 'allocation'){
-    my $ret = (defined $info{allocated_to_snapshot}) ? $info{allocated_to_snapshot} : "ZBX_NOTSUPPORTED";
-    $ret =~ s/,/\./;
-    print $ret;
+# Compat with older versions
+my $old_keys = {
+  allocation           => 'allocated_to_snapshot',
+  allocation_pool_data => 'allocated_pool_data',
+  allocation_metadata  => 'allocated_meta_data'
+};
+if (defined $what && defined $old_keys->{$what}){
+  $what = $old_keys->{$what};
 }
-elsif ($what eq 'allocation_pool_data'){
-    my $ret = (defined $info{allocated_pool_data}) ? $info{allocated_pool_data} : "ZBX_NOTSUPPORTED";
-    $ret =~ s/,/\./;
-    print $ret;
+
+if (defined $what and $what ne ''){
+  print ((defined $json->{$what}) ? $json->{$what} : 'ZBX_NOTSUPPOTED');
+} else {
+  print to_json($json, { pretty => $pretty });
 }
-elsif ($what eq 'allocation_metadata'){
-    my $ret = (defined $info{allocated_meta_data}) ? $info{allocated_meta_data} : "ZBX_NOTSUPPORTED";
-    $ret =~ s/,/\./;
-    print $ret;
-}
-elsif ($what eq 'status'){
-    print $info{status};
-}
-else{
-    usage();
-}
+
 exit(0);
