@@ -180,10 +180,10 @@ sub get_vg_information() {
     my $units_arg = '';
     $units_arg = " --units $units " if ($units);
     if ( -e "/usr/sbin/vgdisplay" ) {
-        @vginfo = `/usr/sbin/vgdisplay -v $units_arg`;
+        @vginfo = `/usr/sbin/vgdisplay -v $units_arg 2>/dev/null`;
     } else {
         if( ! -e "/sbin/vgdisplay" ) { die("LVM utilities not installed in /sbin or /usr/sbin"); }
-        @vginfo = `/sbin/vgdisplay -v $units_arg`;
+        @vginfo = `/sbin/vgdisplay -v $units_arg 2>/dev/null`;
     }
 
     VGINF: foreach(@vginfo) {
