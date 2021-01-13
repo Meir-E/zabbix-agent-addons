@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-    <version>4.4</version>
-    <date>2020-02-17T07:58:01Z</date>
+    <version>5.0</version>
+    <date>2021-01-13T18:30:36Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -23,10 +23,185 @@
             </applications>
             <items>
                 <item>
+                    <name>BackupPC: General info</name>
+                    <key>backuppc.general</key>
+                    <delay>15m</delay>
+                    <history>0</history>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <applications>
+                        <application>
+                            <name>BackupPC</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>BackupPC: Total number of backups</name>
+                    <type>DEPENDENT</type>
+                    <key>backuppc.general[bkp]</key>
+                    <delay>0</delay>
+                    <history>60d</history>
+                    <trends>1825d</trends>
+                    <units>!backup(s)</units>
+                    <applications>
+                        <application>
+                            <name>BackupPC</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.bkp</params>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>backuppc.general</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>BackupPC: Total full size</name>
+                    <type>DEPENDENT</type>
+                    <key>backuppc.general[full_size]</key>
+                    <delay>0</delay>
+                    <history>60d</history>
+                    <trends>1825d</trends>
+                    <units>B</units>
+                    <applications>
+                        <application>
+                            <name>BackupPC</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.full_size</params>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>backuppc.general</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>BackupPC: Total history size</name>
+                    <type>DEPENDENT</type>
+                    <key>backuppc.general[history_size]</key>
+                    <delay>0</delay>
+                    <history>60d</history>
+                    <trends>1825d</trends>
+                    <units>B</units>
+                    <applications>
+                        <application>
+                            <name>BackupPC</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.history_size</params>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>backuppc.general</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>BackupPC: Total number of hosts</name>
+                    <type>DEPENDENT</type>
+                    <key>backuppc.general[hosts]</key>
+                    <delay>0</delay>
+                    <history>60d</history>
+                    <trends>1825d</trends>
+                    <units>!host(s)</units>
+                    <applications>
+                        <application>
+                            <name>BackupPC</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.hosts</params>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>backuppc.general</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>BackupPC: Global perf score</name>
+                    <type>DEPENDENT</type>
+                    <key>backuppc.general[perf]</key>
+                    <delay>0</delay>
+                    <history>60d</history>
+                    <trends>1825d</trends>
+                    <value_type>FLOAT</value_type>
+                    <applications>
+                        <application>
+                            <name>BackupPC</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.perf</params>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>backuppc.general</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>BackupPC: Global compression ratio</name>
+                    <type>DEPENDENT</type>
+                    <key>backuppc.general[ratio]</key>
+                    <delay>0</delay>
+                    <history>60d</history>
+                    <trends>1825d</trends>
+                    <value_type>FLOAT</value_type>
+                    <applications>
+                        <application>
+                            <name>BackupPC</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.ratio</params>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>backuppc.general</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>BackupPC: Total size</name>
+                    <type>DEPENDENT</type>
+                    <key>backuppc.general[total_size]</key>
+                    <delay>0</delay>
+                    <history>60d</history>
+                    <trends>1825d</trends>
+                    <units>B</units>
+                    <applications>
+                        <application>
+                            <name>BackupPC</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.total_size</params>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>backuppc.general</key>
+                    </master_item>
+                </item>
+                <item>
                     <name>Number of BackupPC processes</name>
                     <key>proc.num[,backuppc,,BackupPC]</key>
                     <delay>10m</delay>
-                    <trends>1825d</trends>
+                    <history>60d</history>
+                    <trends>730d</trends>
                     <applications>
                         <application>
                             <name>BackupPC</name>
@@ -38,7 +213,8 @@
                     <name>Number of raidsync processes</name>
                     <key>proc.num[,root,,BackupPC_raidsync]</key>
                     <delay>10m</delay>
-                    <trends>1825d</trends>
+                    <history>60d</history>
+                    <trends>730d</trends>
                     <applications>
                         <application>
                             <name>BackupPC</name>
@@ -65,6 +241,7 @@
                             <type>DEPENDENT</type>
                             <key>backuppc.entity[{#BPC_ENTITY},bkp]</key>
                             <delay>0</delay>
+                            <history>60d</history>
                             <trends>1825d</trends>
                             <applications>
                                 <application>
@@ -86,6 +263,7 @@
                             <type>DEPENDENT</type>
                             <key>backuppc.entity[{#BPC_ENTITY},full_size]</key>
                             <delay>0</delay>
+                            <history>60d</history>
                             <trends>1825d</trends>
                             <units>o</units>
                             <applications>
@@ -108,6 +286,7 @@
                             <type>DEPENDENT</type>
                             <key>backuppc.entity[{#BPC_ENTITY},history_size]</key>
                             <delay>0</delay>
+                            <history>60d</history>
                             <trends>1825d</trends>
                             <units>o</units>
                             <applications>
@@ -130,6 +309,7 @@
                             <type>DEPENDENT</type>
                             <key>backuppc.entity[{#BPC_ENTITY},hosts]</key>
                             <delay>0</delay>
+                            <history>60d</history>
                             <trends>1825d</trends>
                             <applications>
                                 <application>
@@ -151,6 +331,7 @@
                             <type>DEPENDENT</type>
                             <key>backuppc.entity[{#BPC_ENTITY},perf]</key>
                             <delay>0</delay>
+                            <history>60d</history>
                             <trends>1825d</trends>
                             <value_type>FLOAT</value_type>
                             <units>!h/j</units>
@@ -174,6 +355,7 @@
                             <type>DEPENDENT</type>
                             <key>backuppc.entity[{#BPC_ENTITY},ratio]</key>
                             <delay>0</delay>
+                            <history>60d</history>
                             <trends>1825d</trends>
                             <value_type>FLOAT</value_type>
                             <units>%</units>
@@ -197,6 +379,7 @@
                             <type>DEPENDENT</type>
                             <key>backuppc.entity[{#BPC_ENTITY},size]</key>
                             <delay>0</delay>
+                            <history>60d</history>
                             <trends>1825d</trends>
                             <units>o</units>
                             <applications>
@@ -300,6 +483,7 @@
                             <type>DEPENDENT</type>
                             <key>backuppc.host[{#BPCHOST},age]</key>
                             <delay>0</delay>
+                            <history>60d</history>
                             <trends>1825d</trends>
                             <units>s</units>
                             <applications>
@@ -335,6 +519,7 @@
                             <type>DEPENDENT</type>
                             <key>backuppc.host[{#BPCHOST},bkp]</key>
                             <delay>0</delay>
+                            <history>60d</history>
                             <trends>1825d</trends>
                             <units>!backups</units>
                             <applications>
@@ -357,6 +542,7 @@
                             <type>DEPENDENT</type>
                             <key>backuppc.host[{#BPCHOST},comp_ratio]</key>
                             <delay>0</delay>
+                            <history>60d</history>
                             <trends>1825d</trends>
                             <value_type>FLOAT</value_type>
                             <units>%</units>
@@ -380,6 +566,7 @@
                             <type>DEPENDENT</type>
                             <key>backuppc.host[{#BPCHOST},duration]</key>
                             <delay>0</delay>
+                            <history>60d</history>
                             <trends>1825d</trends>
                             <units>s</units>
                             <applications>
@@ -402,6 +589,7 @@
                             <type>DEPENDENT</type>
                             <key>backuppc.host[{#BPCHOST},enabled]</key>
                             <delay>0</delay>
+                            <history>60d</history>
                             <trends>1825d</trends>
                             <applications>
                                 <application>
@@ -423,6 +611,7 @@
                             <type>DEPENDENT</type>
                             <key>backuppc.host[{#BPCHOST},errors]</key>
                             <delay>0</delay>
+                            <history>60d</history>
                             <trends>1825d</trends>
                             <units>!errors</units>
                             <applications>
@@ -445,6 +634,7 @@
                             <type>DEPENDENT</type>
                             <key>backuppc.host[{#BPCHOST},full_size]</key>
                             <delay>0</delay>
+                            <history>60d</history>
                             <trends>1825d</trends>
                             <units>B</units>
                             <applications>
@@ -467,6 +657,7 @@
                             <type>DEPENDENT</type>
                             <key>backuppc.host[{#BPCHOST},history_size]</key>
                             <delay>0</delay>
+                            <history>60d</history>
                             <trends>1825d</trends>
                             <units>B</units>
                             <applications>
@@ -489,6 +680,7 @@
                             <type>DEPENDENT</type>
                             <key>backuppc.host[{#BPCHOST},new_size]</key>
                             <delay>0</delay>
+                            <history>60d</history>
                             <trends>1825d</trends>
                             <units>B</units>
                             <applications>
@@ -511,6 +703,7 @@
                             <type>DEPENDENT</type>
                             <key>backuppc.host[{#BPCHOST},new_size_avg]</key>
                             <delay>0</delay>
+                            <history>60d</history>
                             <trends>1825d</trends>
                             <units>B</units>
                             <applications>
@@ -533,6 +726,7 @@
                             <type>DEPENDENT</type>
                             <key>backuppc.host[{#BPCHOST},new_size_median]</key>
                             <delay>0</delay>
+                            <history>60d</history>
                             <trends>1825d</trends>
                             <units>B</units>
                             <applications>
@@ -555,6 +749,7 @@
                             <type>DEPENDENT</type>
                             <key>backuppc.host[{#BPCHOST},new_size_q1]</key>
                             <delay>0</delay>
+                            <history>60d</history>
                             <trends>1825d</trends>
                             <units>B</units>
                             <applications>
@@ -577,6 +772,7 @@
                             <type>DEPENDENT</type>
                             <key>backuppc.host[{#BPCHOST},new_size_q3]</key>
                             <delay>0</delay>
+                            <history>60d</history>
                             <trends>1825d</trends>
                             <units>B</units>
                             <applications>
@@ -599,6 +795,7 @@
                             <type>DEPENDENT</type>
                             <key>backuppc.host[{#BPCHOST},total_size]</key>
                             <delay>0</delay>
+                            <history>60d</history>
                             <trends>1825d</trends>
                             <units>B</units>
                             <applications>
@@ -624,24 +821,23 @@
                             <priority>WARNING</priority>
                         </trigger_prototype>
                         <trigger_prototype>
-                            <expression>{#BPC_TOO_SMALL_FACTOR}&gt;0 and {Template_App_BackupPC:backuppc.host[{#BPCHOST},enabled].last()}=1 and {Template_App_BackupPC:backuppc.host[{#BPCHOST},bkp].last()}&gt;4 and {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].last()} &lt; ({Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size_q1].last()} - ({Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size_q3].last()} - {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size_q1].last()}) * 1.5) and {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].last()} &lt; {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size_avg].last()}/{#BPC_TOO_SMALL_FACTOR} and ({Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].dayofweek()} &lt;&gt; 6 or {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].time()} &lt; 120000) and {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].dayofweek()} &lt;&gt; 7 and {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].dayofweek()} &lt;&gt; 1 and ({Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].dayofweek()} &lt;&gt; 2 or {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].time()} &gt; 080000)</expression>
+                            <expression>{Template_App_BackupPC:backuppc.host[{#BPCHOST},enabled].last()}=1 and {Template_App_BackupPC:backuppc.host[{#BPCHOST},bkp].last()}&gt;4 and {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].last()} &gt; ({Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size_q3].last()} + ({Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size_q3].last()} - {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size_q1].last()}) * 1.5) and {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].last()} &gt; {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size_avg].last()}*{#BPC_TOO_BIG_FACTOR} and {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].dayofweek()} &lt;&gt; 7 and {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].dayofweek()} &lt;&gt; 1 and ({Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].dayofweek()} &lt;&gt; 2 or {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].time()} &gt; {$BPC_SIZE_WARN_FROM_HOUR})</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                            <recovery_expression>{#BPC_TOO_SMALL_FACTOR}=0 or {Template_App_BackupPC:backuppc.host[{#BPCHOST},enabled].last()}=0 or {Template_App_BackupPC:backuppc.host[{#BPCHOST},bkp].last()}&lt;=4 or {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].last()} &gt;= ({Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size_q1].last()} - ({Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size_q3].last()} - {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size_q1].last()}) * 1.5) or {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].last()} &gt;= {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size_avg].last()}/{#BPC_TOO_SMALL_FACTOR}</recovery_expression>
+                            <recovery_expression>{Template_App_BackupPC:backuppc.host[{#BPCHOST},enabled].last()}=0 or {Template_App_BackupPC:backuppc.host[{#BPCHOST},bkp].last()}&lt;=4 or {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].last()} &lt;= ({Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size_q3].last()} + ({Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size_q3].last()} - {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size_q1].last()}) * 1.5) or {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].last()} &lt;= {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size_avg].last()}*{#BPC_TOO_BIG_FACTOR}</recovery_expression>
+                            <name>Suspiciously big ({ITEM.VALUE3}) backup for {#BPCHOST}</name>
+                            <priority>INFO</priority>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                            <expression>{#BPC_TOO_SMALL_FACTOR}&gt;0 and {Template_App_BackupPC:backuppc.host[{#BPCHOST},enabled].last()}=1 and {Template_App_BackupPC:backuppc.host[{#BPCHOST},bkp].last()}&gt;4 and {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].last()} &lt; ({Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size_q1].last()} - ({Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size_q3].last()} - {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size_q1].last()}) * 1.5) and {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].last()} &lt; {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size_avg].last()}/{#BPC_TOO_SMALL_FACTOR} and {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].dayofweek()} &lt;&gt; 6 and {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].dayofweek()} &lt;&gt; 7 and {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].dayofweek()} &lt;&gt; 1 and ({Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].dayofweek()} &lt;&gt; 2 or {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].time()} &gt; {$BPC_SIZE_WARN_FROM_HOUR})</expression>
+                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                            <recovery_expression>{#BPC_TOO_SMALL_FACTOR}&lt;0 or {Template_App_BackupPC:backuppc.host[{#BPCHOST},enabled].last()}=0 or {Template_App_BackupPC:backuppc.host[{#BPCHOST},bkp].last()}&lt;=4 or {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].last()} &gt;= ({Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size_q1].last()} - ({Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size_q3].last()} - {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size_q1].last()}) * 1.5) or {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].last()} &gt;= {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size_avg].last()}/{#BPC_TOO_SMALL_FACTOR}</recovery_expression>
                             <name>Suspiciously small ({ITEM.VALUE3}) backups for {#BPCHOST}</name>
                             <priority>WARNING</priority>
                         </trigger_prototype>
                         <trigger_prototype>
-                            <expression>{Template_App_BackupPC:backuppc.host[{#BPCHOST},enabled].last()}=1 and {Template_App_BackupPC:backuppc.host[{#BPCHOST},bkp].last()}&gt;4 and {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].last()} &gt; ({Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size_q3].last()} + ({Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size_q3].last()} - {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size_q1].last()}) * 1.5) and {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].last()} &gt; {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size_avg].last()}*{#BPC_TOO_BIG_FACTOR} and {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].dayofweek()} &lt;&gt; 7 and {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].dayofweek()} &lt;&gt; 1 and ({Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].dayofweek()} &lt;&gt; 2 or {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].time()} &gt; 060000)</expression>
-                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                            <recovery_expression>{Template_App_BackupPC:backuppc.host[{#BPCHOST},enabled].last()}=0 or {Template_App_BackupPC:backuppc.host[{#BPCHOST},bkp].last()}&lt;=4 or {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].last()} &lt;= ({Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size_q3].last()} + ({Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size_q3].last()} - {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size_q1].last()}) * 1.5) or {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size].last()} &lt;= {Template_App_BackupPC:backuppc.host[{#BPCHOST},new_size_avg].last()}*{#BPC_TOO_BIG_FACTOR}</recovery_expression>
-                            <name>Suspuciously big ({ITEM.VALUE3}) backup for {#BPCHOST}</name>
-                            <priority>INFO</priority>
-                        </trigger_prototype>
-                        <trigger_prototype>
                             <expression>{Template_App_BackupPC:backuppc.host[{#BPCHOST},errors].last(0)}&gt;{#BPCMAXERROR} and {Template_App_BackupPC:backuppc.host[{#BPCHOST},enabled].last()}=1</expression>
-                            <name>{ITEM.LASTVALUE1} xfer errors in last backup of {#BPCHOST}</name>
+                            <name>{ITEM.LASTVALUE1} (xfer) in last backup of {#BPCHOST}</name>
                             <priority>WARNING</priority>
-                            <manual_close>YES</manual_close>
                         </trigger_prototype>
                     </trigger_prototypes>
                     <graph_prototypes>
@@ -704,6 +900,11 @@
                 </discovery_rule>
             </discovery_rules>
             <macros>
+                <macro>
+                    <macro>{$BPC_SIZE_WARN_FROM_HOUR}</macro>
+                    <value>080000</value>
+                    <description>Size alerts will only start after this hour</description>
+                </macro>
                 <macro>
                     <macro>{$EXT_BACKUPS}</macro>
                     <value>0</value>
