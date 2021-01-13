@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.142
+Version: 0.2.143
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -102,6 +102,9 @@ fi
 %endif
 
 %changelog
+* Wed Jan 13 2021 Daniel Berteaud <daniel@firewall-services.com> 0.2.143-1
+- Update BackupPC template (daniel@firewall-services.com)
+
 * Wed Jan 13 2021 Daniel Berteaud <daniel@firewall-services.com> 0.2.142-1
 - Modernize lvm monitoring scripts (daniel@firewall-services.com)
 - Don't catch stderr for vgdisplay commands (daniel@firewall-services.com)
