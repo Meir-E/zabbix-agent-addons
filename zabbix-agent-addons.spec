@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.144
+Version: 0.2.145
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -106,6 +106,9 @@ fi
 %endif
 
 %changelog
+* Thu Jan 14 2021 Daniel Berteaud <daniel@firewall-services.com> 0.2.145-1
+- Add perl(File::ReadBackwards) dependency (daniel@firewall-services.com)
+
 * Thu Jan 14 2021 Daniel Berteaud <daniel@firewall-services.com> 0.2.144-1
 - Optimize samba audit_auth log parsing by reading from the tail of the file
   (daniel@firewall-services.com)
