@@ -6,6 +6,7 @@ use JSON;
 use Getopt::Long;
 use File::Which;
 use Date::Parse;
+use File::ReadBackwards;
 use Data::Dumper;
 
 my $samba_tool = which('samba-tool');
@@ -144,9 +145,12 @@ if (defined $ou){
   }
 
   if (-e $audit_auth_log){
-    open (my $auth_log, '<', $audit_auth_log) or die "Couldn't open $audit_auth_log : $!\n";
-    foreach my $line (<$auth_log>){
-      my $event = from_json($line);
+    my $backward = File::ReadBackwards->new( $audit_auth_log ) or die "Couldn't open $audit_auth_log : $!\n";
+    while (defined (my $line = $backward->readline)){
+      my $event;
+      eval {
+        $event = from_json($line);
+      };
       # Skip the log entry if we can't parse JSON
       next if (not defined $event);
       my $type = $event->{type};
@@ -155,8 +159,10 @@ if (defined $ou){
       # Parse the date in the timstamp field
       my $timestamp = str2time($event->{timestamp});
 
-      # Only look at lines from the last $since seconds. Skip if date couldn't be parsed
-      next if (not defined $timestamp or time() - $timestamp > $since);
+      # Skip if date couldn't be parsed
+      next if (not defined $timestamp);
+      # As we're reading in reverse order, if we reached an events prior to now - since, then we can stop, as all the other will be even earlier
+      last if (time() - $timestamp > $since);
 
       my $subject;
       if ($type eq 'Authentication'){
@@ -172,7 +178,6 @@ if (defined $ou){
         $json->{activity}->{authorizations}->{$subject}++;
       }
     }
-    close $auth_log;
   }
 }
 

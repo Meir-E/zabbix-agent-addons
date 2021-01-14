@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-01-11T15:08:31Z</date>
+    <date>2021-01-14T14:39:31Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -203,7 +203,7 @@
                     <history>60d</history>
                     <trends>1825d</trends>
                     <value_type>FLOAT</value_type>
-                    <units>!auth/min</units>
+                    <units>!auth</units>
                     <applications>
                         <application>
                             <name>Samba</name>
@@ -213,10 +213,6 @@
                         <step>
                             <type>JSONPATH</type>
                             <params>$.activity.authentications.computers.failure</params>
-                        </step>
-                        <step>
-                            <type>MULTIPLIER</type>
-                            <params>0.2</params>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -239,7 +235,7 @@
                     <history>60d</history>
                     <trends>1825d</trends>
                     <value_type>FLOAT</value_type>
-                    <units>!auth/min</units>
+                    <units>!auth</units>
                     <applications>
                         <application>
                             <name>Samba</name>
@@ -249,10 +245,6 @@
                         <step>
                             <type>JSONPATH</type>
                             <params>$.activity.authentications.computers.success</params>
-                        </step>
-                        <step>
-                            <type>MULTIPLIER</type>
-                            <params>0.2</params>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -267,7 +259,7 @@
                     <history>60d</history>
                     <trends>1825d</trends>
                     <value_type>FLOAT</value_type>
-                    <units>!auth/min</units>
+                    <units>!auth</units>
                     <applications>
                         <application>
                             <name>Samba</name>
@@ -277,10 +269,6 @@
                         <step>
                             <type>JSONPATH</type>
                             <params>$.activity.authentications.users.failure</params>
-                        </step>
-                        <step>
-                            <type>MULTIPLIER</type>
-                            <params>0.2</params>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -295,7 +283,7 @@
                     <history>60d</history>
                     <trends>1825d</trends>
                     <value_type>FLOAT</value_type>
-                    <units>!auth/min</units>
+                    <units>!auth</units>
                     <applications>
                         <application>
                             <name>Samba</name>
@@ -305,10 +293,6 @@
                         <step>
                             <type>JSONPATH</type>
                             <params>$.activity.authentications.users.success</params>
-                        </step>
-                        <step>
-                            <type>MULTIPLIER</type>
-                            <params>0.2</params>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -323,7 +307,7 @@
                     <history>60d</history>
                     <trends>1825d</trends>
                     <value_type>FLOAT</value_type>
-                    <units>!auth/min</units>
+                    <units>!auth</units>
                     <applications>
                         <application>
                             <name>Samba</name>
@@ -333,10 +317,6 @@
                         <step>
                             <type>JSONPATH</type>
                             <params>$.activity.authorizations.computers</params>
-                        </step>
-                        <step>
-                            <type>MULTIPLIER</type>
-                            <params>0.2</params>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -351,7 +331,7 @@
                     <history>60d</history>
                     <trends>1825d</trends>
                     <value_type>FLOAT</value_type>
-                    <units>!auth/min</units>
+                    <units>!auth</units>
                     <applications>
                         <application>
                             <name>Samba</name>
@@ -361,10 +341,6 @@
                         <step>
                             <type>JSONPATH</type>
                             <params>$.activity.authorizations.users</params>
-                        </step>
-                        <step>
-                            <type>MULTIPLIER</type>
-                            <params>0.2</params>
                         </step>
                     </preprocessing>
                     <master_item>
@@ -714,7 +690,7 @@
                     <delay>5m</delay>
                     <history>60d</history>
                     <trends>1825d</trends>
-                    <units>auth</units>
+                    <units>!auth</units>
                     <applications>
                         <application>
                             <name>Samba</name>
@@ -728,7 +704,7 @@
                     <delay>5m</delay>
                     <history>60d</history>
                     <trends>1825d</trends>
-                    <units>auth</units>
+                    <units>!auth</units>
                     <applications>
                         <application>
                             <name>Samba</name>
@@ -742,7 +718,7 @@
                     <delay>5m</delay>
                     <history>60d</history>
                     <trends>1825d</trends>
-                    <units>auth</units>
+                    <units>!auth</units>
                     <applications>
                         <application>
                             <name>Samba</name>
@@ -756,7 +732,7 @@
                     <delay>5m</delay>
                     <history>60d</history>
                     <trends>1825d</trends>
-                    <units>auth</units>
+                    <units>!auth</units>
                     <applications>
                         <application>
                             <name>Samba</name>
@@ -770,7 +746,7 @@
                     <delay>5m</delay>
                     <history>60d</history>
                     <trends>1825d</trends>
-                    <units>auth</units>
+                    <units>!auth</units>
                     <applications>
                         <application>
                             <name>Samba</name>
@@ -784,7 +760,7 @@
                     <delay>5m</delay>
                     <history>60d</history>
                     <trends>1825d</trends>
-                    <units>auth</units>
+                    <units>!auth</units>
                     <applications>
                         <application>
                             <name>Samba</name>
