@@ -19,7 +19,7 @@ my $ou = undef;
 
 # This log is expected to be in JSON format. For example, in smb.conf :
 # log level = 1 auth_audit:3 auth_json_audit:4@/var/log/samba/audit_auth.log
-my $audit_auth_log = '/var/log/samba/audit_auth.log';
+my $audit_auth_log = '/var/log/samba/json/auth.log';
 
 if (not defined $samba_tool or not defined $pdbedit){
   print 'ZBX_NOTSUPPORTED';
@@ -47,7 +47,7 @@ if (defined $ou){
   if ($ou !~ m/^(?<RDN>(?<Key>(?:\\[0-9A-Fa-f]{2}|\\\[^=\,\\]|[^=\,\\]+)+)\=(?<Value>(?:\\[0-9A-Fa-f]{2}|\\\[^=\,\\]|[^=\,\\]+)+))(?:\s*\,\s*(?<RDN>(?<Key>(?:\\[0-9A-Fa-f]{2}|\\\[^=\,\\]|[^=\,\\]+)+)\=(?<Value>(?:\\[0-9A-Fa-f]{2}|\\\[^=\,\\]|[^=\,\\]+)+)))*$/){
     die "Invalid OU\n";
   }
-  foreach (qx($samba_tool ou listobjects '$ou')){
+  foreach (qx($samba_tool ou listobjects '$ou' 2>/dev/null)){
     die "Error while counting objects of OU $ou\n" if ($? != 0);
     chomp;
     $json->{objects}++;
@@ -116,7 +116,7 @@ if (defined $ou){
   }
 
   # Now count groups
-  foreach (qx($samba_tool group list)){
+  foreach (qx($samba_tool group list 2>/dev/null)){
     $json->{accounts}->{groups}++;
   }
 
@@ -124,23 +124,23 @@ if (defined $ou){
   # We want just a quick summary, so only output the first line
   # manual checks will be needed to get the details, but if this field doesn't contains [ALL GOOD],
   # then something is probably wrong
-  $json->{replication} = (split(/\n/, qx($samba_tool drs showrepl --summary)))[0];
+  $json->{replication} = (split(/\n/, qx($samba_tool drs showrepl --summary 2>/dev/null)))[0];
 
   # Get the list of workers
-  foreach (qx($samba_tool processes)){
+  foreach (qx($samba_tool processes 2>/dev/null)){
     if (/^([^\(\s]+).+\d+$/){
       $json->{processes}->{$1}++;
     }
   }
 
   # Get the number of GPO
-  foreach (qx($samba_tool gpo listall)){
+  foreach (qx($samba_tool gpo listall 2/dev/null)){
     next unless (/^GPO/);
     $json->{gpo}++;
   }
 
   # Get the number of OU
-  foreach (qx($samba_tool ou list)){
+  foreach (qx($samba_tool ou list 2>/dev/null)){
     $json->{ou}++;
   }
 
