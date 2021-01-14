@@ -134,7 +134,7 @@ if (defined $ou){
   }
 
   # Get the number of GPO
-  foreach (qx($samba_tool gpo listall 2/dev/null)){
+  foreach (qx($samba_tool gpo listall 2>/dev/null)){
     next unless (/^GPO/);
     $json->{gpo}++;
   }
