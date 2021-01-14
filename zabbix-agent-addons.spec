@@ -22,6 +22,10 @@ Requires: perl(MIME::Base64)
 Requires: perl(File::Which)
 Requires: perl(Config::Simple)
 Requires: perl(Statistics::Descriptive)
+%if 0%{?rhel} > 6
+# used by samba4 scripts, which wont run on anything < 7
+Requires: perl(File::ReadBackwards)
+%endif
 Requires: fping
 BuildRequires: perl
 %if ! 0%{?_without_selinux}
