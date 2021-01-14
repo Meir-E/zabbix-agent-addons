@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-01-14T14:39:31Z</date>
+    <date>2021-01-14T18:29:20Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -583,7 +583,7 @@
                             <priority>WARNING</priority>
                         </trigger>
                         <trigger>
-                            <expression>{nodata(15m)}=1</expression>
+                            <expression>{nodata(25m)}=1</expression>
                             <name>Samba monitoring failed</name>
                             <priority>WARNING</priority>
                         </trigger>
