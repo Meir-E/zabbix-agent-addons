@@ -100,7 +100,7 @@ sub get_zpool_errors {
   };
   my $i = 0;
   my $index = {};
-  foreach my $line (qx($zpool status $pool)){
+  foreach my $line (qx($zpool status $pool 2>/dev/null)){
     # Output looks like
     #   pool: rpool
     #  state: ONLINE
