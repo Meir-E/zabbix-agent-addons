@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.147
+Version: 0.2.148
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -106,6 +106,11 @@ fi
 %endif
 
 %changelog
+* Wed Feb 17 2021 Daniel Berteaud <daniel@firewall-services.com> 0.2.148-1
+- Fix zfs pool monitoring when a pool has errors (daniel@firewall-services.com)
+- Alert only if not samba monitoring for 25min (instead of 15)
+  (daniel@firewall-services.com)
+
 * Thu Jan 14 2021 Daniel Berteaud <daniel@firewall-services.com> 0.2.147-1
 - [check_samba_dc_sudo] Fix typo with GPO listing (daniel@firewall-
   services.com)
