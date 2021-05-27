@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.148
+Version: 0.2.149
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -106,6 +106,9 @@ fi
 %endif
 
 %changelog
+* Thu May 27 2021 Daniel Berteaud <daniel@firewall-services.com> 0.2.149-1
+- Support Debian lib path for BackupPC (daniel@firewall-services.com)
+
 * Wed Feb 17 2021 Daniel Berteaud <daniel@firewall-services.com> 0.2.148-1
 - Fix zfs pool monitoring when a pool has errors (daniel@firewall-services.com)
 - Alert only if not samba monitoring for 25min (instead of 15)
