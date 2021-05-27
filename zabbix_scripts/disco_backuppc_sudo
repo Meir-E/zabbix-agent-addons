@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 
 use lib "/usr/share/BackupPC/lib";
+use lib "/usr/share/backuppc/lib";
 use lib "/usr/local/BackupPC/lib";
 use BackupPC::Lib;
 use BackupPC::CGI::Lib;
