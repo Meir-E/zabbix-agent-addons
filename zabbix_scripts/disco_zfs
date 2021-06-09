@@ -70,7 +70,7 @@ if ($pools){
     push @{$json->{data}}, { '{#ZFS_SNAP}' => $_ };
   }
 } elsif ($sanoidmon){
-  push @{$json->{data}}, { '{#ZFS_SANOID}' => $_ } foreach (qw(snapshot capacity health));
+  push @{$json->{data}}, { '{#ZFS_SANOID}' => $_ } foreach (qw(snapshot));
 } elsif ($arcstats){
   push @{$json->{data}}, { '{#ZFS_STATS}' => 'arcstats' };
 }
