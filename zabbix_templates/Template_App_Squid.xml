@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-    <version>4.4</version>
-    <date>2020-01-16T17:32:11Z</date>
+    <version>5.0</version>
+    <date>2021-06-19T12:11:35Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -28,8 +28,8 @@
                 <item>
                     <name>Squid: Used memory</name>
                     <key>proc.mem[squid]</key>
-                    <delay>5m</delay>
-                    <trends>1825d</trends>
+                    <delay>10m</delay>
+                    <trends>730d</trends>
                     <units>B</units>
                     <applications>
                         <application>
@@ -44,7 +44,8 @@
                     <name>Squid: Number of processes</name>
                     <key>proc.num[squid]</key>
                     <delay>5m</delay>
-                    <trends>1825d</trends>
+                    <history>30d</history>
+                    <trends>0</trends>
                     <units>!process</units>
                     <applications>
                         <application>
@@ -65,7 +66,7 @@
                 <item>
                     <name>Squid: Info</name>
                     <key>squid.check[all]</key>
-                    <delay>300s</delay>
+                    <delay>10m</delay>
                     <history>0</history>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
@@ -83,7 +84,7 @@
                     <type>DEPENDENT</type>
                     <key>squid.check[clients_num]</key>
                     <delay>0</delay>
-                    <trends>1825d</trends>
+                    <trends>730d</trends>
                     <units>!client(s)</units>
                     <applications>
                         <application>
@@ -108,7 +109,7 @@
                     <type>DEPENDENT</type>
                     <key>squid.check[cpu_usage_avg_5min]</key>
                     <delay>0</delay>
-                    <trends>1825d</trends>
+                    <trends>730d</trends>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
                     <applications>
@@ -134,7 +135,7 @@
                     <type>DEPENDENT</type>
                     <key>squid.check[disk_hits_req_percent]</key>
                     <delay>0</delay>
-                    <trends>1825d</trends>
+                    <trends>730d</trends>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
                     <applications>
@@ -160,7 +161,7 @@
                     <type>DEPENDENT</type>
                     <key>squid.check[fd_used_percent]</key>
                     <delay>0</delay>
-                    <trends>1825d</trends>
+                    <trends>730d</trends>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
                     <applications>
@@ -193,7 +194,7 @@
                     <type>DEPENDENT</type>
                     <key>squid.check[hits_req_percent]</key>
                     <delay>0</delay>
-                    <trends>1825d</trends>
+                    <trends>730d</trends>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
                     <applications>
@@ -219,7 +220,7 @@
                     <type>DEPENDENT</type>
                     <key>squid.check[mean_object_size]</key>
                     <delay>0</delay>
-                    <trends>1825d</trends>
+                    <trends>730d</trends>
                     <units>B</units>
                     <applications>
                         <application>
@@ -244,7 +245,7 @@
                     <type>DEPENDENT</type>
                     <key>squid.check[mem_hits_req_percent]</key>
                     <delay>0</delay>
-                    <trends>1825d</trends>
+                    <trends>730d</trends>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
                     <applications>
@@ -270,7 +271,7 @@
                     <type>DEPENDENT</type>
                     <key>squid.check[requests]</key>
                     <delay>0</delay>
-                    <trends>1825d</trends>
+                    <trends>730d</trends>
                     <value_type>FLOAT</value_type>
                     <units>req/s</units>
                     <applications>
@@ -300,7 +301,7 @@
                     <type>DEPENDENT</type>
                     <key>squid.check[stor_swap_used_percent]</key>
                     <delay>0</delay>
-                    <trends>1825d</trends>
+                    <trends>730d</trends>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
                     <applications>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2020-12-17T15:28:00Z</date>
+    <date>2021-06-19T12:12:56Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -1110,8 +1110,8 @@ return (diff &lt; 0 ? 0 : diff);</params>
                                 <step>
                                     <type>JAVASCRIPT</type>
                                     <params>json = JSON.parse(value);
-logicalused = json.logicalused;
-used = json.used;
+logicalused = new Number(json.logicalused);
+used = new Number(json.used);
 return (logicalused &gt; used ? logicalused - used : 0);</params>
                                 </step>
                             </preprocessing>
@@ -1869,6 +1869,11 @@ return (logicalused &gt; used ? logicalused - used : 0);</params>
                         </item_prototype>
                     </item_prototypes>
                     <trigger_prototypes>
+                        <trigger_prototype>
+                            <expression>{Template_App_ZFS:vfs.zfs.zpool[{#ZPOOL},status].nodata(2d)}=1 or {Template_App_ZFS:vfs.zfs.zpool[{#ZPOOL},allocated].nodata(2h)}=1</expression>
+                            <name>ZFS: pool {#ZPOOL} has a monitoring issue</name>
+                            <priority>WARNING</priority>
+                        </trigger_prototype>
                         <trigger_prototype>
                             <expression>{Template_App_ZFS:vfs.zfs.zpool[{#ZPOOL},write_errors].last()}&lt;&gt;0 or {Template_App_ZFS:vfs.zfs.zpool[{#ZPOOL},read_errors].last()}&lt;&gt;0 or {Template_App_ZFS:vfs.zfs.zpool[{#ZPOOL},cksum_errors].last()}&lt;&gt;0</expression>
                             <name>ZFS: Pool {#ZPOOL} has errors</name>

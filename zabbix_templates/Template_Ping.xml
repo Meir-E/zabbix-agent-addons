@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-    <version>4.4</version>
-    <date>2020-03-02T14:07:54Z</date>
+    <version>5.0</version>
+    <date>2021-06-19T12:18:12Z</date>
     <groups>
         <group>
             <name>Modèles</name>
@@ -38,6 +38,7 @@
                     <name>Packet loss</name>
                     <type>SIMPLE</type>
                     <key>icmppingloss[,6,500,,1500]</key>
+                    <delay>{$PING_FREQ}</delay>
                     <trends>1825d</trends>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
@@ -55,12 +56,12 @@
                             <dependencies>
                                 <dependency>
                                     <name>No ping response from {HOST.IP1}</name>
-                                    <expression>{$PING_INFO}=1 and {Template_Ping:icmpping[,2,,,2000].sum({$DOWN_WARN})}=0</expression>
+                                    <expression>{Template_Ping:icmpping[,2,,,2000].nodata(180,strict)}=0 and {Template_Ping:icmpping[,2,,,2000].sum({$DOWN_CRITICAL})}=0 and {Template_Ping:icmpping[,2,,,2000].dayofweek(0)}&gt;={$PING_ALERT_FROM_DAY} and {Template_Ping:icmpping[,2,,,2000].dayofweek(0)}&lt;={$PING_ALERT_TO_DAY} and {Template_Ping:icmpping[,2,,,2000].time(0)}&gt;={$PING_ALERT_FROM_HOUR} and {Template_Ping:icmpping[,2,,,2000].time(0)}&lt;={$PING_ALERT_TO_HOUR}</expression>
                                     <recovery_expression>{Template_Ping:icmpping[,2,,,2000].sum(180)}&gt;3</recovery_expression>
                                 </dependency>
                                 <dependency>
                                     <name>No ping response from {HOST.IP1}</name>
-                                    <expression>{Template_Ping:icmpping[,2,,,2000].sum({$DOWN_CRITICAL})}=0 and {Template_Ping:icmpping[,2,,,2000].dayofweek(0)}&gt;={$PING_ALERT_FROM_DAY} and {Template_Ping:icmpping[,2,,,2000].dayofweek(0)}&lt;={$PING_ALERT_TO_DAY} and {Template_Ping:icmpping[,2,,,2000].time(0)}&gt;={$PING_ALERT_FROM_HOUR} and {Template_Ping:icmpping[,2,,,2000].time(0)}&lt;={$PING_ALERT_TO_HOUR}</expression>
+                                    <expression>{Template_Ping:icmpping[,2,,,2000].sum({$DOWN_WARN})}=0</expression>
                                     <recovery_expression>{Template_Ping:icmpping[,2,,,2000].sum(180)}&gt;3</recovery_expression>
                                 </dependency>
                             </dependencies>
@@ -71,6 +72,7 @@
                     <name>Latency</name>
                     <type>SIMPLE</type>
                     <key>icmppingsec</key>
+                    <delay>{$PING_FREQ}</delay>
                     <trends>1825d</trends>
                     <value_type>FLOAT</value_type>
                     <units>s</units>
@@ -94,7 +96,7 @@
                     <name>Ping response</name>
                     <type>SIMPLE</type>
                     <key>icmpping[,2,,,2000]</key>
-                    <delay>30s</delay>
+                    <delay>{$PING_FREQ}</delay>
                     <trends>1825d</trends>
                     <applications>
                         <application>
@@ -104,7 +106,20 @@
                     <request_method>POST</request_method>
                     <triggers>
                         <trigger>
-                            <expression>{$PING_INFO}=1 and {sum({$DOWN_WARN})}=0</expression>
+                            <expression>{nodata(180,strict)}=1</expression>
+                            <name>No ping information received in last 3 minutes</name>
+                            <priority>INFO</priority>
+                        </trigger>
+                        <trigger>
+                            <expression>{nodata(180,strict)}=0 and {sum({$DOWN_CRITICAL})}=0 and {dayofweek(0)}&gt;={$PING_ALERT_FROM_DAY} and {dayofweek(0)}&lt;={$PING_ALERT_TO_DAY} and {time(0)}&gt;={$PING_ALERT_FROM_HOUR} and {time(0)}&lt;={$PING_ALERT_TO_HOUR}</expression>
+                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                            <recovery_expression>{sum(180)}&gt;3</recovery_expression>
+                            <name>No ping response from {HOST.IP1}</name>
+                            <priority>DISASTER</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                        <trigger>
+                            <expression>{sum({$DOWN_WARN})}=0</expression>
                             <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
                             <recovery_expression>{sum(180)}&gt;3</recovery_expression>
                             <name>No ping response from {HOST.IP1}</name>
@@ -113,18 +128,10 @@
                             <dependencies>
                                 <dependency>
                                     <name>No ping response from {HOST.IP1}</name>
-                                    <expression>{Template_Ping:icmpping[,2,,,2000].sum({$DOWN_CRITICAL})}=0 and {Template_Ping:icmpping[,2,,,2000].dayofweek(0)}&gt;={$PING_ALERT_FROM_DAY} and {Template_Ping:icmpping[,2,,,2000].dayofweek(0)}&lt;={$PING_ALERT_TO_DAY} and {Template_Ping:icmpping[,2,,,2000].time(0)}&gt;={$PING_ALERT_FROM_HOUR} and {Template_Ping:icmpping[,2,,,2000].time(0)}&lt;={$PING_ALERT_TO_HOUR}</expression>
+                                    <expression>{Template_Ping:icmpping[,2,,,2000].nodata(180,strict)}=0 and {Template_Ping:icmpping[,2,,,2000].sum({$DOWN_CRITICAL})}=0 and {Template_Ping:icmpping[,2,,,2000].dayofweek(0)}&gt;={$PING_ALERT_FROM_DAY} and {Template_Ping:icmpping[,2,,,2000].dayofweek(0)}&lt;={$PING_ALERT_TO_DAY} and {Template_Ping:icmpping[,2,,,2000].time(0)}&gt;={$PING_ALERT_FROM_HOUR} and {Template_Ping:icmpping[,2,,,2000].time(0)}&lt;={$PING_ALERT_TO_HOUR}</expression>
                                     <recovery_expression>{Template_Ping:icmpping[,2,,,2000].sum(180)}&gt;3</recovery_expression>
                                 </dependency>
                             </dependencies>
-                        </trigger>
-                        <trigger>
-                            <expression>{sum({$DOWN_CRITICAL})}=0 and {dayofweek(0)}&gt;={$PING_ALERT_FROM_DAY} and {dayofweek(0)}&lt;={$PING_ALERT_TO_DAY} and {time(0)}&gt;={$PING_ALERT_FROM_HOUR} and {time(0)}&lt;={$PING_ALERT_TO_HOUR}</expression>
-                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
-                            <recovery_expression>{sum(180)}&gt;3</recovery_expression>
-                            <name>No ping response from {HOST.IP1}</name>
-                            <priority>DISASTER</priority>
-                            <manual_close>YES</manual_close>
                         </trigger>
                     </triggers>
                 </item>
@@ -167,9 +174,9 @@
                     <value>235959</value>
                 </macro>
                 <macro>
-                    <macro>{$PING_INFO}</macro>
-                    <value>1</value>
-                    <description>Info alert if no response, before critical alert</description>
+                    <macro>{$PING_FREQ}</macro>
+                    <value>30s</value>
+                    <description>Ping frequency</description>
                 </macro>
             </macros>
         </template>

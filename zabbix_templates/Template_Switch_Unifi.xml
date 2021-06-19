@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>5.0</version>
+    <date>2021-06-19T12:19:59Z</date>
+    <groups>
+        <group>
+            <name>Modèles</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Template_Switch_Unifi</template>
+            <name>Template_Switch_Unifi</name>
+            <templates>
+                <template>
+                    <name>Template_Switch_Generic</name>
+                </template>
+            </templates>
+            <groups>
+                <group>
+                    <name>Modèles</name>
+                </group>
+            </groups>
+        </template>
+    </templates>
+</zabbix_export>

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>5.0</version>
+    <date>2021-06-19T12:10:27Z</date>
+    <groups>
+        <group>
+            <name>Modèles</name>
+        </group>
+        <group>
+            <name>Templates</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Template_App_Samba</template>
+            <name>Template_App_Samba</name>
+            <groups>
+                <group>
+                    <name>Modèles</name>
+                </group>
+                <group>
+                    <name>Templates</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>samba</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>Écoute smbd</name>
+                    <key>net.tcp.port[,139]</key>
+                    <delay>5m</delay>
+                    <trends>1825d</trends>
+                    <applications>
+                        <application>
+                            <name>samba</name>
+                        </application>
+                    </applications>
+                    <request_method>POST</request_method>
+                </item>
+                <item>
+                    <name>Mémoire $1</name>
+                    <key>proc.mem[nmbd,,sum]</key>
+                    <delay>2m</delay>
+                    <trends>1825d</trends>
+                    <units>o</units>
+                    <applications>
+                        <application>
+                            <name>samba</name>
+                        </application>
+                    </applications>
+                    <request_method>POST</request_method>
+                </item>
+                <item>
+                    <name>Mémoire $1</name>
+                    <key>proc.mem[smbd,,sum]</key>
+                    <delay>2m</delay>
+                    <trends>1825d</trends>
+                    <units>o</units>
+                    <applications>
+                        <application>
+                            <name>samba</name>
+                        </application>
+                    </applications>
+                    <request_method>POST</request_method>
+                </item>
+                <item>
+                    <name>Nombre de processus $1</name>
+                    <key>proc.num[nmbd]</key>
+                    <delay>5m</delay>
+                    <trends>1825d</trends>
+                    <units>process</units>
+                    <applications>
+                        <application>
+                            <name>samba</name>
+                        </application>
+                    </applications>
+                    <request_method>POST</request_method>
+                </item>
+                <item>
+                    <name>Nombre de processus $1</name>
+                    <key>proc.num[smbd]</key>
+                    <delay>5m</delay>
+                    <trends>1825d</trends>
+                    <units>process</units>
+                    <applications>
+                        <application>
+                            <name>samba</name>
+                        </application>
+                    </applications>
+                    <request_method>POST</request_method>
+                </item>
+                <item>
+                    <name>Lookup nmbd</name>
+                    <key>samba.nmbd.status</key>
+                    <delay>3m</delay>
+                    <trends>1825d</trends>
+                    <applications>
+                        <application>
+                            <name>samba</name>
+                        </application>
+                    </applications>
+                    <request_method>POST</request_method>
+                </item>
+            </items>
+        </template>
+    </templates>
+    <triggers>
+        <trigger>
+            <expression>{Template_App_Samba:proc.num[nmbd].last()}&lt;1 or {Template_App_Samba:samba.nmbd.status.sum(#2)}&lt;1</expression>
+            <name>le démon nmbd ne fonctionne pas</name>
+            <status>DISABLED</status>
+            <priority>AVERAGE</priority>
+        </trigger>
+        <trigger>
+            <expression>{Template_App_Samba:proc.num[smbd].last()}&lt;1 or {Template_App_Samba:net.tcp.port[,139].last()}&lt;&gt;1</expression>
+            <name>le démon smbd n'est pas en fonctionnement</name>
+            <status>DISABLED</status>
+            <priority>AVERAGE</priority>
+        </trigger>
+    </triggers>
+</zabbix_export>

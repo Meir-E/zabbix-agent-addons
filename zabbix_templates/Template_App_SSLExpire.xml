@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>5.0</version>
+    <date>2021-06-19T12:12:08Z</date>
+    <groups>
+        <group>
+            <name>Modèles</name>
+        </group>
+        <group>
+            <name>Templates</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Template_App_SSLExpire</template>
+            <name>Template_App_SSLExpire</name>
+            <groups>
+                <group>
+                    <name>Modèles</name>
+                </group>
+                <group>
+                    <name>Templates</name>
+                </group>
+            </groups>
+            <items>
+                <item>
+                    <name>Expiration du certificat</name>
+                    <type>EXTERNAL</type>
+                    <key>cert_expire.pl[&quot;-h&quot;,&quot;{HOST.CONN}&quot;]</key>
+                    <delay>30m</delay>
+                    <trends>1825d</trends>
+                    <units>jours</units>
+                    <request_method>POST</request_method>
+                    <triggers>
+                        <trigger>
+                            <expression>{last(0)}&lt;{$SSL_WARN_EXPIRE} and {$SSL_WARN_EXPIRE}&lt;&gt;0</expression>
+                            <name>Le certificat expire dans {ITEM.LASTVALUE1}</name>
+                            <priority>AVERAGE</priority>
+                        </trigger>
+                    </triggers>
+                </item>
+            </items>
+            <macros>
+                <macro>
+                    <macro>{$SSL_WARN_EXPIRE}</macro>
+                    <value>90</value>
+                </macro>
+            </macros>
+        </template>
+    </templates>
+</zabbix_export>

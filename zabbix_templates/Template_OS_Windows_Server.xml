@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>5.0</version>
+    <date>2021-06-19T12:17:53Z</date>
+    <groups>
+        <group>
+            <name>Templates</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Template_OS_Windows_Serveur</template>
+            <name>Template_OS_Windows_Serveur</name>
+            <templates>
+                <template>
+                    <name>Template_OS_Windows_Minimal</name>
+                </template>
+                <template>
+                    <name>Template_Ping</name>
+                </template>
+            </templates>
+            <groups>
+                <group>
+                    <name>Templates</name>
+                </group>
+            </groups>
+            <discovery_rules>
+                <discovery_rule>
+                    <name>Megaraid discovery: adapters</name>
+                    <key>raid.megaraid.discovery[adapter]</key>
+                    <delay>12h</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>MegaRAID : Adapter {#MEGARAID_ADP} : Firmware version</name>
+                            <key>raid.megaraid.adapter[{#MEGARAID_ADP},fw_version]</key>
+                            <delay>2h</delay>
+                            <history>30d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <applications>
+                                <application>
+                                    <name>Disks</name>
+                                </application>
+                            </applications>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{diff()}=1</expression>
+                                    <recovery_mode>NONE</recovery_mode>
+                                    <name>Firmware version changed on {#MEGARAID_ADP}</name>
+                                    <priority>WARNING</priority>
+                                    <manual_close>YES</manual_close>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>MegaRAID : Adapter {#MEGARAID_ADP} : Model</name>
+                            <key>raid.megaraid.adapter[{#MEGARAID_ADP},product_name]</key>
+                            <delay>12h</delay>
+                            <history>30d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <applications>
+                                <application>
+                                    <name>Disks</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>Megaraid discovery : bbu</name>
+                    <key>raid.megaraid.discovery[bbu]</key>
+                    <delay>12h</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>MegaRAID : BBU of adapter {#ADAPTER_ID} : State</name>
+                            <key>raid.megaraid.bbu[{#ADAPTER_ID},bbu_state]</key>
+                            <delay>30m</delay>
+                            <history>30d</history>
+                            <applications>
+                                <application>
+                                    <name>Disks</name>
+                                </application>
+                            </applications>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}&lt;&gt;0</expression>
+                                    <name>BBU on adapter {#ADAPTER_ID} must be checked</name>
+                                    <priority>AVERAGE</priority>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{nodata(2h)}=1</expression>
+                                    <name>BBU on adapter {#ADAPTER_ID} not checked recently</name>
+                                    <priority>WARNING</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>No ping information received in last 3 minutes</name>
+                                            <expression>{Template_OS_Windows_Serveur:icmpping[,2,,,2000].nodata(180,strict)}=1</expression>
+                                        </dependency>
+                                        <dependency>
+                                            <name>No ping response from {HOST.IP1}</name>
+                                            <expression>{Template_OS_Windows_Serveur:icmpping[,2,,,2000].nodata(180,strict)}=0 and {Template_OS_Windows_Serveur:icmpping[,2,,,2000].sum({$DOWN_CRITICAL})}=0 and {Template_OS_Windows_Serveur:icmpping[,2,,,2000].dayofweek(0)}&gt;={$PING_ALERT_FROM_DAY} and {Template_OS_Windows_Serveur:icmpping[,2,,,2000].dayofweek(0)}&lt;={$PING_ALERT_TO_DAY} and {Template_OS_Windows_Serveur:icmpping[,2,,,2000].time(0)}&gt;={$PING_ALERT_FROM_HOUR} and {Template_OS_Windows_Serveur:icmpping[,2,,,2000].time(0)}&lt;={$PING_ALERT_TO_HOUR}</expression>
+                                            <recovery_expression>{Template_OS_Windows_Serveur:icmpping[,2,,,2000].sum(180)}&gt;3</recovery_expression>
+                                        </dependency>
+                                        <dependency>
+                                            <name>Zabbix agent unavailable</name>
+                                            <expression>{Template_OS_Windows_Serveur:agent.ping.nodata({$ZBX_UNREACHABLE_TIMEOUT})}=1</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>MegaRAID : BBU of adapter {#ADAPTER_ID} : Design capacity</name>
+                            <key>raid.megaraid.bbu[{#ADAPTER_ID},design_capacity]</key>
+                            <delay>30m</delay>
+                            <history>30d</history>
+                            <units>mAh</units>
+                            <applications>
+                                <application>
+                                    <name>Disks</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>MegaRAID : BBU of adapter {#ADAPTER_ID} : Full capacity</name>
+                            <key>raid.megaraid.bbu[{#ADAPTER_ID},full_capacity]</key>
+                            <delay>30m</delay>
+                            <history>30d</history>
+                            <units>mAh</units>
+                            <applications>
+                                <application>
+                                    <name>Disks</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                    <trigger_prototypes>
+                        <trigger_prototype>
+                            <expression>{Template_OS_Windows_Serveur:raid.megaraid.bbu[{#ADAPTER_ID},full_capacity].last()}&lt;({Template_OS_Windows_Serveur:raid.megaraid.bbu[{#ADAPTER_ID},design_capacity].last()}/2)</expression>
+                            <name>BBU on adapter {#ADAPTER_ID} capacity is less than 50%</name>
+                            <priority>AVERAGE</priority>
+                        </trigger_prototype>
+                    </trigger_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>Megaraid discovery: pdisks</name>
+                    <key>raid.megaraid.discovery[pdisk]</key>
+                    <delay>3h</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>MegaRAID : Disk [{#ENCLOSURE_ID}:{#PDRIVE_ID}] on adapter {#ADAPTER_ID} : State</name>
+                            <key>raid.megaraid.pdisk[{#ADAPTER_ID},{#ENCLOSURE_ID},{#PDRIVE_ID},firmware_state]</key>
+                            <delay>15m</delay>
+                            <history>30d</history>
+                            <applications>
+                                <application>
+                                    <name>Disks</name>
+                                </application>
+                            </applications>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}&lt;&gt;0</expression>
+                                    <name>Drive [{#ENCLOSURE_ID},{#PDRIVE_ID}] on adapter {#ADAPTER_ID} has an issue</name>
+                                    <priority>AVERAGE</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>Drive [{#ENCLOSURE_ID},{#PDRIVE_ID}] on adapter {#ADAPTER_ID} is rebuilding</name>
+                                            <expression>{Template_OS_Windows_Serveur:raid.megaraid.pdisk[{#ADAPTER_ID},{#ENCLOSURE_ID},{#PDRIVE_ID},firmware_state].last()}=2</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{last()}=2</expression>
+                                    <name>Drive [{#ENCLOSURE_ID},{#PDRIVE_ID}] on adapter {#ADAPTER_ID} is rebuilding</name>
+                                    <priority>WARNING</priority>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{nodata(2h)}=1</expression>
+                                    <name>Drive [{#ENCLOSURE_ID},{#PDRIVE_ID}] on adapter {#ADAPTER_ID} not checked recently</name>
+                                    <priority>WARNING</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>No ping information received in last 3 minutes</name>
+                                            <expression>{Template_OS_Windows_Serveur:icmpping[,2,,,2000].nodata(180,strict)}=1</expression>
+                                        </dependency>
+                                        <dependency>
+                                            <name>No ping response from {HOST.IP1}</name>
+                                            <expression>{Template_OS_Windows_Serveur:icmpping[,2,,,2000].nodata(180,strict)}=0 and {Template_OS_Windows_Serveur:icmpping[,2,,,2000].sum({$DOWN_CRITICAL})}=0 and {Template_OS_Windows_Serveur:icmpping[,2,,,2000].dayofweek(0)}&gt;={$PING_ALERT_FROM_DAY} and {Template_OS_Windows_Serveur:icmpping[,2,,,2000].dayofweek(0)}&lt;={$PING_ALERT_TO_DAY} and {Template_OS_Windows_Serveur:icmpping[,2,,,2000].time(0)}&gt;={$PING_ALERT_FROM_HOUR} and {Template_OS_Windows_Serveur:icmpping[,2,,,2000].time(0)}&lt;={$PING_ALERT_TO_HOUR}</expression>
+                                            <recovery_expression>{Template_OS_Windows_Serveur:icmpping[,2,,,2000].sum(180)}&gt;3</recovery_expression>
+                                        </dependency>
+                                        <dependency>
+                                            <name>Zabbix agent unavailable</name>
+                                            <expression>{Template_OS_Windows_Serveur:agent.ping.nodata({$ZBX_UNREACHABLE_TIMEOUT})}=1</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>MegaRAID : Disk [{#ENCLOSURE_ID}:{#PDRIVE_ID}] on adapter {#ADAPTER_ID} : Media Errors</name>
+                            <key>raid.megaraid.pdisk[{#ADAPTER_ID},{#ENCLOSURE_ID},{#PDRIVE_ID},media_errors]</key>
+                            <delay>15m</delay>
+                            <history>30d</history>
+                            <units>!errors</units>
+                            <applications>
+                                <application>
+                                    <name>Disks</name>
+                                </application>
+                            </applications>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{diff()}=1</expression>
+                                    <recovery_mode>NONE</recovery_mode>
+                                    <name>Drive [{#ENCLOSURE_ID},{#PDRIVE_ID}] on adapter {#ADAPTER_ID} has {ITEM.LASTVALUE1} (media)</name>
+                                    <priority>WARNING</priority>
+                                    <manual_close>YES</manual_close>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>MegaRAID : Disk [{#ENCLOSURE_ID}:{#PDRIVE_ID}] on adapter {#ADAPTER_ID} : Predictive errors</name>
+                            <key>raid.megaraid.pdisk[{#ADAPTER_ID},{#ENCLOSURE_ID},{#PDRIVE_ID},predictive_errors]</key>
+                            <delay>15m</delay>
+                            <history>30d</history>
+                            <units>!errors</units>
+                            <applications>
+                                <application>
+                                    <name>Disks</name>
+                                </application>
+                            </applications>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{diff()}=1</expression>
+                                    <recovery_mode>NONE</recovery_mode>
+                                    <name>Drive [{#ENCLOSURE_ID},{#PDRIVE_ID}] on adapter {#ADAPTER_ID} has {ITEM.LASTVALUE1} (predictive)</name>
+                                    <priority>WARNING</priority>
+                                    <manual_close>YES</manual_close>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>Megaraid discovery: vdisks</name>
+                    <key>raid.megaraid.discovery[vdisk]</key>
+                    <delay>12h</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>MegaRAID : vdisk {#VDRIVE_ID} on adapter {#ADAPTER_ID} : State</name>
+                            <key>raid.megaraid.vdisk[{#ADAPTER_ID},{#VDRIVE_ID},vd_state]</key>
+                            <delay>15m</delay>
+                            <history>30d</history>
+                            <applications>
+                                <application>
+                                    <name>Disks</name>
+                                </application>
+                            </applications>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}&lt;&gt;0</expression>
+                                    <name>Virtual drive {#VDRIVE_ID} on adapter {#ADAPTER_ID} is not optimal</name>
+                                    <priority>HIGH</priority>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{nodata(2h)}=1</expression>
+                                    <name>Virtual drive {#VDRIVE_ID} on adapter {#ADAPTER_ID} not checked recently</name>
+                                    <priority>WARNING</priority>
+                                    <dependencies>
+                                        <dependency>
+                                            <name>No ping information received in last 3 minutes</name>
+                                            <expression>{Template_OS_Windows_Serveur:icmpping[,2,,,2000].nodata(180,strict)}=1</expression>
+                                        </dependency>
+                                        <dependency>
+                                            <name>No ping response from {HOST.IP1}</name>
+                                            <expression>{Template_OS_Windows_Serveur:icmpping[,2,,,2000].nodata(180,strict)}=0 and {Template_OS_Windows_Serveur:icmpping[,2,,,2000].sum({$DOWN_CRITICAL})}=0 and {Template_OS_Windows_Serveur:icmpping[,2,,,2000].dayofweek(0)}&gt;={$PING_ALERT_FROM_DAY} and {Template_OS_Windows_Serveur:icmpping[,2,,,2000].dayofweek(0)}&lt;={$PING_ALERT_TO_DAY} and {Template_OS_Windows_Serveur:icmpping[,2,,,2000].time(0)}&gt;={$PING_ALERT_FROM_HOUR} and {Template_OS_Windows_Serveur:icmpping[,2,,,2000].time(0)}&lt;={$PING_ALERT_TO_HOUR}</expression>
+                                            <recovery_expression>{Template_OS_Windows_Serveur:icmpping[,2,,,2000].sum(180)}&gt;3</recovery_expression>
+                                        </dependency>
+                                        <dependency>
+                                            <name>Zabbix agent unavailable</name>
+                                            <expression>{Template_OS_Windows_Serveur:agent.ping.nodata({$ZBX_UNREACHABLE_TIMEOUT})}=1</expression>
+                                        </dependency>
+                                    </dependencies>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+            </discovery_rules>
+            <macros>
+                <macro>
+                    <macro>{$LOAD_COEF}</macro>
+                    <value>1</value>
+                </macro>
+                <macro>
+                    <macro>{$MAX_PROCESSES}</macro>
+                    <value>200</value>
+                </macro>
+                <macro>
+                    <macro>{$REBOOT_WARN}</macro>
+                    <value>21600</value>
+                </macro>
+                <macro>
+                    <macro>{$ZBX_UNREACHABLE_TIMEOUT}</macro>
+                    <value>900</value>
+                </macro>
+            </macros>
+        </template>
+    </templates>
+    <triggers>
+        <trigger>
+            <expression>({Template_OS_Windows_Serveur:system.cpu.load[,avg1].avg(900)}&gt;({Template_OS_Windows_Serveur:system.cpu.num[].last(0)}*3*{$LOAD_COEF})) or ({Template_OS_Windows_Serveur:system.cpu.load[,avg1].avg(1800)}&gt;({Template_OS_Windows_Serveur:system.cpu.num[].last(0)}*2.5*{$LOAD_COEF})) or ({Template_OS_Windows_Serveur:system.cpu.load[,avg1].avg(7200)}&gt;({Template_OS_Windows_Serveur:system.cpu.num[].last(0)}*1.2*{$LOAD_COEF}))</expression>
+            <name>High CPU load</name>
+            <priority>INFO</priority>
+        </trigger>
+        <trigger>
+            <expression>{Template_OS_Windows_Serveur:proc.num[].last(0)}&gt;{$MAX_PROCESSES}</expression>
+            <name>Too many processes</name>
+            <priority>AVERAGE</priority>
+        </trigger>
+        <trigger>
+            <expression>{Template_OS_Windows_Serveur:agent.ping.nodata({$ZBX_UNREACHABLE_TIMEOUT})}=1</expression>
+            <name>Zabbix agent unavailable</name>
+            <priority>DISASTER</priority>
+            <dependencies>
+                <dependency>
+                    <name>No ping response from {HOST.IP1}</name>
+                    <expression>{Template_OS_Windows_Serveur:icmpping[,2,,,2000].nodata(180,strict)}=0 and {Template_OS_Windows_Serveur:icmpping[,2,,,2000].sum({$DOWN_CRITICAL})}=0 and {Template_OS_Windows_Serveur:icmpping[,2,,,2000].dayofweek(0)}&gt;={$PING_ALERT_FROM_DAY} and {Template_OS_Windows_Serveur:icmpping[,2,,,2000].dayofweek(0)}&lt;={$PING_ALERT_TO_DAY} and {Template_OS_Windows_Serveur:icmpping[,2,,,2000].time(0)}&gt;={$PING_ALERT_FROM_HOUR} and {Template_OS_Windows_Serveur:icmpping[,2,,,2000].time(0)}&lt;={$PING_ALERT_TO_HOUR}</expression>
+                    <recovery_expression>{Template_OS_Windows_Serveur:icmpping[,2,,,2000].sum(180)}&gt;3</recovery_expression>
+                </dependency>
+            </dependencies>
+        </trigger>
+        <trigger>
+            <expression>{Template_OS_Windows_Serveur:system.uptime.last(0)}&lt;{$REBOOT_WARN}</expression>
+            <name>{HOSTNAME} rebooted {ITEM.LASTVALUE1} ago</name>
+            <priority>INFO</priority>
+        </trigger>
+    </triggers>
+</zabbix_export>

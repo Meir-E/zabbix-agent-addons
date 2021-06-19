@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-    <version>4.4</version>
-    <date>2020-03-02T14:24:14Z</date>
+    <version>5.0</version>
+    <date>2021-06-19T12:12:25Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -347,6 +347,7 @@
                                     <expression>{str(true)}=0</expression>
                                     <name>AP {#UNIFI_DEV_NAME} is waiting adoption</name>
                                     <priority>WARNING</priority>
+                                    <manual_close>YES</manual_close>
                                 </trigger_prototype>
                             </trigger_prototypes>
                         </item_prototype>
@@ -914,7 +915,7 @@
                                 </step>
                                 <step>
                                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>1d</params>
+                                    <params>1h</params>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -926,6 +927,7 @@
                                     <expression>{diff()}=1</expression>
                                     <name>AP {#UNIFI_DEV_NAME} received a new config</name>
                                     <priority>INFO</priority>
+                                    <manual_close>YES</manual_close>
                                 </trigger_prototype>
                             </trigger_prototypes>
                         </item_prototype>
@@ -1158,6 +1160,7 @@
                                     <expression>{diff()}=1</expression>
                                     <name>AP {#UNIFI_AP_NAME} changed its inform URL ({ITEM.LASTVALUE1})</name>
                                     <priority>AVERAGE</priority>
+                                    <manual_close>YES</manual_close>
                                 </trigger_prototype>
                             </trigger_prototypes>
                         </item_prototype>
@@ -1189,6 +1192,7 @@
                                     <expression>{last()}&gt;{$UNIFI_LAST_SEEN_WARN}</expression>
                                     <name>No contact with AP {#UNIFI_DEV_NAME} since {ITEM.LASTVALUE1}</name>
                                     <priority>AVERAGE</priority>
+                                    <manual_close>YES</manual_close>
                                 </trigger_prototype>
                             </trigger_prototypes>
                         </item_prototype>
@@ -1296,6 +1300,7 @@
                                     <expression>{str(false)}=0</expression>
                                     <name>AP {#UNIFI_DEV_NAME} location is enabled</name>
                                     <priority>WARNING</priority>
+                                    <manual_close>YES</manual_close>
                                 </trigger_prototype>
                             </trigger_prototypes>
                         </item_prototype>
@@ -1875,6 +1880,7 @@
                                     <expression>{last()}&lt;2h</expression>
                                     <name>AP {#UNIFI_DEV_NAME} rebooted</name>
                                     <priority>INFO</priority>
+                                    <manual_close>YES</manual_close>
                                 </trigger_prototype>
                             </trigger_prototypes>
                         </item_prototype>
@@ -2060,7 +2066,7 @@
                                 </step>
                                 <step>
                                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>1d</params>
+                                    <params>1h</params>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2072,6 +2078,7 @@
                                     <expression>{diff()}=1</expression>
                                     <name>AP {#UNIFI_DEV_NAME} changed firmware version ({ITEM.LASTVALUE1})</name>
                                     <priority>WARNING</priority>
+                                    <manual_close>YES</manual_close>
                                 </trigger_prototype>
                             </trigger_prototypes>
                         </item_prototype>
@@ -2398,6 +2405,7 @@
                                     <expression>{str(true)}=0</expression>
                                     <name>Switch {#UNIFI_DEV_NAME} is waiting adoption</name>
                                     <priority>WARNING</priority>
+                                    <manual_close>YES</manual_close>
                                 </trigger_prototype>
                             </trigger_prototypes>
                         </item_prototype>
@@ -2421,7 +2429,7 @@
                                 </step>
                                 <step>
                                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>1d</params>
+                                    <params>1h</params>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -2433,6 +2441,7 @@
                                     <expression>{diff()}=1</expression>
                                     <name>Switch {#UNIFI_DEV_NAME} received a new configuration</name>
                                     <priority>INFO</priority>
+                                    <manual_close>YES</manual_close>
                                 </trigger_prototype>
                             </trigger_prototypes>
                         </item_prototype>
@@ -2531,6 +2540,7 @@
                                     <expression>{last()}&gt;{$UNIFI_LAST_SEEN_WARN}</expression>
                                     <name>No contact with switch {#UNIFI_DEV_NAME} since {ITEM.LASTVALUE1}</name>
                                     <priority>WARNING</priority>
+                                    <manual_close>YES</manual_close>
                                 </trigger_prototype>
                             </trigger_prototypes>
                         </item_prototype>
@@ -2638,6 +2648,7 @@
                                     <expression>{str(false)}=0</expression>
                                     <name>Switch {#UNIFI_DEV_NAME} has location enabed</name>
                                     <priority>WARNING</priority>
+                                    <manual_close>YES</manual_close>
                                 </trigger_prototype>
                             </trigger_prototypes>
                         </item_prototype>
@@ -2992,6 +3003,7 @@
                                     <expression>{last()}&lt;2h</expression>
                                     <name>Switch {#UNIFI_DEV_NAME} rebooted</name>
                                     <priority>INFO</priority>
+                                    <manual_close>YES</manual_close>
                                 </trigger_prototype>
                             </trigger_prototypes>
                         </item_prototype>
@@ -3015,7 +3027,7 @@
                                 </step>
                                 <step>
                                     <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>1d</params>
+                                    <params>1h</params>
                                 </step>
                             </preprocessing>
                             <master_item>
@@ -3027,6 +3039,7 @@
                                     <expression>{diff()}=1</expression>
                                     <name>Firmware version of switch {#UNIFI_DEV_NAME} changed ({ITEM.LASTVALUE1})</name>
                                     <priority>WARNING</priority>
+                                    <manual_close>YES</manual_close>
                                 </trigger_prototype>
                             </trigger_prototypes>
                         </item_prototype>
@@ -4917,7 +4930,7 @@
                 </macro>
                 <macro>
                     <macro>{$UNIFI_NOISE_WARN}</macro>
-                    <value>-85</value>
+                    <value>-82</value>
                 </macro>
                 <macro>
                     <macro>{$UNIFI_PASS}</macro>

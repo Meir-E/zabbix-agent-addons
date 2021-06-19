@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-    <version>4.4</version>
-    <date>2020-03-02T14:08:55Z</date>
+    <version>5.0</version>
+    <date>2021-06-19T12:17:25Z</date>
     <groups>
         <group>
             <name>Modèles</name>
@@ -46,12 +46,16 @@
                 <application>
                     <name>Processus</name>
                 </application>
+                <application>
+                    <name>System</name>
+                </application>
             </applications>
             <items>
                 <item>
                     <name>TCP ping of the agent</name>
                     <key>agent.ping</key>
                     <delay>5m</delay>
+                    <history>60d</history>
                     <trends>1825d</trends>
                     <applications>
                         <application>
@@ -70,7 +74,7 @@
                             <dependencies>
                                 <dependency>
                                     <name>No ping response from {HOST.IP1}</name>
-                                    <expression>{Template_OS_PfSense2:icmpping[,2,,,2000].sum({$DOWN_CRITICAL})}=0 and {Template_OS_PfSense2:icmpping[,2,,,2000].dayofweek(0)}&gt;={$PING_ALERT_FROM_DAY} and {Template_OS_PfSense2:icmpping[,2,,,2000].dayofweek(0)}&lt;={$PING_ALERT_TO_DAY} and {Template_OS_PfSense2:icmpping[,2,,,2000].time(0)}&gt;={$PING_ALERT_FROM_HOUR} and {Template_OS_PfSense2:icmpping[,2,,,2000].time(0)}&lt;={$PING_ALERT_TO_HOUR}</expression>
+                                    <expression>{Template_OS_PfSense2:icmpping[,2,,,2000].nodata(180,strict)}=0 and {Template_OS_PfSense2:icmpping[,2,,,2000].sum({$DOWN_CRITICAL})}=0 and {Template_OS_PfSense2:icmpping[,2,,,2000].dayofweek(0)}&gt;={$PING_ALERT_FROM_DAY} and {Template_OS_PfSense2:icmpping[,2,,,2000].dayofweek(0)}&lt;={$PING_ALERT_TO_DAY} and {Template_OS_PfSense2:icmpping[,2,,,2000].time(0)}&gt;={$PING_ALERT_FROM_HOUR} and {Template_OS_PfSense2:icmpping[,2,,,2000].time(0)}&lt;={$PING_ALERT_TO_HOUR}</expression>
                                     <recovery_expression>{Template_OS_PfSense2:icmpping[,2,,,2000].sum(180)}&gt;3</recovery_expression>
                                 </dependency>
                             </dependencies>
@@ -80,21 +84,34 @@
                 <item>
                     <name>Maximum number of opened files</name>
                     <key>kernel.maxfiles</key>
-                    <delay>1h</delay>
-                    <history>30d</history>
-                    <trends>0</trends>
-                    <units>fichiers</units>
+                    <delay>2h</delay>
+                    <history>60d</history>
+                    <trends>1825d</trends>
+                    <description>It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.</description>
                     <applications>
                         <application>
-                            <name>Processus</name>
+                            <name>System</name>
                         </application>
                     </applications>
-                    <request_method>POST</request_method>
+                </item>
+                <item>
+                    <name>Maximum number of processes</name>
+                    <key>kernel.maxproc</key>
+                    <delay>2h</delay>
+                    <history>60d</history>
+                    <trends>1825d</trends>
+                    <description>It could be increased by using sysctrl utility or modifying file /etc/sysctl.conf.</description>
+                    <applications>
+                        <application>
+                            <name>System</name>
+                        </application>
+                    </applications>
                 </item>
                 <item>
                     <name>DNS Resolution response for $2</name>
                     <key>net.dns.record[127.0.0.1,{$DNS_NAME_CHECK},A,,]</key>
-                    <history>30d</history>
+                    <delay>5m</delay>
+                    <history>15d</history>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
                     <applications>
@@ -108,7 +125,7 @@
                     <name>DNS resolution for $2 is working</name>
                     <key>net.dns[127.0.0.1,{$DNS_NAME_CHECK},A,,]</key>
                     <delay>5m</delay>
-                    <history>30d</history>
+                    <history>15d</history>
                     <trends>0</trends>
                     <applications>
                         <application>
@@ -125,22 +142,178 @@
                     </triggers>
                 </item>
                 <item>
-                    <name>Opened files</name>
-                    <key>openfiles.num</key>
+                    <name>MBUF Cache</name>
+                    <key>pfsense.mbuf.cache</key>
                     <delay>5m</delay>
+                    <history>60d</history>
                     <trends>1825d</trends>
-                    <units>fichiers</units>
                     <applications>
                         <application>
-                            <name>Processus</name>
+                            <name>Memory</name>
+                        </application>
+                        <application>
+                            <name>Network</name>
                         </application>
                     </applications>
-                    <request_method>POST</request_method>
+                </item>
+                <item>
+                    <name>MBUF Current</name>
+                    <key>pfsense.mbuf.current</key>
+                    <delay>5m</delay>
+                    <history>60d</history>
+                    <trends>1825d</trends>
+                    <applications>
+                        <application>
+                            <name>Memory</name>
+                        </application>
+                        <application>
+                            <name>Network</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>MBUF Max</name>
+                    <key>pfsense.mbuf.max</key>
+                    <delay>1h</delay>
+                    <history>60d</history>
+                    <trends>1825d</trends>
+                    <applications>
+                        <application>
+                            <name>Memory</name>
+                        </application>
+                        <application>
+                            <name>Network</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>MBUF Total Used (percent)</name>
+                    <type>CALCULATED</type>
+                    <key>pfsense.mbuf.ptotal</key>
+                    <delay>5m</delay>
+                    <history>60d</history>
+                    <trends>1825d</trends>
+                    <params>((last(pfsense.mbuf.current) + last(pfsense.mbuf.cache)) * 100) / last(pfsense.mbuf.max)</params>
+                    <applications>
+                        <application>
+                            <name>Memory</name>
+                        </application>
+                        <application>
+                            <name>Network</name>
+                        </application>
+                    </applications>
+                    <triggers>
+                        <trigger>
+                            <expression>{last()}&gt;80</expression>
+                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                            <recovery_expression>{last()}&lt;75</recovery_expression>
+                            <name>MBUF used at {ITEM.LASTVALUE1}</name>
+                            <priority>WARNING</priority>
+                            <dependencies>
+                                <dependency>
+                                    <name>MBUF used at {ITEM.LASTVALUE1}</name>
+                                    <expression>{Template_OS_PfSense2:pfsense.mbuf.ptotal.last()}&gt;90</expression>
+                                    <recovery_expression>{Template_OS_PfSense2:pfsense.mbuf.ptotal.last()}&lt;85</recovery_expression>
+                                </dependency>
+                            </dependencies>
+                        </trigger>
+                        <trigger>
+                            <expression>{last()}&gt;90</expression>
+                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                            <recovery_expression>{last()}&lt;85</recovery_expression>
+                            <name>MBUF used at {ITEM.LASTVALUE1}</name>
+                            <priority>HIGH</priority>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>States Table Current</name>
+                    <key>pfsense.states.current</key>
+                    <delay>2m</delay>
+                    <history>60d</history>
+                    <trends>1825d</trends>
+                    <applications>
+                        <application>
+                            <name>Memory</name>
+                        </application>
+                    </applications>
+                </item>
+                <item>
+                    <name>States Table Max</name>
+                    <key>pfsense.states.max</key>
+                    <delay>10m</delay>
+                    <history>60d</history>
+                    <trends>1825d</trends>
+                    <applications>
+                        <application>
+                            <name>Memory</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                            <params>2h</params>
+                        </step>
+                    </preprocessing>
+                </item>
+                <item>
+                    <name>States Table Current (percent)</name>
+                    <type>CALCULATED</type>
+                    <key>pfsense.states.pused</key>
+                    <delay>2m</delay>
+                    <history>60d</history>
+                    <trends>1825d</trends>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <params>(last(pfsense.states.current) * 100) / last(pfsense.states.max)</params>
+                    <applications>
+                        <application>
+                            <name>Memory</name>
+                        </application>
+                    </applications>
+                    <triggers>
+                        <trigger>
+                            <expression>{last()}&gt;80</expression>
+                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                            <recovery_expression>{last()}&lt;75</recovery_expression>
+                            <name>States table used at {ITEM.LASTVALUE1}</name>
+                            <priority>WARNING</priority>
+                            <dependencies>
+                                <dependency>
+                                    <name>States table used at {ITEM.LASTVALUE1}</name>
+                                    <expression>{Template_OS_PfSense2:pfsense.states.pused.last()}&gt;90</expression>
+                                    <recovery_expression>{Template_OS_PfSense2:pfsense.states.pused.last()}&lt;85</recovery_expression>
+                                </dependency>
+                            </dependencies>
+                        </trigger>
+                        <trigger>
+                            <expression>{last()}&gt;90</expression>
+                            <recovery_mode>RECOVERY_EXPRESSION</recovery_mode>
+                            <recovery_expression>{last()}&lt;85</recovery_expression>
+                            <name>States table used at {ITEM.LASTVALUE1}</name>
+                            <priority>HIGH</priority>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>pfSense Installed Version</name>
+                    <key>pfsense.value[system,installed_version]</key>
+                    <delay>1h</delay>
+                    <history>60d</history>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <preprocessing>
+                        <step>
+                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                            <params>1d</params>
+                        </step>
+                    </preprocessing>
                 </item>
                 <item>
                     <name>Number of active processes</name>
                     <key>proc.num[,,run]</key>
                     <delay>2m</delay>
+                    <history>60d</history>
                     <trends>1825d</trends>
                     <units>processus</units>
                     <applications>
@@ -161,7 +334,7 @@
                     <name>Number of sshd processes</name>
                     <key>proc.num[sshd]</key>
                     <delay>5m</delay>
-                    <history>30d</history>
+                    <history>60d</history>
                     <trends>0</trends>
                     <applications>
                         <application>
@@ -181,6 +354,7 @@
                     <name>Number of processes</name>
                     <key>proc.num[]</key>
                     <delay>5m</delay>
+                    <history>60d</history>
                     <trends>1825d</trends>
                     <units>processus</units>
                     <request_method>POST</request_method>
@@ -195,6 +369,7 @@
                 <item>
                     <name>CPU Load</name>
                     <key>system.cpu.load[,avg1]</key>
+                    <history>60d</history>
                     <trends>1825d</trends>
                     <value_type>FLOAT</value_type>
                     <applications>
@@ -208,6 +383,7 @@
                     <name>CPU Load (5min)</name>
                     <key>system.cpu.load[,avg5]</key>
                     <delay>5m</delay>
+                    <history>60d</history>
                     <trends>1825d</trends>
                     <value_type>FLOAT</value_type>
                     <applications>
@@ -221,6 +397,7 @@
                     <name>CPU Load (15min)</name>
                     <key>system.cpu.load[,avg15]</key>
                     <delay>15m</delay>
+                    <history>60d</history>
                     <trends>1825d</trends>
                     <value_type>FLOAT</value_type>
                     <applications>
@@ -231,9 +408,29 @@
                     <request_method>POST</request_method>
                 </item>
                 <item>
+                    <name>Context switches per second</name>
+                    <key>system.cpu.switches</key>
+                    <delay>60</delay>
+                    <history>60d</history>
+                    <trends>1825d</trends>
+                    <units>sps</units>
+                    <applications>
+                        <application>
+                            <name>Processor</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>CHANGE_PER_SECOND</type>
+                            <params/>
+                        </step>
+                    </preprocessing>
+                </item>
+                <item>
                     <name>CPU usage: $2</name>
                     <key>system.cpu.util[,interrupt,avg1]</key>
                     <delay>45s</delay>
+                    <history>60d</history>
                     <trends>1825d</trends>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
@@ -248,6 +445,7 @@
                     <name>CPU usage: $2</name>
                     <key>system.cpu.util[,nice,avg1]</key>
                     <delay>45s</delay>
+                    <history>60d</history>
                     <trends>1825d</trends>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
@@ -262,6 +460,7 @@
                     <name>CPU usage: $2</name>
                     <key>system.cpu.util[,system,avg1]</key>
                     <delay>45s</delay>
+                    <history>60d</history>
                     <trends>1825d</trends>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
@@ -276,6 +475,7 @@
                     <name>CPU usage: $2</name>
                     <key>system.cpu.util[,user,avg1]</key>
                     <delay>45s</delay>
+                    <history>60d</history>
                     <trends>1825d</trends>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
@@ -291,6 +491,7 @@
                     <type>CALCULATED</type>
                     <key>system.swap.size.used</key>
                     <delay>10m</delay>
+                    <history>60d</history>
                     <trends>1825d</trends>
                     <units>B</units>
                     <params>last(&quot;system.swap.size[,total]&quot;)-last(&quot;system.swap.size[,free]&quot;)</params>
@@ -305,6 +506,7 @@
                     <name>Swap: $2</name>
                     <key>system.swap.size[,free]</key>
                     <delay>10m</delay>
+                    <history>60d</history>
                     <trends>1825d</trends>
                     <units>B</units>
                     <applications>
@@ -316,10 +518,10 @@
                 </item>
                 <item>
                     <name>Free swap space in %</name>
-                    <snmp_community>public</snmp_community>
                     <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
                     <key>system.swap.size[,pfree]</key>
                     <delay>5m</delay>
+                    <history>60d</history>
                     <trends>1825d</trends>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
@@ -329,6 +531,7 @@
                     <name>Swap: $2</name>
                     <key>system.swap.size[,pused]</key>
                     <delay>10m</delay>
+                    <history>60d</history>
                     <trends>1825d</trends>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
@@ -350,6 +553,7 @@
                     <name>Swap: $2</name>
                     <key>system.swap.size[,total]</key>
                     <delay>1h</delay>
+                    <history>60d</history>
                     <trends>1825d</trends>
                     <units>B</units>
                     <applications>
@@ -363,13 +567,14 @@
                     <name>Uptime</name>
                     <key>system.uptime</key>
                     <delay>10m</delay>
+                    <history>60d</history>
                     <trends>1825d</trends>
                     <units>s</units>
                     <request_method>POST</request_method>
                     <triggers>
                         <trigger>
-                            <expression>({last(0)}&lt;{$REBOOT_WARN_DAY} and ({last(0)}&gt;090000 and {last(0)}&lt;230000)) or ({last(0)}&lt;{$REBOOT_WARN_NIGHT} and ({last(0)}&gt;230000 or {last(0)}&lt;090000))</expression>
-                            <name>{HOSTNAME} rebooted {ITEM.LASTVALUE1} ago</name>
+                            <expression>({last(0)}&lt;{$REBOOT_WARN_DAY} and ({time(0)}&gt;090000 and {time(0)}&lt;230000)) or ({last(0)}&lt;{$REBOOT_WARN_NIGHT} and ({time(0)}&gt;230000 or {time(0)}&lt;090000))</expression>
+                            <name>System has rebooted</name>
                             <priority>INFO</priority>
                         </trigger>
                     </triggers>
@@ -378,7 +583,13 @@
                     <name>Connected users</name>
                     <key>system.users.num</key>
                     <delay>5m</delay>
+                    <history>60d</history>
                     <trends>1825d</trends>
+                    <applications>
+                        <application>
+                            <name>System</name>
+                        </application>
+                    </applications>
                     <request_method>POST</request_method>
                     <triggers>
                         <trigger>
@@ -440,6 +651,7 @@
                 <item>
                     <name>Memory: $1</name>
                     <key>vm.memory.size[active]</key>
+                    <history>60d</history>
                     <trends>1825d</trends>
                     <units>B</units>
                     <applications>
@@ -452,6 +664,7 @@
                 <item>
                     <name>Memory: $1</name>
                     <key>vm.memory.size[buffers]</key>
+                    <history>60d</history>
                     <trends>1825d</trends>
                     <units>B</units>
                     <applications>
@@ -464,6 +677,7 @@
                 <item>
                     <name>Memory: $1</name>
                     <key>vm.memory.size[cached]</key>
+                    <history>60d</history>
                     <trends>1825d</trends>
                     <units>B</units>
                     <applications>
@@ -476,6 +690,7 @@
                 <item>
                     <name>Memory: $1</name>
                     <key>vm.memory.size[free]</key>
+                    <history>60d</history>
                     <trends>1825d</trends>
                     <units>B</units>
                     <applications>
@@ -488,6 +703,7 @@
                 <item>
                     <name>Memory: $1</name>
                     <key>vm.memory.size[inactive]</key>
+                    <history>60d</history>
                     <trends>1825d</trends>
                     <units>B</units>
                     <applications>
@@ -501,6 +717,7 @@
                     <name>Memory: $1</name>
                     <type>CALCULATED</type>
                     <key>vm.memory.size[pfree]</key>
+                    <history>60d</history>
                     <trends>1825d</trends>
                     <units>%</units>
                     <params>100*last(&quot;vm.memory.size[free]&quot;)/last(&quot;vm.memory.size[total]&quot;)</params>
@@ -515,6 +732,7 @@
                     <name>Memory: $1</name>
                     <type>CALCULATED</type>
                     <key>vm.memory.size[pused]</key>
+                    <history>60d</history>
                     <trends>1825d</trends>
                     <units>%</units>
                     <params>100*last(&quot;vm.memory.size[used]&quot;)/last(&quot;vm.memory.size[total]&quot;)</params>
@@ -523,6 +741,7 @@
                 <item>
                     <name>Memory: $1</name>
                     <key>vm.memory.size[shared]</key>
+                    <history>60d</history>
                     <trends>1825d</trends>
                     <units>B</units>
                     <applications>
@@ -536,6 +755,7 @@
                     <name>Memory: $1</name>
                     <key>vm.memory.size[total]</key>
                     <delay>1h</delay>
+                    <history>60d</history>
                     <trends>1825d</trends>
                     <units>B</units>
                     <applications>
@@ -548,6 +768,7 @@
                 <item>
                     <name>Memory: $1</name>
                     <key>vm.memory.size[used]</key>
+                    <history>60d</history>
                     <trends>1825d</trends>
                     <units>B</units>
                     <applications>
@@ -560,6 +781,7 @@
                 <item>
                     <name>Memory: $1</name>
                     <key>vm.memory.size[wired]</key>
+                    <history>60d</history>
                     <trends>1825d</trends>
                     <units>B</units>
                     <applications>
@@ -572,8 +794,116 @@
             </items>
             <discovery_rules>
                 <discovery_rule>
+                    <name>Gateway discovery</name>
+                    <key>pfsense.discovery[gw]</key>
+                    <delay>1h</delay>
+                    <lifetime>1d</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>Gateway $2 RTT</name>
+                            <key>pfsense.value[gw_value,{#GATEWAY},delay]</key>
+                            <delay>3m</delay>
+                            <history>30d</history>
+                            <trends>1825d</trends>
+                            <value_type>FLOAT</value_type>
+                            <units>s</units>
+                            <applications>
+                                <application>
+                                    <name>Network</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>RTRIM</type>
+                                    <params>ms</params>
+                                </step>
+                                <step>
+                                    <type>MULTIPLIER</type>
+                                    <params>0.001</params>
+                                </step>
+                            </preprocessing>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Gateway $2 Packet  Loss</name>
+                            <key>pfsense.value[gw_value,{#GATEWAY},loss]</key>
+                            <delay>3m</delay>
+                            <history>60d</history>
+                            <trends>1825d</trends>
+                            <value_type>FLOAT</value_type>
+                            <units>%</units>
+                            <applications>
+                                <application>
+                                    <name>Network</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>RTRIM</type>
+                                    <params>%</params>
+                                </step>
+                            </preprocessing>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Gateway $2 Status</name>
+                            <key>pfsense.value[gw_value,{#GATEWAY},status]</key>
+                            <delay>3m</delay>
+                            <history>30d</history>
+                            <trends>1825d</trends>
+                            <applications>
+                                <application>
+                                    <name>Network</name>
+                                </application>
+                            </applications>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{$PFS_MONITOR_GW}=1 and {last()}=5 and {last(#2)}=5</expression>
+                                    <name>Gateway {#GATEWAY} is down</name>
+                                    <priority>HIGH</priority>
+                                    <manual_close>YES</manual_close>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{$PFS_MONITOR_GW}=1 and {last()}=2 and {last(#2)}=2</expression>
+                                    <name>High Delay on gateway {#GATEWAY}</name>
+                                    <priority>WARNING</priority>
+                                    <manual_close>YES</manual_close>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{$PFS_MONITOR_GW}=1 and {last()}=3 and {last(#2)}=3</expression>
+                                    <name>High packet loss on {#GATEWAY}</name>
+                                    <priority>WARNING</priority>
+                                    <manual_close>YES</manual_close>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Gateway $2 RTT Std Deviation</name>
+                            <key>pfsense.value[gw_value,{#GATEWAY},stddev]</key>
+                            <delay>3m</delay>
+                            <history>30d</history>
+                            <trends>1825d</trends>
+                            <value_type>FLOAT</value_type>
+                            <units>s</units>
+                            <applications>
+                                <application>
+                                    <name>Network</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>RTRIM</type>
+                                    <params>ms</params>
+                                </step>
+                                <step>
+                                    <type>MULTIPLIER</type>
+                                    <params>0.001</params>
+                                </step>
+                            </preprocessing>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
                     <name>Network interface discovery</name>
-                    <key>net.if.discovery</key>
+                    <key>pfsense.discovery[interfaces]</key>
                     <delay>1h</delay>
                     <filter>
                         <conditions>
@@ -587,7 +917,7 @@
                     <lifetime>10d</lifetime>
                     <item_prototypes>
                         <item_prototype>
-                            <name>Inbound trafic on {#IFNAME}</name>
+                            <name>Inbound trafic on {#IFDESCR} ({#IFNAME})</name>
                             <key>net.if.in[{#IFNAME},bytes]</key>
                             <delay>45s</delay>
                             <trends>1825d</trends>
@@ -611,7 +941,7 @@
                             <request_method>POST</request_method>
                         </item_prototype>
                         <item_prototype>
-                            <name>Errors on inbound trafic for {#IFNAME}</name>
+                            <name>Errors on inbound trafic for {#IFDESCR} ({#IFNAME})</name>
                             <key>net.if.in[{#IFNAME},errors]</key>
                             <delay>15m</delay>
                             <trends>1825d</trends>
@@ -631,7 +961,7 @@
                             <request_method>POST</request_method>
                         </item_prototype>
                         <item_prototype>
-                            <name>Outbound trafic on {#IFNAME}</name>
+                            <name>Outbound trafic on {#IFDESCR} ({#IFNAME})</name>
                             <key>net.if.out[{#IFNAME},bytes]</key>
                             <delay>45s</delay>
                             <trends>1825d</trends>
@@ -655,7 +985,7 @@
                             <request_method>POST</request_method>
                         </item_prototype>
                         <item_prototype>
-                            <name>Errors on outbound trafic for {#IFNAME}</name>
+                            <name>Errors on outbound trafic for {#IFDESCR} ({#IFNAME})</name>
                             <key>net.if.out[{#IFNAME},errors]</key>
                             <delay>15m</delay>
                             <trends>1825d</trends>
@@ -677,9 +1007,10 @@
                     </item_prototypes>
                     <graph_prototypes>
                         <graph_prototype>
-                            <name>Network: trafic: {#IFNAME}</name>
+                            <name>Network: trafic: {#IFDESCR} ({#IFNAME})</name>
                             <graph_items>
                                 <graph_item>
+                                    <sortorder>1</sortorder>
                                     <drawtype>FILLED_REGION</drawtype>
                                     <color>009900</color>
                                     <item>
@@ -688,7 +1019,7 @@
                                     </item>
                                 </graph_item>
                                 <graph_item>
-                                    <sortorder>1</sortorder>
+                                    <sortorder>2</sortorder>
                                     <drawtype>FILLED_REGION</drawtype>
                                     <color>FF6666</color>
                                     <item>
@@ -697,7 +1028,7 @@
                                     </item>
                                 </graph_item>
                                 <graph_item>
-                                    <sortorder>2</sortorder>
+                                    <sortorder>3</sortorder>
                                     <drawtype>BOLD_LINE</drawtype>
                                     <color>EE00EE</color>
                                     <yaxisside>RIGHT</yaxisside>
@@ -707,7 +1038,7 @@
                                     </item>
                                 </graph_item>
                                 <graph_item>
-                                    <sortorder>3</sortorder>
+                                    <sortorder>4</sortorder>
                                     <drawtype>BOLD_LINE</drawtype>
                                     <color>EE00EE</color>
                                     <yaxisside>RIGHT</yaxisside>
@@ -720,6 +1051,172 @@
                         </graph_prototype>
                     </graph_prototypes>
                     <request_method>POST</request_method>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>IPsec Phase 1 Discovery</name>
+                    <key>pfsense.discovery[ipsec_ph1]</key>
+                    <delay>2h</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>IPsec Tunnel {#IKEID} {#NAME} Tunnel Disabled</name>
+                            <key>pfsense.value[ipsec_ph1,{#IKEID},disabled]</key>
+                            <delay>1h</delay>
+                            <history>60d</history>
+                            <trends>1825d</trends>
+                            <applications>
+                                <application>
+                                    <name>Network</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>IPsec Tunnel {#IKEID} {#NAME}  Phase 1 Status</name>
+                            <key>pfsense.value[ipsec_ph1,{#IKEID},status]</key>
+                            <delay>3m</delay>
+                            <history>30d</history>
+                            <trends>1825d</trends>
+                            <applications>
+                                <application>
+                                    <name>Network</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                    </item_prototypes>
+                    <trigger_prototypes>
+                        <trigger_prototype>
+                            <expression>{Template_OS_PfSense2:pfsense.value[ipsec_ph1,{#IKEID},disabled].last()}&lt;&gt;1 and {Template_OS_PfSense2:pfsense.value[ipsec_ph1,{#IKEID},status].last()}&lt;&gt;1 and {Template_OS_PfSense2:pfsense.value[ipsec_ph1,{#IKEID},status].last(#2)}&lt;&gt;1</expression>
+                            <name>IPsec Tunnel {#IKEID} ({#NAME}) Not Connected</name>
+                            <priority>WARNING</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger_prototype>
+                    </trigger_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>OpenVPN Client Discovery</name>
+                    <key>pfsense.discovery[openvpn_client]</key>
+                    <delay>1h</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>OpenVPN Client  {#NAME} Tunnel Status</name>
+                            <key>pfsense.value[openvpn_clientvalue,{#CLIENT},status]</key>
+                            <delay>3m</delay>
+                            <history>30d</history>
+                            <trends>1825d</trends>
+                            <applications>
+                                <application>
+                                    <name>Network</name>
+                                </application>
+                            </applications>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}=0 and {last(#2)}=0</expression>
+                                    <name>OpenVPN Client {#NAME} Tunnel is Down</name>
+                                    <priority>WARNING</priority>
+                                    <manual_close>YES</manual_close>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>OpenVPN Server Discovery</name>
+                    <key>pfsense.discovery[openvpn_server]</key>
+                    <delay>1h</delay>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>OpenVPN Server {#NAME} Clients Connected</name>
+                            <key>pfsense.value[openvpn_servervalue,{#SERVER},conns]</key>
+                            <delay>3m</delay>
+                            <history>60d</history>
+                            <trends>1825d</trends>
+                            <applications>
+                                <application>
+                                    <name>Network</name>
+                                </application>
+                            </applications>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>OpenVPN Server {#NAME} Tunnel Status</name>
+                            <key>pfsense.value[openvpn_servervalue,{#SERVER},status]</key>
+                            <delay>3m</delay>
+                            <history>30d</history>
+                            <trends>1825d</trends>
+                            <applications>
+                                <application>
+                                    <name>Network</name>
+                                </application>
+                            </applications>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}=0 and {last(#2)}=0</expression>
+                                    <name>OpenVPN Server {#NAME} is Down</name>
+                                    <priority>WARNING</priority>
+                                    <manual_close>YES</manual_close>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
+                    <graph_prototypes>
+                        <graph_prototype>
+                            <name>Network: OpenVPN {#NAME} connections</name>
+                            <graph_items>
+                                <graph_item>
+                                    <sortorder>1</sortorder>
+                                    <drawtype>GRADIENT_LINE</drawtype>
+                                    <color>FFD54F</color>
+                                    <item>
+                                        <host>Template_OS_PfSense2</host>
+                                        <key>pfsense.value[openvpn_servervalue,{#SERVER},conns]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                    </graph_prototypes>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>Services Discovery</name>
+                    <key>pfsense.discovery[services]</key>
+                    <delay>1h</delay>
+                    <filter>
+                        <conditions>
+                            <condition>
+                                <macro>{#SERVICE}</macro>
+                                <value>^openvpn</value>
+                                <operator>NOT_MATCHES_REGEX</operator>
+                                <formulaid>A</formulaid>
+                            </condition>
+                            <condition>
+                                <macro>{#SERVICE}</macro>
+                                <value>^iperf</value>
+                                <operator>NOT_MATCHES_REGEX</operator>
+                                <formulaid>B</formulaid>
+                            </condition>
+                        </conditions>
+                    </filter>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>Service {#DESCRIPTION} Status</name>
+                            <key>pfsense.value[service_value,{#SERVICE},status]</key>
+                            <delay>5m</delay>
+                            <history>30d</history>
+                            <trends>0</trends>
+                            <applications>
+                                <application>
+                                    <name>Processus</name>
+                                </application>
+                                <application>
+                                    <name>System</name>
+                                </application>
+                            </applications>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last()}=0</expression>
+                                    <name>Service {#DESCRIPTION} is not running</name>
+                                    <priority>AVERAGE</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                    </item_prototypes>
                 </discovery_rule>
                 <discovery_rule>
                     <name>Filesystem discovery</name>
@@ -833,6 +1330,10 @@
                     <value>5</value>
                 </macro>
                 <macro>
+                    <macro>{$PFS_MONITOR_GW}</macro>
+                    <value>1</value>
+                </macro>
+                <macro>
                     <macro>{$REBOOT_WARN_DAY}</macro>
                     <value>7200</value>
                 </macro>
@@ -847,18 +1348,31 @@
             </macros>
         </template>
     </templates>
-    <triggers>
-        <trigger>
-            <expression>{Template_OS_PfSense2:openfiles.num.last(0)}&gt;({Template_OS_PfSense2:kernel.maxfiles.last(0)}-2000)</expression>
-            <name>Lots of opened files</name>
-            <priority>AVERAGE</priority>
-        </trigger>
-    </triggers>
     <graphs>
+        <graph>
+            <name>Network: Connection states</name>
+            <ymax_type_1>ITEM</ymax_type_1>
+            <ymax_item_1>
+                <host>Template_OS_PfSense2</host>
+                <key>pfsense.states.max</key>
+            </ymax_item_1>
+            <graph_items>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <drawtype>GRADIENT_LINE</drawtype>
+                    <color>B39DDB</color>
+                    <item>
+                        <host>Template_OS_PfSense2</host>
+                        <key>pfsense.states.current</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
         <graph>
             <name>System: CPU: Load</name>
             <graph_items>
                 <graph_item>
+                    <sortorder>1</sortorder>
                     <color>009900</color>
                     <item>
                         <host>Template_OS_PfSense2</host>
@@ -866,7 +1380,7 @@
                     </item>
                 </graph_item>
                 <graph_item>
-                    <sortorder>1</sortorder>
+                    <sortorder>2</sortorder>
                     <color>FF0000</color>
                     <item>
                         <host>Template_OS_PfSense2</host>
@@ -874,11 +1388,20 @@
                     </item>
                 </graph_item>
                 <graph_item>
-                    <sortorder>2</sortorder>
+                    <sortorder>3</sortorder>
                     <color>CCCC00</color>
                     <item>
                         <host>Template_OS_PfSense2</host>
                         <key>system.cpu.load[,avg5]</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>4</sortorder>
+                    <color>0040FF</color>
+                    <yaxisside>RIGHT</yaxisside>
+                    <item>
+                        <host>Template_OS_PfSense2</host>
+                        <key>system.cpu.switches</key>
                     </item>
                 </graph_item>
             </graph_items>
@@ -922,6 +1445,33 @@
                     <item>
                         <host>Template_OS_PfSense2</host>
                         <key>system.cpu.util[,nice,avg1]</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+        <graph>
+            <name>System: Mbuf usage</name>
+            <type>STACKED</type>
+            <ymax_type_1>ITEM</ymax_type_1>
+            <ymax_item_1>
+                <host>Template_OS_PfSense2</host>
+                <key>pfsense.mbuf.max</key>
+            </ymax_item_1>
+            <graph_items>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <color>81C784</color>
+                    <item>
+                        <host>Template_OS_PfSense2</host>
+                        <key>pfsense.mbuf.current</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>2</sortorder>
+                    <color>7986CB</color>
+                    <item>
+                        <host>Template_OS_PfSense2</host>
+                        <key>pfsense.mbuf.cache</key>
                     </item>
                 </graph_item>
             </graph_items>

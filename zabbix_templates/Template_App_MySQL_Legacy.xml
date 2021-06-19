@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>5.0</version>
+    <date>2021-06-19T12:09:19Z</date>
+    <groups>
+        <group>
+            <name>Modèles</name>
+        </group>
+        <group>
+            <name>Templates</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Template_App_MySQL_legacy</template>
+            <name>Template_App_MySQL_legacy</name>
+            <groups>
+                <group>
+                    <name>Modèles</name>
+                </group>
+                <group>
+                    <name>Templates</name>
+                </group>
+            </groups>
+            <items>
+                <item>
+                    <name>MySQL queries per second</name>
+                    <key>mysql.qps</key>
+                    <delay>5m</delay>
+                    <trends>1095d</trends>
+                    <value_type>FLOAT</value_type>
+                    <units>qps</units>
+                    <request_method>POST</request_method>
+                </item>
+                <item>
+                    <name>MySQL number of slow queries</name>
+                    <key>mysql.slowqueries</key>
+                    <delay>5m</delay>
+                    <trends>1095d</trends>
+                    <request_method>POST</request_method>
+                </item>
+                <item>
+                    <name>MySQL number of threads</name>
+                    <key>mysql.threads</key>
+                    <delay>5m</delay>
+                    <trends>1095d</trends>
+                    <request_method>POST</request_method>
+                </item>
+                <item>
+                    <name>MySQL uptime</name>
+                    <key>mysql.uptime</key>
+                    <delay>5m</delay>
+                    <trends>1095d</trends>
+                    <status>DISABLED</status>
+                    <units>uptime</units>
+                    <request_method>POST</request_method>
+                </item>
+                <item>
+                    <name>MySQL is alive</name>
+                    <key>mysql[ping]</key>
+                    <delay>5m</delay>
+                    <trends>1095d</trends>
+                    <value_type>FLOAT</value_type>
+                    <request_method>POST</request_method>
+                </item>
+                <item>
+                    <name>MySQL version</name>
+                    <key>version[mysql]</key>
+                    <delay>2h</delay>
+                    <trends>0</trends>
+                    <status>DISABLED</status>
+                    <value_type>CHAR</value_type>
+                    <request_method>POST</request_method>
+                </item>
+            </items>
+        </template>
+    </templates>
+</zabbix_export>

@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>5.0</version>
+    <date>2021-06-19T12:11:50Z</date>
+    <groups>
+        <group>
+            <name>Modèles</name>
+        </group>
+        <group>
+            <name>Templates</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Template_App_Squid_legacy</template>
+            <name>Template_App_Squid_legacy</name>
+            <groups>
+                <group>
+                    <name>Modèles</name>
+                </group>
+                <group>
+                    <name>Templates</name>
+                </group>
+            </groups>
+            <items>
+                <item>
+                    <name>Nombre de File Descriptors disponibles</name>
+                    <key>squid.available_fd</key>
+                    <delay>5m</delay>
+                    <trends>1825d</trends>
+                    <value_type>FLOAT</value_type>
+                    <units>fd</units>
+                    <request_method>POST</request_method>
+                </item>
+                <item>
+                    <name>Nombre moyen de requêtes HTTP par minute</name>
+                    <key>squid.avg_http_req_per_min</key>
+                    <delay>1h</delay>
+                    <trends>1825d</trends>
+                    <value_type>FLOAT</value_type>
+                    <units>req/min</units>
+                    <request_method>POST</request_method>
+                </item>
+                <item>
+                    <name>Taux du volume en cache</name>
+                    <key>squid.byte_hit_ratio</key>
+                    <delay>10m</delay>
+                    <trends>1825d</trends>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <request_method>POST</request_method>
+                </item>
+                <item>
+                    <name>Taille du cache sur disque</name>
+                    <key>squid.cache_size_disk</key>
+                    <delay>30m</delay>
+                    <trends>1825d</trends>
+                    <units>byte</units>
+                    <preprocessing>
+                        <step>
+                            <type>MULTIPLIER</type>
+                            <params>1024</params>
+                        </step>
+                    </preprocessing>
+                    <request_method>POST</request_method>
+                </item>
+                <item>
+                    <name>Taille du cache  en mémoire</name>
+                    <key>squid.cache_size_mem</key>
+                    <delay>30m</delay>
+                    <trends>1825d</trends>
+                    <units>byte</units>
+                    <preprocessing>
+                        <step>
+                            <type>MULTIPLIER</type>
+                            <params>1024</params>
+                        </step>
+                    </preprocessing>
+                    <request_method>POST</request_method>
+                </item>
+                <item>
+                    <name>Nombre maximum de Files Descriptors</name>
+                    <key>squid.max_fd</key>
+                    <delay>2h</delay>
+                    <trends>1825d</trends>
+                    <value_type>FLOAT</value_type>
+                    <units>fd</units>
+                    <request_method>POST</request_method>
+                </item>
+                <item>
+                    <name>Taux des requêtes en cache</name>
+                    <key>squid.request_hit_ratio</key>
+                    <delay>10m</delay>
+                    <trends>1825d</trends>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <request_method>POST</request_method>
+                </item>
+                <item>
+                    <name>Nombre de File Descriptors réservés</name>
+                    <key>squid.reserved_fd</key>
+                    <delay>2h</delay>
+                    <trends>1825d</trends>
+                    <value_type>FLOAT</value_type>
+                    <units>fd</units>
+                    <request_method>POST</request_method>
+                </item>
+            </items>
+            <macros>
+                <macro>
+                    <macro>{$SQUID_MIN_FREE_FD}</macro>
+                    <value>20</value>
+                </macro>
+            </macros>
+        </template>
+    </templates>
+    <triggers>
+        <trigger>
+            <expression>({Template_App_Squid_legacy:squid.available_fd.last(0)} - {Template_App_Squid_legacy:squid.reserved_fd.last(0)})*100/{Template_App_Squid_legacy:squid.max_fd.last(0)}&lt;{$SQUID_MIN_FREE_FD}</expression>
+            <name>Moins de {$SQUID_MIN_FREE_FD} % de descripteurs de fichiers disponibles pour Squid</name>
+            <priority>AVERAGE</priority>
+            <description>Plus que {ITEM.LASTVALUE1} descripteurs de fichiers disponibles pour Squid.</description>
+        </trigger>
+    </triggers>
+    <graphs>
+        <graph>
+            <name>Réseau: Statistiques Squid</name>
+            <ymin_type_1>FIXED</ymin_type_1>
+            <graph_items>
+                <graph_item>
+                    <drawtype>BOLD_LINE</drawtype>
+                    <color>009900</color>
+                    <item>
+                        <host>Template_App_Squid_legacy</host>
+                        <key>squid.byte_hit_ratio</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>1</sortorder>
+                    <drawtype>BOLD_LINE</drawtype>
+                    <color>DD0000</color>
+                    <item>
+                        <host>Template_App_Squid_legacy</host>
+                        <key>squid.request_hit_ratio</key>
+                    </item>
+                </graph_item>
+                <graph_item>
+                    <sortorder>2</sortorder>
+                    <drawtype>BOLD_LINE</drawtype>
+                    <color>0000DD</color>
+                    <yaxisside>RIGHT</yaxisside>
+                    <item>
+                        <host>Template_App_Squid_legacy</host>
+                        <key>squid.avg_http_req_per_min</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+    </graphs>
+</zabbix_export>

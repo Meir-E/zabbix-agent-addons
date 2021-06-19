@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>5.0</version>
+    <date>2021-06-19T12:18:27Z</date>
+    <groups>
+        <group>
+            <name>Modèles</name>
+        </group>
+        <group>
+            <name>Templates</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Template_PublicService_HTTP</template>
+            <name>Template_PublicService_HTTP</name>
+            <groups>
+                <group>
+                    <name>Modèles</name>
+                </group>
+                <group>
+                    <name>Templates</name>
+                </group>
+            </groups>
+            <items>
+                <item>
+                    <name>Service HTTP</name>
+                    <type>SIMPLE</type>
+                    <key>net.tcp.service[http]</key>
+                    <delay>2m</delay>
+                    <trends>1825d</trends>
+                    <valuemap>
+                        <name>Service state</name>
+                    </valuemap>
+                    <request_method>POST</request_method>
+                    <triggers>
+                        <trigger>
+                            <expression>{$SERVICE_HTTP}=1 and {sum(#3)}=0</expression>
+                            <name>Le service HTTP ne répond pas</name>
+                            <priority>INFO</priority>
+                        </trigger>
+                    </triggers>
+                </item>
+            </items>
+            <macros>
+                <macro>
+                    <macro>{$SERVICE_HTTP}</macro>
+                    <value>1</value>
+                </macro>
+            </macros>
+        </template>
+        <template>
+            <template>Template_PublicService_HTTPS</template>
+            <name>Template_PublicService_HTTPS</name>
+            <groups>
+                <group>
+                    <name>Modèles</name>
+                </group>
+                <group>
+                    <name>Templates</name>
+                </group>
+            </groups>
+            <items>
+                <item>
+                    <name>Temps de réponse HTTPS (de l'extérieur)</name>
+                    <type>SIMPLE</type>
+                    <key>net.tcp.service.perf[https]</key>
+                    <delay>2m</delay>
+                    <trends>1825d</trends>
+                    <value_type>FLOAT</value_type>
+                    <units>s</units>
+                    <valuemap>
+                        <name>Service state</name>
+                    </valuemap>
+                    <request_method>POST</request_method>
+                </item>
+                <item>
+                    <name>Service HTTPS (de l'extérieur)</name>
+                    <type>SIMPLE</type>
+                    <key>net.tcp.service[https]</key>
+                    <delay>2m</delay>
+                    <trends>1825d</trends>
+                    <valuemap>
+                        <name>Service state</name>
+                    </valuemap>
+                    <request_method>POST</request_method>
+                    <triggers>
+                        <trigger>
+                            <expression>{$SERVICE_HTTPS}=1 and {sum(#3)}=0</expression>
+                            <name>Le service HTTPS ne répond pas</name>
+                            <priority>INFO</priority>
+                        </trigger>
+                    </triggers>
+                </item>
+            </items>
+            <macros>
+                <macro>
+                    <macro>{$SERVICE_HTTPS}</macro>
+                    <value>1</value>
+                </macro>
+            </macros>
+        </template>
+    </templates>
+    <graphs>
+        <graph>
+            <name>Services: HTTPS (extérieur)</name>
+            <graph_items>
+                <graph_item>
+                    <drawtype>GRADIENT_LINE</drawtype>
+                    <color>C80000</color>
+                    <item>
+                        <host>Template_PublicService_HTTPS</host>
+                        <key>net.tcp.service.perf[https]</key>
+                    </item>
+                </graph_item>
+            </graph_items>
+        </graph>
+    </graphs>
+    <value_maps>
+        <value_map>
+            <name>Service state</name>
+            <mappings>
+                <mapping>
+                    <value>0</value>
+                    <newvalue>Down</newvalue>
+                </mapping>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>Up</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+    </value_maps>
+</zabbix_export>

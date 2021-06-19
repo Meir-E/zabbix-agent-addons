@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>5.0</version>
+    <date>2021-06-19T12:19:47Z</date>
+    <groups>
+        <group>
+            <name>Modèles</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Template_Switch_Netgear_Prosafe</template>
+            <name>Template_Switch_Netgear_Prosafe</name>
+            <templates>
+                <template>
+                    <name>Template_Switch_Generic</name>
+                </template>
+            </templates>
+            <groups>
+                <group>
+                    <name>Modèles</name>
+                </group>
+            </groups>
+            <discovery_rules>
+                <discovery_rule>
+                    <name>Stack members</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>discovery[{#UNIT_SERIAL},.1.3.6.1.2.1.47.1.1.1.1.11,{#STACK_POSITION},.1.3.6.1.2.1.47.1.1.1.1.6]</snmp_oid>
+                    <key>stack.members.discovery</key>
+                    <delay>30m</delay>
+                    <filter>
+                        <conditions>
+                            <condition>
+                                <macro>{#UNIT_SERIAL}</macro>
+                                <value>^.+$</value>
+                                <formulaid>A</formulaid>
+                            </condition>
+                        </conditions>
+                    </filter>
+                    <lifetime>1w</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>Model ($1)</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.47.1.1.1.1.2.{#SNMPINDEX}</snmp_oid>
+                            <key>stack.member.model[{#SNMPINDEX}]</key>
+                            <delay>2h</delay>
+                            <history>30d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <request_method>POST</request_method>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Stack position ($1)</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.47.1.1.1.1.6.{#SNMPINDEX}</snmp_oid>
+                            <key>stack.member.position[{#SNMPINDEX}]</key>
+                            <delay>2h</delay>
+                            <history>30d</history>
+                            <trends>0</trends>
+                            <request_method>POST</request_method>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Serial number ($1)</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.47.1.1.1.1.11.{#SNMPINDEX}</snmp_oid>
+                            <key>stack.member.serial[{#SNMPINDEX}]</key>
+                            <delay>30m</delay>
+                            <history>30d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <request_method>POST</request_method>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{nodata(7200)}=1</expression>
+                                    <name>No data received from {#STACK_POSITION}</name>
+                                    <priority>AVERAGE</priority>
+                                </trigger_prototype>
+                                <trigger_prototype>
+                                    <expression>{diff()}=1</expression>
+                                    <name>S/N changed on {#STACK_POSITION}</name>
+                                    <priority>WARNING</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Bootrom version ($1)</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.47.1.1.1.1.9.{#SNMPINDEX}</snmp_oid>
+                            <key>stack.member.version.boot[{#SNMPINDEX}]</key>
+                            <delay>2h</delay>
+                            <history>30d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <request_method>POST</request_method>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{diff()}=1</expression>
+                                    <name>Bootrom version changed on {#STACK_POSITION}</name>
+                                    <priority>WARNING</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Firmware version ($1)</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.47.1.1.1.1.10.{#SNMPINDEX}</snmp_oid>
+                            <key>stack.member.version.fw[{#SNMPINDEX}]</key>
+                            <delay>2h</delay>
+                            <history>30d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <request_method>POST</request_method>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{diff()}=1</expression>
+                                    <name>Firmware version changed on {#STACK_POSITION}</name>
+                                    <priority>WARNING</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Hardware version ($1)</name>
+                            <type>SNMP_AGENT</type>
+                            <snmp_oid>.1.3.6.1.2.1.47.1.1.1.1.8.{#SNMPINDEX}</snmp_oid>
+                            <key>stack.member.version.hw[{#SNMPINDEX}]</key>
+                            <delay>2h</delay>
+                            <history>30d</history>
+                            <trends>0</trends>
+                            <value_type>CHAR</value_type>
+                            <request_method>POST</request_method>
+                        </item_prototype>
+                    </item_prototypes>
+                    <request_method>POST</request_method>
+                </discovery_rule>
+            </discovery_rules>
+            <macros>
+                <macro>
+                    <macro>{$SNMP_COMMUNITY}</macro>
+                    <value>public</value>
+                </macro>
+            </macros>
+        </template>
+    </templates>
+</zabbix_export>

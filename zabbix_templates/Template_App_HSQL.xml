@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>5.0</version>
+    <date>2021-06-19T12:08:22Z</date>
+    <groups>
+        <group>
+            <name>Templates</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Template_App_HSQL</template>
+            <name>Template_App_HSQL</name>
+            <groups>
+                <group>
+                    <name>Templates</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>HSQL</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>HSQL TCP Service</name>
+                    <key>net.tcp.listen[{$HSQL_PORT}]</key>
+                    <delay>6m</delay>
+                    <history>30d</history>
+                    <trends>0</trends>
+                    <applications>
+                        <application>
+                            <name>HSQL</name>
+                        </application>
+                    </applications>
+                    <triggers>
+                        <trigger>
+                            <expression>{last()}&lt;&gt;1</expression>
+                            <name>HSQL port {$HSQL_PORT} is not listening</name>
+                            <priority>WARNING</priority>
+                            <dependencies>
+                                <dependency>
+                                    <name>No HSQL Service running</name>
+                                    <expression>{Template_App_HSQL:proc.num[manta,hyperfile,,HFCS-Serveur].last()}&lt;1</expression>
+                                </dependency>
+                            </dependencies>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>HSQL Server Processes</name>
+                    <key>proc.num[manta,hyperfile,,HFCS-Serveur]</key>
+                    <delay>5m</delay>
+                    <history>30d</history>
+                    <units>!process</units>
+                    <applications>
+                        <application>
+                            <name>HSQL</name>
+                        </application>
+                    </applications>
+                    <triggers>
+                        <trigger>
+                            <expression>{last()}&lt;1</expression>
+                            <name>No HSQL Service running</name>
+                            <priority>WARNING</priority>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>HSQL MantaManager Processes</name>
+                    <key>proc.num[mantamanager,root,,]</key>
+                    <delay>5m</delay>
+                    <history>30d</history>
+                    <units>!process</units>
+                    <applications>
+                        <application>
+                            <name>HSQL</name>
+                        </application>
+                    </applications>
+                    <triggers>
+                        <trigger>
+                            <expression>{last()}&lt;1</expression>
+                            <name>No HSQL Manager Service running</name>
+                            <priority>WARNING</priority>
+                        </trigger>
+                    </triggers>
+                </item>
+            </items>
+            <macros>
+                <macro>
+                    <macro>{$HSQL_PORT}</macro>
+                    <value>4900</value>
+                </macro>
+            </macros>
+        </template>
+    </templates>
+</zabbix_export>

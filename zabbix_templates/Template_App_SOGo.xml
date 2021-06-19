@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>5.0</version>
+    <date>2021-06-19T12:11:20Z</date>
+    <groups>
+        <group>
+            <name>Modèles</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Template_App_SOGo</template>
+            <name>Template_App_SOGo</name>
+            <groups>
+                <group>
+                    <name>Modèles</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>sogo</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>Mémoire utilisée par SOGo</name>
+                    <key>proc.mem[sogod]</key>
+                    <delay>3m</delay>
+                    <trends>1825d</trends>
+                    <units>o</units>
+                    <applications>
+                        <application>
+                            <name>sogo</name>
+                        </application>
+                    </applications>
+                    <request_method>POST</request_method>
+                </item>
+                <item>
+                    <name>Numbre de processus sogod</name>
+                    <key>proc.num[sogod]</key>
+                    <delay>2m</delay>
+                    <trends>1825d</trends>
+                    <applications>
+                        <application>
+                            <name>sogo</name>
+                        </application>
+                    </applications>
+                    <request_method>POST</request_method>
+                    <triggers>
+                        <trigger>
+                            <expression>{$SOGO}=1 and {last()}&lt;1</expression>
+                            <name>Aucun processus SOGo</name>
+                            <priority>AVERAGE</priority>
+                        </trigger>
+                    </triggers>
+                </item>
+            </items>
+            <macros>
+                <macro>
+                    <macro>{$SOGO}</macro>
+                    <value>1</value>
+                </macro>
+            </macros>
+        </template>
+    </templates>
+</zabbix_export>
