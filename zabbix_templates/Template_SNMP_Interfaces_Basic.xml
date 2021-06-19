@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-06-19T10:41:36Z</date>
+    <date>2021-06-19T10:41:59Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -9,13 +9,9 @@
     </groups>
     <templates>
         <template>
-            <template>Template_SNMP_Interfaces</template>
-            <name>Template_SNMP_Interfaces</name>
-            <templates>
-                <template>
-                    <name>Template_SNMP_Device</name>
-                </template>
-            </templates>
+            <template>Template_SNMP_Interface_Basic</template>
+            <name>Template_SNMP_Interface_Basic</name>
+            <description>For basic SNMP devices, without IfName, nor 64 bit counters</description>
             <groups>
                 <group>
                     <name>Templates</name>
@@ -30,7 +26,7 @@
                 <discovery_rule>
                     <name>Interfaces</name>
                     <type>SNMP_AGENT</type>
-                    <snmp_oid>discovery[{#IFINDEX},IF-MIB::ifIndex,{#IFNAME},IF-MIB::ifName,{#IFDESCR},IF-MIB::ifDescr,{#IFSTATUS},IF-MIB::ifOperStatus,{#IFTYPE},IF-MIB::ifType]</snmp_oid>
+                    <snmp_oid>discovery[{#IFINDEX},IF-MIB::ifIndex,{#IFDESCR},IF-MIB::ifDescr,{#IFSTATUS},IF-MIB::ifOperStatus,{#IFTYPE},IF-MIB::ifType]</snmp_oid>
                     <key>ifIndex.discovery</key>
                     <delay>1h</delay>
                     <filter>
@@ -39,31 +35,19 @@
                             <condition>
                                 <macro>{#IFSTATUS}</macro>
                                 <value>^(1|2)$</value>
-                                <formulaid>C</formulaid>
-                            </condition>
-                            <condition>
-                                <macro>{#IFNAME}</macro>
-                                <value>^Po[1-9]\d\d?</value>
-                                <operator>NOT_MATCHES_REGEX</operator>
-                                <formulaid>B</formulaid>
-                            </condition>
-                            <condition>
-                                <macro>{#IFNAME}</macro>
-                                <value>^0/3/\d\d+</value>
-                                <operator>NOT_MATCHES_REGEX</operator>
                                 <formulaid>A</formulaid>
                             </condition>
                             <condition>
                                 <macro>{#IFTYPE}</macro>
                                 <value>^(6|161|200|169|56|23)$</value>
-                                <formulaid>D</formulaid>
+                                <formulaid>B</formulaid>
                             </condition>
                         </conditions>
                     </filter>
                     <lifetime>2d</lifetime>
                     <item_prototypes>
                         <item_prototype>
-                            <name>Admin status of {#IFNAME}</name>
+                            <name>Admin status of {#IFDESCR}</name>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>IF-MIB::ifAdminStatus.{#SNMPINDEX}</snmp_oid>
                             <key>ifAdminStatus[{#IFINDEX},{#SNMPINDEX}]</key>
@@ -81,60 +65,16 @@
                                     <params>1d</params>
                                 </step>
                             </preprocessing>
-                            <request_method>POST</request_method>
                         </item_prototype>
                         <item_prototype>
-                            <name>{#IFNAME} interface alias</name>
-                            <type>SNMP_AGENT</type>
-                            <snmp_oid>IF-MIB::ifAlias.{#SNMPINDEX}</snmp_oid>
-                            <key>ifAlias[{#IFINDEX},{#SNMPINDEX}]</key>
-                            <delay>6h</delay>
-                            <history>30d</history>
-                            <trends>0</trends>
-                            <value_type>CHAR</value_type>
-                            <applications>
-                                <application>
-                                    <name>Interface(s)</name>
-                                </application>
-                            </applications>
-                            <preprocessing>
-                                <step>
-                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>1d</params>
-                                </step>
-                            </preprocessing>
-                            <request_method>POST</request_method>
-                        </item_prototype>
-                        <item_prototype>
-                            <name>{#IFNAME} interface description</name>
-                            <type>SNMP_AGENT</type>
-                            <snmp_oid>IF-MIB::ifDescr.{#SNMPINDEX}</snmp_oid>
-                            <key>ifDescr[{#IFINDEX},{#SNMPINDEX}]</key>
-                            <delay>6h</delay>
-                            <history>30d</history>
-                            <trends>0</trends>
-                            <value_type>CHAR</value_type>
-                            <applications>
-                                <application>
-                                    <name>Interface(s)</name>
-                                </application>
-                            </applications>
-                            <preprocessing>
-                                <step>
-                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <params>1d</params>
-                                </step>
-                            </preprocessing>
-                            <request_method>POST</request_method>
-                        </item_prototype>
-                        <item_prototype>
-                            <name>Rejected inbound packets on {#IFNAME}</name>
+                            <name>Rejected inbound packets on {#IFDESCR}</name>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>IF-MIB::ifInDiscards.{#SNMPINDEX}</snmp_oid>
                             <key>ifInDiscards[{#IFINDEX},{#SNMPINDEX}]</key>
                             <delay>1h</delay>
                             <history>30d</history>
                             <trends>730d</trends>
+                            <units>bps</units>
                             <applications>
                                 <application>
                                     <name>Interface(s)</name>
@@ -150,10 +90,9 @@
                                     <params>1d</params>
                                 </step>
                             </preprocessing>
-                            <request_method>POST</request_method>
                         </item_prototype>
                         <item_prototype>
-                            <name>Inbound errors on {#IFNAME}</name>
+                            <name>Inbound errors on {#IFDESCR}</name>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>IF-MIB::ifInErrors.{#SNMPINDEX}</snmp_oid>
                             <key>ifInErrors[{#IFINDEX},{#SNMPINDEX}]</key>
@@ -175,12 +114,11 @@
                                     <params>1d</params>
                                 </step>
                             </preprocessing>
-                            <request_method>POST</request_method>
                         </item_prototype>
                         <item_prototype>
-                            <name>Inbound trafic on {#IFNAME}</name>
+                            <name>Inbound trafic on {#IFDESCR}</name>
                             <type>SNMP_AGENT</type>
-                            <snmp_oid>IF-MIB::ifHCInOctets.{#SNMPINDEX}</snmp_oid>
+                            <snmp_oid>IF-MIB::ifInOctets.{#SNMPINDEX}</snmp_oid>
                             <key>ifInOctets[{#IFINDEX},{#SNMPINDEX}]</key>
                             <delay>3m</delay>
                             <history>30d</history>
@@ -205,10 +143,9 @@
                                     <params>3200</params>
                                 </step>
                             </preprocessing>
-                            <request_method>POST</request_method>
                         </item_prototype>
                         <item_prototype>
-                            <name>Last state change for {#IFNAME}</name>
+                            <name>Last state change for {#IFDESCR}</name>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>IF-MIB::ifLastChange.{#SNMPINDEX}</snmp_oid>
                             <key>ifLastChange[{#IFINDEX},{#SNMPINDEX}]</key>
@@ -227,10 +164,9 @@
                                     <params>0.01</params>
                                 </step>
                             </preprocessing>
-                            <request_method>POST</request_method>
                         </item_prototype>
                         <item_prototype>
-                            <name>Operational status of {#IFNAME}</name>
+                            <name>Operational status of {#IFDESCR}</name>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>IF-MIB::ifOperStatus.{#SNMPINDEX}</snmp_oid>
                             <key>ifOperStatus[{#IFINDEX},{#SNMPINDEX}]</key>
@@ -248,16 +184,16 @@
                                     <params>1d</params>
                                 </step>
                             </preprocessing>
-                            <request_method>POST</request_method>
                         </item_prototype>
                         <item_prototype>
-                            <name>Rejected outbound packets on {#IFNAME}</name>
+                            <name>Rejected outbound packets on {#IFDESCR}</name>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>IF-MIB::ifOutDiscards.{#SNMPINDEX}</snmp_oid>
                             <key>ifOutDiscards[{#IFINDEX},{#SNMPINDEX}]</key>
                             <delay>1h</delay>
                             <history>30d</history>
                             <trends>730d</trends>
+                            <units>bps</units>
                             <applications>
                                 <application>
                                     <name>Interface(s)</name>
@@ -273,16 +209,15 @@
                                     <params>1d</params>
                                 </step>
                             </preprocessing>
-                            <request_method>POST</request_method>
                         </item_prototype>
                         <item_prototype>
-                            <name>Outbound errors on {#IFNAME}</name>
+                            <name>Outbound errors on {#IFDESCR}</name>
                             <type>SNMP_AGENT</type>
                             <snmp_oid>IF-MIB::ifOutErrors.{#SNMPINDEX}</snmp_oid>
                             <key>ifOutErrors[{#IFINDEX},{#SNMPINDEX}]</key>
                             <delay>15m</delay>
                             <history>30d</history>
-                            <trends>730d</trends>
+                            <trends>0</trends>
                             <applications>
                                 <application>
                                     <name>Interface(s)</name>
@@ -298,12 +233,11 @@
                                     <params>1d</params>
                                 </step>
                             </preprocessing>
-                            <request_method>POST</request_method>
                         </item_prototype>
                         <item_prototype>
-                            <name>Outbound trafic on {#IFNAME}</name>
+                            <name>Outbound trafic on {#IFDESCR}</name>
                             <type>SNMP_AGENT</type>
-                            <snmp_oid>IF-MIB::ifHCOutOctets.{#SNMPINDEX}</snmp_oid>
+                            <snmp_oid>IF-MIB::ifOutOctets.{#SNMPINDEX}</snmp_oid>
                             <key>ifOutOctets[{#IFINDEX},{#SNMPINDEX}]</key>
                             <delay>3m</delay>
                             <history>30d</history>
@@ -328,27 +262,17 @@
                                     <params>3200</params>
                                 </step>
                             </preprocessing>
-                            <request_method>POST</request_method>
                         </item_prototype>
                     </item_prototypes>
-                    <trigger_prototypes>
-                        <trigger_prototype>
-                            <expression>{$ALERT_ON_IF_CHANGE}=1 and ({Template_SNMP_Interfaces:sysUpTimeInstance.last()}-{Template_SNMP_Interfaces:ifLastChange[{#IFINDEX},{#SNMPINDEX}].last()})&lt;1800 and  {Template_SNMP_Interfaces:ifLastChange[{#IFINDEX},{#SNMPINDEX}].last()} &gt; 0</expression>
-                            <name>{#IFNAME} state changed</name>
-                            <priority>AVERAGE</priority>
-                        </trigger_prototype>
-                    </trigger_prototypes>
                     <graph_prototypes>
                         <graph_prototype>
-                            <name>Trafic on {#IFNAME} ({#IFINDEX} - {#IFDESCR})</name>
-                            <percent_left>0.95</percent_left>
-                            <percent_right>0.95</percent_right>
+                            <name>Trafic on {#IFDESCR} ({#IFINDEX})</name>
                             <graph_items>
                                 <graph_item>
                                     <drawtype>GRADIENT_LINE</drawtype>
                                     <color>00CF00</color>
                                     <item>
-                                        <host>Template_SNMP_Interfaces</host>
+                                        <host>Template_SNMP_Interface_Basic</host>
                                         <key>ifInOctets[{#IFINDEX},{#SNMPINDEX}]</key>
                                     </item>
                                 </graph_item>
@@ -358,21 +282,16 @@
                                     <color>002A97</color>
                                     <yaxisside>RIGHT</yaxisside>
                                     <item>
-                                        <host>Template_SNMP_Interfaces</host>
+                                        <host>Template_SNMP_Interface_Basic</host>
                                         <key>ifOutOctets[{#IFINDEX},{#SNMPINDEX}]</key>
                                     </item>
                                 </graph_item>
                             </graph_items>
                         </graph_prototype>
                     </graph_prototypes>
-                    <request_method>POST</request_method>
                 </discovery_rule>
             </discovery_rules>
             <macros>
-                <macro>
-                    <macro>{$ALERT_ON_IF_CHANGE}</macro>
-                    <value>0</value>
-                </macro>
                 <macro>
                     <macro>{$SNMP_COMMUNITY}</macro>
                     <value>public</value>

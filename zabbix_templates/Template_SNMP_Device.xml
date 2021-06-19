@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
-    <version>4.4</version>
-    <date>2020-03-02T14:10:14Z</date>
+    <version>5.0</version>
+    <date>2021-06-19T10:41:22Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -9,8 +9,8 @@
     </groups>
     <templates>
         <template>
-            <template>Model_SNMP_Device</template>
-            <name>Model_SNMP_Device</name>
+            <template>Template_SNMP_Device</template>
+            <name>Template_SNMP_Device</name>
             <templates>
                 <template>
                     <name>Template_Ping</name>
@@ -24,8 +24,7 @@
             <items>
                 <item>
                     <name>Contact</name>
-                    <type>SNMPV2</type>
-                    <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                    <type>SNMP_AGENT</type>
                     <snmp_oid>SNMPv2-MIB::sysContact.0</snmp_oid>
                     <key>sysContact</key>
                     <delay>2h</delay>
@@ -36,8 +35,7 @@
                 </item>
                 <item>
                     <name>Description</name>
-                    <type>SNMPV2</type>
-                    <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                    <type>SNMP_AGENT</type>
                     <snmp_oid>SNMPv2-MIB::sysDescr.0</snmp_oid>
                     <key>sysDescr</key>
                     <delay>2h</delay>
@@ -48,8 +46,7 @@
                 </item>
                 <item>
                     <name>Location</name>
-                    <type>SNMPV2</type>
-                    <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                    <type>SNMP_AGENT</type>
                     <snmp_oid>SNMPv2-MIB::sysLocation.0</snmp_oid>
                     <key>sysLocation</key>
                     <delay>2h</delay>
@@ -60,8 +57,7 @@
                 </item>
                 <item>
                     <name>Device name</name>
-                    <type>SNMPV2</type>
-                    <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                    <type>SNMP_AGENT</type>
                     <snmp_oid>SNMPv2-MIB::sysName.0</snmp_oid>
                     <key>sysName</key>
                     <delay>2h</delay>
@@ -72,8 +68,7 @@
                 </item>
                 <item>
                     <name>Uptime</name>
-                    <type>SNMPV2</type>
-                    <snmp_community>{$SNMP_COMMUNITY}</snmp_community>
+                    <type>SNMP_AGENT</type>
                     <snmp_oid>DISMAN-EVENT-MIB::sysUpTimeInstance</snmp_oid>
                     <key>sysUpTimeInstance</key>
                     <delay>10m</delay>
@@ -89,7 +84,7 @@
                     <request_method>POST</request_method>
                     <triggers>
                         <trigger>
-                            <expression>{last()}&lt;7200</expression>
+                            <expression>{last()}&lt;{$SNMP_REBOOT_WARN}</expression>
                             <name>Device rebooted {ITEM.LASTVALUE1} ago</name>
                             <priority>WARNING</priority>
                         </trigger>
@@ -100,6 +95,10 @@
                 <macro>
                     <macro>{$SNMP_COMMUNITY}</macro>
                     <value>public</value>
+                </macro>
+                <macro>
+                    <macro>{$SNMP_REBOOT_WARN}</macro>
+                    <value>7200</value>
                 </macro>
             </macros>
         </template>

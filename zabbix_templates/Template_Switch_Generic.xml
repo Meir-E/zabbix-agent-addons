@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>5.0</version>
+    <date>2021-06-19T10:43:36Z</date>
+    <groups>
+        <group>
+            <name>Templates</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Model_Switch_Generic</template>
+            <name>Model_Switch_Generic</name>
+            <templates>
+                <template>
+                    <name>Template_SNMP_Interfaces</name>
+                </template>
+            </templates>
+            <groups>
+                <group>
+                    <name>Templates</name>
+                </group>
+            </groups>
+            <items>
+                <item>
+                    <name>IP Forwarding</name>
+                    <type>SNMP_AGENT</type>
+                    <snmp_oid>IP-MIB::ipForwarding.0</snmp_oid>
+                    <key>ipForwarding</key>
+                    <delay>30m</delay>
+                    <history>30d</history>
+                    <trends>0</trends>
+                    <request_method>POST</request_method>
+                    <triggers>
+                        <trigger>
+                            <expression>{diff()}=1</expression>
+                            <name>IP forwarding config changed</name>
+                            <priority>WARNING</priority>
+                        </trigger>
+                    </triggers>
+                </item>
+            </items>
+        </template>
+    </templates>
+</zabbix_export>
