@@ -183,7 +183,7 @@ ADAPTER: for ( my $adp = 0; $adp < $adapters; $adp++ ) {
 	open (PDLIST, "$megacli -PdList  -a$adp -NoLog |") 
 		|| die "error: Could not execute $megacli -PdList -a$adp -NoLog";
 	
-	my ($slotnumber,$fwstate);
+	my ($slotnumber,$fwstate,$fwinfo);
 	PDISKS: while (<PDLIST>) {
 		if ( m/Slot Number:\s*(\d+)/ ) {
 			$slotnumber = $1;
@@ -198,11 +198,14 @@ ADAPTER: for ( my $adp = 0; $adp < $adapters; $adp++ ) {
 			}
 		} elsif ( m/Predictive Failure Count:\s*(\d+)/ ) {
 			$prederrors += $1;
-		} elsif ( m/Firmware state:\s*(\w+)/ ) {
+		} elsif ( m/Firmware state:\s*(\w+)(.*)/ ) {
 			$fwstate = $1;
+			$fwinfo = $2;
 			if ( $fwstate =~ m/Hotspare/ ) {
 				$hotsparecount++;
 			} elsif ( $fwstate =~ m/^Online/ ) {
+				# Do nothing
+			} elsif ( $fwstate =~ m/^Unconfigured/ && defined $fwinfo && $fwinfo =~ m/^\(good\)/) {
 				# Do nothing
 			} elsif ( $slotnumber != 255 ) {
 				$pdbad++;
