@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.149
+Version: 0.2.150
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -106,6 +106,16 @@ fi
 %endif
 
 %changelog
+* Fri Jul 16 2021 Daniel Berteaud <daniel@firewall-services.com> 0.2.150-1
+- Do not count Unconfigured(good) drives as an error (daniel@firewall-
+  services.com)
+- Remove duplicated templates (daniel@firewall-services.com)
+- Typo in template filename (daniel@firewall-services.com)
+- Update and provide more templates (daniel@firewall-services.com)
+- Update and add more Zabbix templates (daniel@firewall-services.com)
+- Remove health and capacity sanoid checks from discovery (daniel@firewall-
+  services.com)
+
 * Thu May 27 2021 Daniel Berteaud <daniel@firewall-services.com> 0.2.149-1
 - Support Debian lib path for BackupPC (daniel@firewall-services.com)
 
