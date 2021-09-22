@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-06-19T12:17:09Z</date>
+    <date>2021-09-22T16:04:27Z</date>
     <groups>
         <group>
             <name>Modèles</name>
@@ -112,7 +112,7 @@
             </items>
             <discovery_rules>
                 <discovery_rule>
-                    <name>Découverte onduleurs</name>
+                    <name>UPS discovery</name>
                     <key>hardware.ups.discovery[]</key>
                     <delay>1800</delay>
                     <lifetime>1d</lifetime>
@@ -120,7 +120,9 @@
                         <item_prototype>
                             <name>UPS: Taux de charge de la batterie pour {#UPSNAME}</name>
                             <key>hardware.ups[{#UPSNAME},battery.charge]</key>
-                            <trends>1825d</trends>
+                            <delay>2m</delay>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <units>%</units>
                             <applications>
                                 <application>
@@ -132,7 +134,9 @@
                         <item_prototype>
                             <name>UPS: Charge de l'onduleur {#UPSNAME}</name>
                             <key>hardware.ups[{#UPSNAME},ups.load]</key>
-                            <trends>1825d</trends>
+                            <delay>2m</delay>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <value_type>FLOAT</value_type>
                             <units>%</units>
                             <applications>
@@ -152,6 +156,8 @@
                         <item_prototype>
                             <name>UPS: État de l'onduleur {#UPSNAME}</name>
                             <key>hardware.ups[{#UPSNAME},ups.status]</key>
+                            <delay>2m</delay>
+                            <history>30d</history>
                             <trends>0</trends>
                             <value_type>CHAR</value_type>
                             <applications>
@@ -231,7 +237,8 @@
                             <type>DEPENDENT</type>
                             <key>httpd[{#HTTPD_STATUS_URI},busyworkers]</key>
                             <delay>0</delay>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <applications>
                                 <application>
                                     <name>Applications</name>
@@ -253,7 +260,8 @@
                             <type>DEPENDENT</type>
                             <key>httpd[{#HTTPD_STATUS_URI},bytesperreq]</key>
                             <delay>0</delay>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <value_type>FLOAT</value_type>
                             <units>B</units>
                             <applications>
@@ -277,7 +285,8 @@
                             <type>DEPENDENT</type>
                             <key>httpd[{#HTTPD_STATUS_URI},bytespersec]</key>
                             <delay>0</delay>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <value_type>FLOAT</value_type>
                             <units>b/s</units>
                             <applications>
@@ -312,7 +321,8 @@
                             <type>DEPENDENT</type>
                             <key>httpd[{#HTTPD_STATUS_URI},idleworkers]</key>
                             <delay>0</delay>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <applications>
                                 <application>
                                     <name>Applications</name>
@@ -334,7 +344,8 @@
                             <type>DEPENDENT</type>
                             <key>httpd[{#HTTPD_STATUS_URI},reqpersec]</key>
                             <delay>0</delay>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <value_type>FLOAT</value_type>
                             <units>r/s</units>
                             <applications>
@@ -425,8 +436,8 @@
                             <type>DEPENDENT</type>
                             <key>nginx.status.dep[{#NGINX_STATUS_URI},active_conn]</key>
                             <delay>0</delay>
-                            <history>180d</history>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <applications>
                                 <application>
                                     <name>Applications</name>
@@ -448,8 +459,8 @@
                             <type>DEPENDENT</type>
                             <key>nginx.status.dep[{#NGINX_STATUS_URI},conn_per_sec]</key>
                             <delay>0</delay>
-                            <history>180d</history>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <value_type>FLOAT</value_type>
                             <units>c/s</units>
                             <applications>
@@ -477,8 +488,8 @@
                             <type>DEPENDENT</type>
                             <key>nginx.status.dep[{#NGINX_STATUS_URI},keep_alive_conn]</key>
                             <delay>0</delay>
-                            <history>180d</history>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <applications>
                                 <application>
                                     <name>Applications</name>
@@ -500,8 +511,8 @@
                             <type>DEPENDENT</type>
                             <key>nginx.status.dep[{#NGINX_STATUS_URI},req_per_sec]</key>
                             <delay>0</delay>
-                            <history>180d</history>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <value_type>FLOAT</value_type>
                             <units>r/s</units>
                             <applications>
@@ -585,11 +596,12 @@
                     <lifetime>1h</lifetime>
                     <item_prototypes>
                         <item_prototype>
-                            <name>Latence du node {#PVE_NODE_NAME}</name>
+                            <name>Latency for node {#PVE_NODE_NAME}</name>
                             <type>DEPENDENT</type>
                             <key>net.icmp.info[{#PVE_NODE_IP},latency]</key>
                             <delay>0</delay>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <value_type>FLOAT</value_type>
                             <units>s</units>
                             <applications>
@@ -618,11 +630,12 @@
                             </trigger_prototypes>
                         </item_prototype>
                         <item_prototype>
-                            <name>Taux de perte de ping pour le node {#PVE_NODE_NAME}</name>
+                            <name>Ping loss for node {#PVE_NODE_NAME}</name>
                             <type>DEPENDENT</type>
                             <key>net.icmp.info[{#PVE_NODE_IP},loss]</key>
                             <delay>0</delay>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <value_type>FLOAT</value_type>
                             <units>%</units>
                             <applications>
@@ -651,11 +664,12 @@
                             </trigger_prototypes>
                         </item_prototype>
                         <item_prototype>
-                            <name>Ping du node {#PVE_NODE_NAME}</name>
+                            <name>Ping response for node {#PVE_NODE_NAME}</name>
                             <type>DEPENDENT</type>
                             <key>net.icmp.info[{#PVE_NODE_IP},respond]</key>
                             <delay>0</delay>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <applications>
                                 <application>
                                     <name>Latency</name>
@@ -675,9 +689,9 @@
                             </master_item>
                         </item_prototype>
                         <item_prototype>
-                            <name>Stat ICMP du node {#PVE_NODE_NAME}</name>
+                            <name>ICMP stats for node {#PVE_NODE_NAME}</name>
                             <key>net.icmp[{#PVE_NODE_IP},all]</key>
-                            <delay>5s</delay>
+                            <delay>30s</delay>
                             <history>0</history>
                             <trends>0</trends>
                             <value_type>TEXT</value_type>
@@ -768,6 +782,7 @@
                             <name>MegaRAID status ({#CONTROLLERNO})</name>
                             <key>raid.mega.status[{$MEGARAID_SPARES},{$MEGARAID_IGNORE_OTHER},{$MEGARAID_IGNORE_MEDIA},{#CONTROLLERNO}]</key>
                             <delay>15m</delay>
+                            <history>30d</history>
                             <trends>0</trends>
                             <value_type>CHAR</value_type>
                             <applications>
@@ -836,7 +851,7 @@
                         <item_prototype>
                             <name>{#DEVICE} status</name>
                             <key>raid.sw.status[{#DEVICE}]</key>
-                            <delay>5m</delay>
+                            <delay>10m</delay>
                             <history>30d</history>
                             <trends>0</trends>
                             <value_type>CHAR</value_type>
@@ -892,7 +907,7 @@
                         <item_prototype>
                             <name>VDO: Info for {#VDO_VOL}</name>
                             <key>vfs.vdo.vol.all[{#VDO_VOL}]</key>
-                            <delay>10m</delay>
+                            <delay>15m</delay>
                             <history>0</history>
                             <trends>0</trends>
                             <value_type>TEXT</value_type>
@@ -907,6 +922,7 @@
                             <type>DEPENDENT</type>
                             <key>vfs.vdo.vol.info[{#VDO_VOL},operating_mode]</key>
                             <delay>0</delay>
+                            <history>30d</history>
                             <trends>0</trends>
                             <value_type>CHAR</value_type>
                             <applications>
@@ -939,7 +955,8 @@
                             <type>DEPENDENT</type>
                             <key>vfs.vdo.vol.info[{#VDO_VOL},saving_percent]</key>
                             <delay>0</delay>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <units>%</units>
                             <applications>
                                 <application>
@@ -964,7 +981,8 @@
                             <type>DEPENDENT</type>
                             <key>vfs.vdo.vol.info[{#VDO_VOL},used_percent]</key>
                             <delay>0</delay>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <units>%</units>
                             <applications>
                                 <application>
@@ -996,7 +1014,8 @@
                             <type>DEPENDENT</type>
                             <key>vfs.vdo.vol.info[{#VDO_VOL},version]</key>
                             <delay>0</delay>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
@@ -1019,6 +1038,7 @@
                             <type>DEPENDENT</type>
                             <key>vfs.vdo.vol.info[{#VDO_VOL},write_policy]</key>
                             <delay>0</delay>
+                            <history>30d</history>
                             <trends>0</trends>
                             <value_type>CHAR</value_type>
                             <applications>

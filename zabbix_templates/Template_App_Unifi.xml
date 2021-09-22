@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-06-19T12:12:25Z</date>
+    <date>2021-09-22T16:05:01Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -33,8 +33,8 @@
                     <type>DEPENDENT</type>
                     <key>unifi.alarm</key>
                     <delay>0</delay>
-                    <history>30d</history>
-                    <trends>730d</trends>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <applications>
                         <application>
                             <name>Network</name>
@@ -69,6 +69,7 @@
                     <type>DEPENDENT</type>
                     <key>unifi.build</key>
                     <delay>0</delay>
+                    <history>30d</history>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
                     <applications>
@@ -96,8 +97,8 @@
                 <item>
                     <name>Unifi: Controler info</name>
                     <key>unifi.check.all[{$UNIFI_URL},{$UNIFI_USER},{$UNIFI_PASS},{$UNIFI_SITE},unifi]</key>
-                    <delay>5m</delay>
-                    <history>1h</history>
+                    <delay>10m</delay>
+                    <history>0</history>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
                     <applications>
@@ -115,8 +116,8 @@
                     <type>DEPENDENT</type>
                     <key>unifi.dev_adopted</key>
                     <delay>0</delay>
-                    <history>30d</history>
-                    <trends>730d</trends>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <applications>
                         <application>
                             <name>Unifi</name>
@@ -145,8 +146,8 @@
                     <type>DEPENDENT</type>
                     <key>unifi.dev_pending</key>
                     <delay>0</delay>
-                    <history>30d</history>
-                    <trends>730d</trends>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <applications>
                         <application>
                             <name>Unifi</name>
@@ -175,6 +176,7 @@
                     <type>DEPENDENT</type>
                     <key>unifi.version</key>
                     <delay>0</delay>
+                    <history>30d</history>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
                     <applications>
@@ -205,8 +207,8 @@
                     <type>DEPENDENT</type>
                     <key>unifi.wired_clients</key>
                     <delay>0</delay>
-                    <history>30d</history>
-                    <trends>730d</trends>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <applications>
                         <application>
                             <name>Unifi</name>
@@ -228,8 +230,8 @@
                     <type>DEPENDENT</type>
                     <key>unifi.wired_guests</key>
                     <delay>0</delay>
-                    <history>30d</history>
-                    <trends>730d</trends>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <applications>
                         <application>
                             <name>Unifi</name>
@@ -251,8 +253,8 @@
                     <type>DEPENDENT</type>
                     <key>unifi.wireless_clients</key>
                     <delay>0</delay>
-                    <history>30d</history>
-                    <trends>730d</trends>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <applications>
                         <application>
                             <name>Unifi</name>
@@ -274,8 +276,8 @@
                     <type>DEPENDENT</type>
                     <key>unifi.wireless_guests</key>
                     <delay>0</delay>
-                    <history>30d</history>
-                    <trends>730d</trends>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <applications>
                         <application>
                             <name>Unifi</name>
@@ -302,7 +304,7 @@
                         <item_prototype>
                             <name>Unifi: AP: {#UNIFI_DEV_NAME}: Info</name>
                             <key>unifi.check.all[{$UNIFI_URL},{$UNIFI_USER},{$UNIFI_PASS},{$UNIFI_SITE},dev,{#UNIFI_DEV_MAC},uap]</key>
-                            <delay>5m</delay>
+                            <delay>8m</delay>
                             <history>0</history>
                             <trends>0</trends>
                             <value_type>TEXT</value_type>
@@ -2366,7 +2368,7 @@
                         <item_prototype>
                             <name>Unifi: Switch: {#UNIFI_DEV_NAME}: Info</name>
                             <key>unifi.check.all[{$UNIFI_URL},{$UNIFI_USER},{$UNIFI_PASS},{$UNIFI_SITE},dev,{#UNIFI_DEV_MAC},usw]</key>
-                            <delay>5m</delay>
+                            <delay>8m</delay>
                             <history>0</history>
                             <trends>0</trends>
                             <value_type>TEXT</value_type>
@@ -3142,7 +3144,7 @@
                         <item_prototype>
                             <name>Unifi: Station {#UNIFI_STA_NAME}: Info</name>
                             <key>unifi.check.all[{$UNIFI_URL},{$UNIFI_USER},{$UNIFI_PASS},{$UNIFI_SITE},station,{#UNIFI_STA_MAC},wireless]</key>
-                            <delay>5m</delay>
+                            <delay>8m</delay>
                             <history>0</history>
                             <trends>0</trends>
                             <value_type>TEXT</value_type>
@@ -3811,7 +3813,7 @@
                         <item_prototype>
                             <name>Unifi: WLAN {#UNIFI_WLAN_NAME}: Info</name>
                             <key>unifi.check.all[{$UNIFI_URL},{$UNIFI_USER},{$UNIFI_PASS},{$UNIFI_SITE},wlan,{#UNIFI_WLAN_ID},]</key>
-                            <delay>5m</delay>
+                            <delay>8m</delay>
                             <history>0</history>
                             <trends>0</trends>
                             <value_type>TEXT</value_type>

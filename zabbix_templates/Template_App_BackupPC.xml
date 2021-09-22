@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-06-19T12:07:27Z</date>
+    <date>2021-09-22T16:02:43Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -41,7 +41,7 @@
                     <key>backuppc.general[bkp]</key>
                     <delay>0</delay>
                     <history>60d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
                     <units>!backup(s)</units>
                     <applications>
                         <application>
@@ -64,7 +64,7 @@
                     <key>backuppc.general[full_size]</key>
                     <delay>0</delay>
                     <history>60d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
                     <units>B</units>
                     <applications>
                         <application>
@@ -87,7 +87,7 @@
                     <key>backuppc.general[history_size]</key>
                     <delay>0</delay>
                     <history>60d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
                     <units>B</units>
                     <applications>
                         <application>
@@ -110,7 +110,7 @@
                     <key>backuppc.general[hosts]</key>
                     <delay>0</delay>
                     <history>60d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
                     <units>!host(s)</units>
                     <applications>
                         <application>
@@ -133,7 +133,7 @@
                     <key>backuppc.general[perf]</key>
                     <delay>0</delay>
                     <history>60d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
                     <value_type>FLOAT</value_type>
                     <applications>
                         <application>
@@ -156,7 +156,7 @@
                     <key>backuppc.general[ratio]</key>
                     <delay>0</delay>
                     <history>60d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
                     <value_type>FLOAT</value_type>
                     <applications>
                         <application>
@@ -179,7 +179,7 @@
                     <key>backuppc.general[total_size]</key>
                     <delay>0</delay>
                     <history>60d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
                     <units>B</units>
                     <applications>
                         <application>
@@ -199,9 +199,9 @@
                 <item>
                     <name>Number of BackupPC processes</name>
                     <key>proc.num[,backuppc,,BackupPC]</key>
-                    <delay>10m</delay>
+                    <delay>30m</delay>
                     <history>60d</history>
-                    <trends>730d</trends>
+                    <trends>0</trends>
                     <applications>
                         <application>
                             <name>BackupPC</name>
@@ -214,7 +214,7 @@
                     <key>proc.num[,root,,BackupPC_raidsync]</key>
                     <delay>10m</delay>
                     <history>60d</history>
-                    <trends>730d</trends>
+                    <trends>0</trends>
                     <applications>
                         <application>
                             <name>BackupPC</name>
@@ -242,7 +242,7 @@
                             <key>backuppc.entity[{#BPC_ENTITY},bkp]</key>
                             <delay>0</delay>
                             <history>60d</history>
-                            <trends>1825d</trends>
+                            <trends>1095d</trends>
                             <applications>
                                 <application>
                                     <name>BackupPC</name>
@@ -264,7 +264,7 @@
                             <key>backuppc.entity[{#BPC_ENTITY},full_size]</key>
                             <delay>0</delay>
                             <history>60d</history>
-                            <trends>1825d</trends>
+                            <trends>1095d</trends>
                             <units>o</units>
                             <applications>
                                 <application>
@@ -287,7 +287,7 @@
                             <key>backuppc.entity[{#BPC_ENTITY},history_size]</key>
                             <delay>0</delay>
                             <history>60d</history>
-                            <trends>1825d</trends>
+                            <trends>1095d</trends>
                             <units>o</units>
                             <applications>
                                 <application>
@@ -310,7 +310,7 @@
                             <key>backuppc.entity[{#BPC_ENTITY},hosts]</key>
                             <delay>0</delay>
                             <history>60d</history>
-                            <trends>1825d</trends>
+                            <trends>1095d</trends>
                             <applications>
                                 <application>
                                     <name>BackupPC</name>
@@ -332,7 +332,7 @@
                             <key>backuppc.entity[{#BPC_ENTITY},perf]</key>
                             <delay>0</delay>
                             <history>60d</history>
-                            <trends>1825d</trends>
+                            <trends>1095d</trends>
                             <value_type>FLOAT</value_type>
                             <units>!h/j</units>
                             <applications>
@@ -356,7 +356,7 @@
                             <key>backuppc.entity[{#BPC_ENTITY},ratio]</key>
                             <delay>0</delay>
                             <history>60d</history>
-                            <trends>1825d</trends>
+                            <trends>1095d</trends>
                             <value_type>FLOAT</value_type>
                             <units>%</units>
                             <applications>
@@ -380,7 +380,7 @@
                             <key>backuppc.entity[{#BPC_ENTITY},size]</key>
                             <delay>0</delay>
                             <history>60d</history>
-                            <trends>1825d</trends>
+                            <trends>1095d</trends>
                             <units>o</units>
                             <applications>
                                 <application>
@@ -400,7 +400,7 @@
                         <item_prototype>
                             <name>BackupPC: Info for entity {#BPC_ENTITY}</name>
                             <key>backuppc.entity[{#BPC_ENTITY}]</key>
-                            <delay>1800</delay>
+                            <delay>1h</delay>
                             <history>0</history>
                             <trends>0</trends>
                             <value_type>TEXT</value_type>
@@ -484,7 +484,7 @@
                             <key>backuppc.host[{#BPCHOST},age]</key>
                             <delay>0</delay>
                             <history>60d</history>
-                            <trends>1825d</trends>
+                            <trends>1095d</trends>
                             <units>s</units>
                             <applications>
                                 <application>
@@ -504,7 +504,7 @@
                         <item_prototype>
                             <name>BackupPC: Info de {#BPCHOST}</name>
                             <key>backuppc.host[{#BPCHOST},all]</key>
-                            <delay>15m</delay>
+                            <delay>30m</delay>
                             <history>0</history>
                             <trends>0</trends>
                             <value_type>TEXT</value_type>
@@ -520,7 +520,7 @@
                             <key>backuppc.host[{#BPCHOST},bkp]</key>
                             <delay>0</delay>
                             <history>60d</history>
-                            <trends>1825d</trends>
+                            <trends>1095d</trends>
                             <units>!backups</units>
                             <applications>
                                 <application>
@@ -543,7 +543,7 @@
                             <key>backuppc.host[{#BPCHOST},comp_ratio]</key>
                             <delay>0</delay>
                             <history>60d</history>
-                            <trends>1825d</trends>
+                            <trends>1095d</trends>
                             <value_type>FLOAT</value_type>
                             <units>%</units>
                             <applications>
@@ -567,7 +567,7 @@
                             <key>backuppc.host[{#BPCHOST},duration]</key>
                             <delay>0</delay>
                             <history>60d</history>
-                            <trends>1825d</trends>
+                            <trends>1095d</trends>
                             <units>s</units>
                             <applications>
                                 <application>
@@ -590,7 +590,7 @@
                             <key>backuppc.host[{#BPCHOST},enabled]</key>
                             <delay>0</delay>
                             <history>60d</history>
-                            <trends>1825d</trends>
+                            <trends>1095d</trends>
                             <applications>
                                 <application>
                                     <name>BackupPC</name>
@@ -612,7 +612,7 @@
                             <key>backuppc.host[{#BPCHOST},errors]</key>
                             <delay>0</delay>
                             <history>60d</history>
-                            <trends>1825d</trends>
+                            <trends>1095d</trends>
                             <units>!errors</units>
                             <applications>
                                 <application>
@@ -635,7 +635,7 @@
                             <key>backuppc.host[{#BPCHOST},full_size]</key>
                             <delay>0</delay>
                             <history>60d</history>
-                            <trends>1825d</trends>
+                            <trends>1095d</trends>
                             <units>B</units>
                             <applications>
                                 <application>
@@ -658,7 +658,7 @@
                             <key>backuppc.host[{#BPCHOST},history_size]</key>
                             <delay>0</delay>
                             <history>60d</history>
-                            <trends>1825d</trends>
+                            <trends>1095d</trends>
                             <units>B</units>
                             <applications>
                                 <application>
@@ -681,7 +681,7 @@
                             <key>backuppc.host[{#BPCHOST},new_size]</key>
                             <delay>0</delay>
                             <history>60d</history>
-                            <trends>1825d</trends>
+                            <trends>1095d</trends>
                             <units>B</units>
                             <applications>
                                 <application>
@@ -704,7 +704,7 @@
                             <key>backuppc.host[{#BPCHOST},new_size_avg]</key>
                             <delay>0</delay>
                             <history>60d</history>
-                            <trends>1825d</trends>
+                            <trends>1095d</trends>
                             <units>B</units>
                             <applications>
                                 <application>
@@ -727,7 +727,7 @@
                             <key>backuppc.host[{#BPCHOST},new_size_median]</key>
                             <delay>0</delay>
                             <history>60d</history>
-                            <trends>1825d</trends>
+                            <trends>1095d</trends>
                             <units>B</units>
                             <applications>
                                 <application>
@@ -750,7 +750,7 @@
                             <key>backuppc.host[{#BPCHOST},new_size_q1]</key>
                             <delay>0</delay>
                             <history>60d</history>
-                            <trends>1825d</trends>
+                            <trends>1095d</trends>
                             <units>B</units>
                             <applications>
                                 <application>
@@ -773,7 +773,7 @@
                             <key>backuppc.host[{#BPCHOST},new_size_q3]</key>
                             <delay>0</delay>
                             <history>60d</history>
-                            <trends>1825d</trends>
+                            <trends>1095d</trends>
                             <units>B</units>
                             <applications>
                                 <application>
@@ -796,7 +796,7 @@
                             <key>backuppc.host[{#BPCHOST},total_size]</key>
                             <delay>0</delay>
                             <history>60d</history>
-                            <trends>1825d</trends>
+                            <trends>1095d</trends>
                             <units>B</units>
                             <applications>
                                 <application>

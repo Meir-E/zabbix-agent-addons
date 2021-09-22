@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-06-19T12:16:52Z</date>
+    <date>2021-09-22T16:03:32Z</date>
     <groups>
         <group>
             <name>Modèles</name>
@@ -51,7 +51,7 @@
                     <key>agent.ping</key>
                     <delay>5m</delay>
                     <history>30d</history>
-                    <trends>730d</trends>
+                    <trends>180d</trends>
                     <valuemap>
                         <name>Service state</name>
                     </valuemap>
@@ -75,7 +75,8 @@
                     <name>Opened files limit</name>
                     <key>kernel.maxfiles</key>
                     <delay>1h</delay>
-                    <trends>1825d</trends>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <units>Fichiers</units>
                     <preprocessing>
                         <step>
@@ -89,7 +90,8 @@
                     <name>Max number of processes</name>
                     <key>kernel.maxproc</key>
                     <delay>1h</delay>
-                    <trends>1825d</trends>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <units>!process</units>
                     <preprocessing>
                         <step>
@@ -103,7 +105,8 @@
                     <name>Opened files</name>
                     <key>kernel.openedfiles</key>
                     <delay>5m</delay>
-                    <trends>1825d</trends>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <units>Fichiers</units>
                     <request_method>POST</request_method>
                 </item>
@@ -124,8 +127,9 @@
                 <item>
                     <name>Number of active processes</name>
                     <key>proc.num[,,run]</key>
-                    <delay>2m</delay>
-                    <trends>1825d</trends>
+                    <delay>3m</delay>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <request_method>POST</request_method>
                     <triggers>
                         <trigger>
@@ -139,7 +143,8 @@
                     <name>Number of processes</name>
                     <key>proc.num[]</key>
                     <delay>5m</delay>
-                    <trends>1825d</trends>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <request_method>POST</request_method>
                     <triggers>
                         <trigger>
@@ -154,7 +159,8 @@
                 <item>
                     <name>CPU load</name>
                     <key>system.cpu.load[,avg1]</key>
-                    <trends>1825d</trends>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <value_type>FLOAT</value_type>
                     <applications>
                         <application>
@@ -167,7 +173,8 @@
                     <name>CPU load (5min)</name>
                     <key>system.cpu.load[,avg5]</key>
                     <delay>5m</delay>
-                    <trends>1825d</trends>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <value_type>FLOAT</value_type>
                     <applications>
                         <application>
@@ -180,7 +187,8 @@
                     <name>CPU load (15min)</name>
                     <key>system.cpu.load[,avg15]</key>
                     <delay>15m</delay>
-                    <trends>1825d</trends>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <value_type>FLOAT</value_type>
                     <applications>
                         <application>
@@ -193,7 +201,8 @@
                     <name>Number of CPU</name>
                     <key>system.cpu.num[]</key>
                     <delay>1d</delay>
-                    <trends>1825d</trends>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <units>cpu</units>
                     <applications>
                         <application>
@@ -205,8 +214,9 @@
                 <item>
                     <name>CPU context switch</name>
                     <key>system.cpu.switches</key>
-                    <delay>30s</delay>
-                    <trends>1825d</trends>
+                    <delay>2m</delay>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <applications>
                         <application>
                             <name>Processor</name>
@@ -223,8 +233,8 @@
                 <item>
                     <name>CPU usage: $2</name>
                     <key>system.cpu.util[,interrupt,avg1]</key>
-                    <delay>45s</delay>
-                    <trends>1825d</trends>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
                     <applications>
@@ -237,8 +247,8 @@
                 <item>
                     <name>CPU usage: $2</name>
                     <key>system.cpu.util[,iowait,avg1]</key>
-                    <delay>45s</delay>
-                    <trends>1825d</trends>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
                     <applications>
@@ -251,8 +261,8 @@
                 <item>
                     <name>CPU usage: $2</name>
                     <key>system.cpu.util[,nice,avg1]</key>
-                    <delay>45s</delay>
-                    <trends>1825d</trends>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
                     <applications>
@@ -265,8 +275,8 @@
                 <item>
                     <name>CPU usage: $2</name>
                     <key>system.cpu.util[,softirq,avg1]</key>
-                    <delay>45s</delay>
-                    <trends>1825d</trends>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
                     <applications>
@@ -279,8 +289,8 @@
                 <item>
                     <name>CPU usage: $2</name>
                     <key>system.cpu.util[,system,avg1]</key>
-                    <delay>45s</delay>
-                    <trends>1825d</trends>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
                     <applications>
@@ -293,8 +303,8 @@
                 <item>
                     <name>CPU usage: $2</name>
                     <key>system.cpu.util[,user,avg1]</key>
-                    <delay>45s</delay>
-                    <trends>1825d</trends>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
                     <applications>
@@ -308,7 +318,7 @@
                     <name>Hostname</name>
                     <key>system.hostname</key>
                     <delay>2h</delay>
-                    <history>30d</history>
+                    <history>15d</history>
                     <trends>0</trends>
                     <value_type>TEXT</value_type>
                     <applications>
@@ -321,7 +331,9 @@
                 <item>
                     <name>Swapped in pages</name>
                     <key>system.swap.in[,pages]</key>
-                    <trends>1825d</trends>
+                    <delay>3m</delay>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <units>pages/s</units>
                     <applications>
                         <application>
@@ -339,7 +351,9 @@
                 <item>
                     <name>Swapped out pages</name>
                     <key>system.swap.out[,pages]</key>
-                    <trends>1825d</trends>
+                    <delay>3m</delay>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <units>pages/s</units>
                     <applications>
                         <application>
@@ -358,7 +372,8 @@
                     <name>Swap: Free</name>
                     <key>system.swap.size[,free]</key>
                     <delay>3m</delay>
-                    <trends>1825d</trends>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <units>B</units>
                     <applications>
                         <application>
@@ -371,7 +386,8 @@
                     <name>Swap : Free %</name>
                     <key>system.swap.size[,pfree]</key>
                     <delay>3m</delay>
-                    <trends>1825d</trends>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
                     <applications>
@@ -385,7 +401,8 @@
                     <name>Swap: Used %</name>
                     <key>system.swap.size[,pused]</key>
                     <delay>3m</delay>
-                    <trends>1825d</trends>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
                     <applications>
@@ -399,7 +416,8 @@
                     <name>Swap: Total</name>
                     <key>system.swap.size[,total]</key>
                     <delay>1h</delay>
-                    <trends>1825d</trends>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <units>B</units>
                     <applications>
                         <application>
@@ -418,7 +436,8 @@
                     <name>Swap: Used</name>
                     <key>system.swap.size[,used]</key>
                     <delay>3m</delay>
-                    <trends>1825d</trends>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <units>B</units>
                     <applications>
                         <application>
@@ -430,8 +449,9 @@
                 <item>
                     <name>Uptime</name>
                     <key>system.uptime</key>
-                    <delay>5m</delay>
-                    <trends>1825d</trends>
+                    <delay>10m</delay>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <units>s</units>
                     <request_method>POST</request_method>
                 </item>
@@ -439,7 +459,8 @@
                     <name>Connected users</name>
                     <key>system.users.num</key>
                     <delay>5m</delay>
-                    <trends>1825d</trends>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <request_method>POST</request_method>
                     <triggers>
                         <trigger>
@@ -719,7 +740,9 @@
                     <name>Memory: Used %</name>
                     <type>CALCULATED</type>
                     <key>vm.memory.size.pused</key>
-                    <trends>1825d</trends>
+                    <delay>3m</delay>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
                     <params>100-last(&quot;vm.memory.size[pavailable]&quot;)</params>
@@ -734,7 +757,9 @@
                     <name>Memory: Used</name>
                     <type>CALCULATED</type>
                     <key>vm.memory.size.used</key>
-                    <trends>1825d</trends>
+                    <delay>3m</delay>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <units>B</units>
                     <params>last(&quot;vm.memory.size[total]&quot;)-last(&quot;vm.memory.size[available]&quot;)</params>
                     <applications>
@@ -747,7 +772,9 @@
                 <item>
                     <name>Memory: Available</name>
                     <key>vm.memory.size[available]</key>
-                    <trends>1825d</trends>
+                    <delay>3m</delay>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <units>B</units>
                     <applications>
                         <application>
@@ -758,7 +785,9 @@
                 <item>
                     <name>Memory: Buffers</name>
                     <key>vm.memory.size[buffers]</key>
-                    <trends>1825d</trends>
+                    <delay>3m</delay>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <units>B</units>
                     <applications>
                         <application>
@@ -770,7 +799,9 @@
                 <item>
                     <name>Memory: Cache</name>
                     <key>vm.memory.size[cached]</key>
-                    <trends>1825d</trends>
+                    <delay>3m</delay>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <units>B</units>
                     <applications>
                         <application>
@@ -782,7 +813,9 @@
                 <item>
                     <name>Memory: Free</name>
                     <key>vm.memory.size[free]</key>
-                    <trends>1825d</trends>
+                    <delay>3m</delay>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <units>B</units>
                     <applications>
                         <application>
@@ -794,7 +827,9 @@
                 <item>
                     <name>Memory: Available %</name>
                     <key>vm.memory.size[pavailable]</key>
-                    <trends>1825d</trends>
+                    <delay>3m</delay>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <value_type>FLOAT</value_type>
                     <units>%</units>
                     <applications>
@@ -806,8 +841,9 @@
                 <item>
                     <name>Memory: Total</name>
                     <key>vm.memory.size[total]</key>
-                    <delay>15m</delay>
-                    <trends>1825d</trends>
+                    <delay>3m</delay>
+                    <history>60d</history>
+                    <trends>1095d</trends>
                     <units>B</units>
                     <applications>
                         <application>
@@ -842,8 +878,9 @@
                         <item_prototype>
                             <name>SMART: {#SMARTDRIVE}: $2</name>
                             <key>hardware.disk.smart[{#SMARTDRIVE},Current_Pending_Sector]</key>
-                            <delay>15m</delay>
-                            <trends>1825d</trends>
+                            <delay>30m</delay>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <applications>
                                 <application>
                                     <name>Disks</name>
@@ -854,8 +891,9 @@
                         <item_prototype>
                             <name>SMART: {#SMARTDRIVE}: $2</name>
                             <key>hardware.disk.smart[{#SMARTDRIVE},Offline_Uncorrectable]</key>
-                            <delay>15m</delay>
-                            <trends>1825d</trends>
+                            <delay>30m</delay>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <applications>
                                 <application>
                                     <name>Disks</name>
@@ -867,7 +905,8 @@
                             <name>SMART: {#SMARTDRIVE}: $2</name>
                             <key>hardware.disk.smart[{#SMARTDRIVE},Power_Cycle_Count]</key>
                             <delay>1h</delay>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <applications>
                                 <application>
                                     <name>Disks</name>
@@ -879,7 +918,8 @@
                             <name>SMART: {#SMARTDRIVE}: $2</name>
                             <key>hardware.disk.smart[{#SMARTDRIVE},Power_On_Hours]</key>
                             <delay>1h</delay>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <units>s</units>
                             <applications>
                                 <application>
@@ -897,8 +937,9 @@
                         <item_prototype>
                             <name>SMART: {#SMARTDRIVE}: $2</name>
                             <key>hardware.disk.smart[{#SMARTDRIVE},Reallocated_Sector_Ct]</key>
-                            <delay>15m</delay>
-                            <trends>1825d</trends>
+                            <delay>30m</delay>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <applications>
                                 <application>
                                     <name>Disks</name>
@@ -938,7 +979,8 @@
                             <name>Temperature $1</name>
                             <key>hardware.sensor[{#SENSORNAME}]</key>
                             <delay>5m</delay>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <value_type>FLOAT</value_type>
                             <units>°C</units>
                             <applications>
@@ -971,7 +1013,8 @@
                             <name>Rotation speed for {#SENSORNAME}</name>
                             <key>hardware.sensor[{#SENSORNAME},fan]</key>
                             <delay>10m</delay>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <value_type>FLOAT</value_type>
                             <units>rpm</units>
                             <applications>
@@ -1010,8 +1053,9 @@
                         <item_prototype>
                             <name>Power consumption ({#SENSORNAME})</name>
                             <key>hardware.sensor[{#SENSORNAME},power]</key>
-                            <delay>5m</delay>
-                            <trends>1825d</trends>
+                            <delay>10m</delay>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <units>{#SENSORUNIT}</units>
                             <applications>
                                 <application>
@@ -1041,8 +1085,8 @@
                         <item_prototype>
                             <name>Inbound trafic for {#IFNAME}</name>
                             <key>net.if.in[{#IFNAME},bytes]</key>
-                            <delay>45s</delay>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <value_type>FLOAT</value_type>
                             <units>bps</units>
                             <applications>
@@ -1066,7 +1110,8 @@
                             <name>Errors on inbound trafic for {#IFNAME}</name>
                             <key>net.if.in[{#IFNAME},errors]</key>
                             <delay>15m</delay>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <value_type>FLOAT</value_type>
                             <units>errors</units>
                             <applications>
@@ -1085,8 +1130,8 @@
                         <item_prototype>
                             <name>Outbound trafic for {#IFNAME}</name>
                             <key>net.if.out[{#IFNAME},bytes]</key>
-                            <delay>45s</delay>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <value_type>FLOAT</value_type>
                             <units>bps</units>
                             <applications>
@@ -1110,7 +1155,8 @@
                             <name>Errors on outbound trafic for {#IFNAME}</name>
                             <key>net.if.out[{#IFNAME},errors]</key>
                             <delay>15m</delay>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <value_type>FLOAT</value_type>
                             <units>errors</units>
                             <applications>
@@ -1196,7 +1242,8 @@
                             <name>Read operations on {#DEVNAME}</name>
                             <key>vfs.dev.read[{#DEVNAME},ops]</key>
                             <delay>2m</delay>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <value_type>FLOAT</value_type>
                             <units>iops</units>
                             <applications>
@@ -1210,7 +1257,8 @@
                             <name>Reads on {#DEVNAME}</name>
                             <key>vfs.dev.read[{#DEVNAME},sectors]</key>
                             <delay>2m</delay>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <value_type>FLOAT</value_type>
                             <units>B/s</units>
                             <applications>
@@ -1234,7 +1282,8 @@
                             <name>Write operations on {#DEVNAME}</name>
                             <key>vfs.dev.write[{#DEVNAME},ops]</key>
                             <delay>2m</delay>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <value_type>FLOAT</value_type>
                             <units>iops</units>
                             <applications>
@@ -1254,7 +1303,8 @@
                             <name>Writes on {#DEVNAME}</name>
                             <key>vfs.dev.write[{#DEVNAME},sectors]</key>
                             <delay>2m</delay>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <value_type>FLOAT</value_type>
                             <units>B/s</units>
                             <applications>
@@ -1302,7 +1352,8 @@
                             <name>Free inodes on {#FSNAME}</name>
                             <key>vfs.fs.inode[{#FSNAME},free]</key>
                             <delay>10m</delay>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <units>inodes</units>
                             <applications>
                                 <application>
@@ -1315,7 +1366,8 @@
                             <name>Used inodes on {#FSNAME} (%)</name>
                             <key>vfs.fs.inode[{#FSNAME},pused]</key>
                             <delay>15m</delay>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <value_type>FLOAT</value_type>
                             <units>%</units>
                             <applications>
@@ -1345,7 +1397,8 @@
                             <name>Used inodes on {#FSNAME}</name>
                             <key>vfs.fs.inode[{#FSNAME},used]</key>
                             <delay>15m</delay>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <units>inodes</units>
                             <applications>
                                 <application>
@@ -1358,7 +1411,8 @@
                             <name>Free space on {#FSNAME}</name>
                             <key>vfs.fs.size[{#FSNAME},free]</key>
                             <delay>10m</delay>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <units>B</units>
                             <applications>
                                 <application>
@@ -1371,7 +1425,8 @@
                             <name>Used space on {#FSNAME} (%)</name>
                             <key>vfs.fs.size[{#FSNAME},pused]</key>
                             <delay>10m</delay>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <value_type>FLOAT</value_type>
                             <units>%</units>
                             <applications>
@@ -1410,7 +1465,8 @@
                             <name>Used space on {#FSNAME}</name>
                             <key>vfs.fs.size[{#FSNAME},used]</key>
                             <delay>10m</delay>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <units>B</units>
                             <applications>
                                 <application>
@@ -1434,7 +1490,7 @@
                             <key>vfs.lvm.vg[{#LVMGRP},alloc_ct]</key>
                             <delay>15m</delay>
                             <history>60d</history>
-                            <trends>1825d</trends>
+                            <trends>1095d</trends>
                             <value_type>FLOAT</value_type>
                             <units>%</units>
                             <params>100*last(&quot;vfs.lvm.vg[{#LVMGRP},alloc_pe_size]&quot;)/last(&quot;vfs.lvm.vg[{#LVMGRP},vg_size]&quot;)</params>
@@ -1453,7 +1509,7 @@
                             <key>vfs.lvm.vg[{#LVMGRP},alloc_pe_size]</key>
                             <delay>0</delay>
                             <history>60d</history>
-                            <trends>1825d</trends>
+                            <trends>1095d</trends>
                             <units>B</units>
                             <applications>
                                 <application>
@@ -1479,7 +1535,7 @@
                             <key>vfs.lvm.vg[{#LVMGRP},cur_lv]</key>
                             <delay>0</delay>
                             <history>60d</history>
-                            <trends>1825d</trends>
+                            <trends>1095d</trends>
                             <units>!lv</units>
                             <applications>
                                 <application>
@@ -1505,7 +1561,7 @@
                             <key>vfs.lvm.vg[{#LVMGRP},vg_size]</key>
                             <delay>0</delay>
                             <history>60d</history>
-                            <trends>1825d</trends>
+                            <trends>1095d</trends>
                             <units>B</units>
                             <applications>
                                 <application>
@@ -1561,8 +1617,9 @@
                         <item_prototype>
                             <name>LVM: {#LVMSNAP} allocation</name>
                             <key>vfs.lvm.lv[{#LVMSNAP},allocation]</key>
-                            <delay>5m</delay>
-                            <trends>1825d</trends>
+                            <delay>10m</delay>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <value_type>FLOAT</value_type>
                             <units>%</units>
                             <applications>
@@ -1602,7 +1659,8 @@
                             <name>Metadata allocation for pool {#LVMTHINP}</name>
                             <key>vfs.lvm.lv[{#LVMTHINP},allocation_metadata]</key>
                             <delay>10m</delay>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <value_type>FLOAT</value_type>
                             <units>%</units>
                             <applications>
@@ -1623,7 +1681,8 @@
                             <name>Data allocation for pool {#LVMTHINP}</name>
                             <key>vfs.lvm.lv[{#LVMTHINP},allocation_pool_data]</key>
                             <delay>10m</delay>
-                            <trends>1825d</trends>
+                            <history>60d</history>
+                            <trends>1095d</trends>
                             <value_type>FLOAT</value_type>
                             <units>%</units>
                             <applications>

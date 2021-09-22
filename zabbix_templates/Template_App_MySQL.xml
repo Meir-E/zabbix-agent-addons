@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>5.0</version>
-    <date>2021-06-19T12:09:04Z</date>
+    <date>2021-09-22T16:01:48Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -28,7 +28,7 @@
                     <key>db.mysql[Aborted_clients]</key>
                     <delay>0</delay>
                     <history>30d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
                     <units>!connections</units>
                     <applications>
                         <application>
@@ -55,7 +55,7 @@
                     <key>db.mysql[Aborted_connects]</key>
                     <delay>0</delay>
                     <history>30d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
                     <units>!conn</units>
                     <applications>
                         <application>
@@ -82,7 +82,7 @@
                     <key>db.mysql[Access_denied_errors]</key>
                     <delay>0</delay>
                     <history>30d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
                     <units>!connections</units>
                     <applications>
                         <application>
@@ -110,7 +110,7 @@ return json.Access_denied_errors || 0;</params>
                     <key>db.mysql[Acl_users]</key>
                     <delay>0</delay>
                     <history>30d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
                     <units>!users</units>
                     <applications>
                         <application>
@@ -134,7 +134,7 @@ return json.Acl_users || 0;</params>
                     <key>db.mysql[Bytes_received]</key>
                     <delay>0</delay>
                     <history>30d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
                     <units>B/s</units>
                     <applications>
                         <application>
@@ -161,7 +161,7 @@ return json.Acl_users || 0;</params>
                     <key>db.mysql[Bytes_sent]</key>
                     <delay>0</delay>
                     <history>30d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
                     <units>B/s</units>
                     <applications>
                         <application>
@@ -188,7 +188,8 @@ return json.Acl_users || 0;</params>
                     <key>db.mysql[Com_admin_commands]</key>
                     <delay>0</delay>
                     <history>30d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
+                    <value_type>FLOAT</value_type>
                     <units>!qps</units>
                     <applications>
                         <application>
@@ -215,7 +216,8 @@ return json.Acl_users || 0;</params>
                     <key>db.mysql[Com_alter_user]</key>
                     <delay>0</delay>
                     <history>30d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
+                    <value_type>FLOAT</value_type>
                     <units>!qps</units>
                     <applications>
                         <application>
@@ -243,7 +245,8 @@ return json.Com_alter_user || 0;</params>
                     <key>db.mysql[Com_begin]</key>
                     <delay>0</delay>
                     <history>30d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
+                    <value_type>FLOAT</value_type>
                     <units>!qps</units>
                     <applications>
                         <application>
@@ -270,7 +273,8 @@ return json.Com_alter_user || 0;</params>
                     <key>db.mysql[Com_commit]</key>
                     <delay>0</delay>
                     <history>30d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
+                    <value_type>FLOAT</value_type>
                     <units>!qps</units>
                     <applications>
                         <application>
@@ -297,7 +301,8 @@ return json.Com_alter_user || 0;</params>
                     <key>db.mysql[Com_create_user]</key>
                     <delay>0</delay>
                     <history>30d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
+                    <value_type>FLOAT</value_type>
                     <units>!qps</units>
                     <applications>
                         <application>
@@ -324,7 +329,8 @@ return json.Com_alter_user || 0;</params>
                     <key>db.mysql[Com_delete]</key>
                     <delay>0</delay>
                     <history>30d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
+                    <value_type>FLOAT</value_type>
                     <units>!qps</units>
                     <applications>
                         <application>
@@ -351,7 +357,8 @@ return json.Com_alter_user || 0;</params>
                     <key>db.mysql[Com_insert]</key>
                     <delay>0</delay>
                     <history>30d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
+                    <value_type>FLOAT</value_type>
                     <units>!qps</units>
                     <applications>
                         <application>
@@ -378,7 +385,8 @@ return json.Com_alter_user || 0;</params>
                     <key>db.mysql[Com_prepare_sql]</key>
                     <delay>0</delay>
                     <history>30d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
+                    <value_type>FLOAT</value_type>
                     <units>!qps</units>
                     <applications>
                         <application>
@@ -405,7 +413,8 @@ return json.Com_alter_user || 0;</params>
                     <key>db.mysql[Com_rollback]</key>
                     <delay>0</delay>
                     <history>30d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
+                    <value_type>FLOAT</value_type>
                     <units>!qps</units>
                     <applications>
                         <application>
@@ -432,7 +441,8 @@ return json.Com_alter_user || 0;</params>
                     <key>db.mysql[Com_select]</key>
                     <delay>0</delay>
                     <history>30d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
+                    <value_type>FLOAT</value_type>
                     <units>!qps</units>
                     <applications>
                         <application>
@@ -459,7 +469,8 @@ return json.Com_alter_user || 0;</params>
                     <key>db.mysql[Com_update]</key>
                     <delay>0</delay>
                     <history>30d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
+                    <value_type>FLOAT</value_type>
                     <units>!qps</units>
                     <applications>
                         <application>
@@ -486,7 +497,7 @@ return json.Com_alter_user || 0;</params>
                     <key>db.mysql[Connections]</key>
                     <delay>0</delay>
                     <history>30d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
                     <units>!conn</units>
                     <applications>
                         <application>
@@ -513,7 +524,7 @@ return json.Com_alter_user || 0;</params>
                     <key>db.mysql[Innodb_buffer_pool_bytes_data]</key>
                     <delay>0</delay>
                     <history>30d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
                     <units>B</units>
                     <applications>
                         <application>
@@ -536,7 +547,7 @@ return json.Com_alter_user || 0;</params>
                     <key>db.mysql[Innodb_buffer_pool_bytes_dirty]</key>
                     <delay>0</delay>
                     <history>30d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
                     <units>B</units>
                     <applications>
                         <application>
@@ -594,7 +605,8 @@ return json.Innodb_buffer_pool_load_status || 'Buffer pool(s) load completed at'
                     <key>db.mysql[Innodb_buffer_pool_reads]</key>
                     <delay>0</delay>
                     <history>30d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
+                    <value_type>FLOAT</value_type>
                     <units>!reads</units>
                     <applications>
                         <application>
@@ -621,7 +633,8 @@ return json.Innodb_buffer_pool_load_status || 'Buffer pool(s) load completed at'
                     <key>db.mysql[Innodb_data_fsyncs]</key>
                     <delay>0</delay>
                     <history>30d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
+                    <value_type>FLOAT</value_type>
                     <units>!fsync/s</units>
                     <applications>
                         <application>
@@ -648,7 +661,8 @@ return json.Innodb_buffer_pool_load_status || 'Buffer pool(s) load completed at'
                     <key>db.mysql[Innodb_os_log_fsyncs]</key>
                     <delay>0</delay>
                     <history>30d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
+                    <value_type>FLOAT</value_type>
                     <units>!fsync/s</units>
                     <applications>
                         <application>
@@ -675,7 +689,8 @@ return json.Innodb_buffer_pool_load_status || 'Buffer pool(s) load completed at'
                     <key>db.mysql[Max_statement_time_exceeded]</key>
                     <delay>0</delay>
                     <history>30d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
+                    <value_type>FLOAT</value_type>
                     <units>!qps</units>
                     <applications>
                         <application>
@@ -703,7 +718,7 @@ return json.Max_statement_time_exceeded || 0;</params>
                     <key>db.mysql[Memory_used]</key>
                     <delay>0</delay>
                     <history>30d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
                     <units>B</units>
                     <applications>
                         <application>
@@ -727,7 +742,7 @@ return json.Memory_used || 0;</params>
                     <key>db.mysql[Open_files]</key>
                     <delay>0</delay>
                     <history>30d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
                     <units>!files</units>
                     <applications>
                         <application>
@@ -773,7 +788,8 @@ return json.Memory_used || 0;</params>
                     <key>db.mysql[Qcache_hits]</key>
                     <delay>0</delay>
                     <history>30d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
+                    <value_type>FLOAT</value_type>
                     <units>!qps</units>
                     <applications>
                         <application>
@@ -800,7 +816,8 @@ return json.Memory_used || 0;</params>
                     <key>db.mysql[Queries]</key>
                     <delay>0</delay>
                     <history>30d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
+                    <value_type>FLOAT</value_type>
                     <units>!qps</units>
                     <applications>
                         <application>
@@ -834,7 +851,8 @@ return json.Memory_used || 0;</params>
                     <key>db.mysql[Slow_queries]</key>
                     <delay>0</delay>
                     <history>30d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
+                    <value_type>FLOAT</value_type>
                     <units>!qps</units>
                     <applications>
                         <application>
@@ -868,7 +886,7 @@ return json.Memory_used || 0;</params>
                     <key>db.mysql[Threads_running]</key>
                     <delay>0</delay>
                     <history>30d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
                     <units>!conn</units>
                     <applications>
                         <application>
@@ -891,7 +909,7 @@ return json.Memory_used || 0;</params>
                     <key>db.mysql[Uptime]</key>
                     <delay>0</delay>
                     <history>30d</history>
-                    <trends>1825d</trends>
+                    <trends>1095d</trends>
                     <units>s</units>
                     <applications>
                         <application>
