@@ -1,0 +1,91 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+use JSON;
+use Getopt::Long;
+use LWP::UserAgent;
+use HTTP::Request::Common;
+use URI;
+use Data::Dumper;
+
+my $user      = undef;
+my $pass      = undef;
+my $url       = 'http://localhost:9200';
+my $certcheck = 1;
+my $nodes     = 0;
+my $indices   = 0;
+my $pretty    = 0;
+
+my $json = [];
+
+GetOptions (
+  'user=s'       => \$user,
+  'password|p=s' => \$pass,
+  'url=s'        => \$url,
+  'cert-check!'  => \$certcheck,
+  'nodes'        => \$nodes,
+  'indices'      => \$indices,
+  'pretty'       => \$pretty
+);
+
+if ($nodes and $indices){
+  die "--nodes and --indices are mutually exclusive\n";
+}
+
+my $uri = URI->new($url);
+
+if (not defined $uri){
+  die "$url is not a valid URL\n";
+}
+
+# If connecting over http or is host is localhost
+# there's no need to check certificate
+if ($uri->scheme eq 'http' or $uri->host =~ m/^localhost|127\.0\.0/){
+  $certcheck = 0;
+}
+
+my $sslopts = {};
+if (not $certcheck){
+  $sslopts = {
+    verify_hostname => 0,
+    SSL_verify_mode => 0
+  }
+}
+
+my $ua = LWP::UserAgent->new(
+  ssl_opts   => $sslopts
+);
+
+if ($nodes){
+  foreach (@{make_request('/_cat/nodes?format=json')}){
+    push @{$json}, {
+      '{#ES_NODE_NAME}' => $_->{name},
+      '{#ES_NODE_ROLE}' => $_->{'node.role'}
+    };
+  }
+} elsif ($indices){
+  foreach (@{make_request('/_cat/indices?format=json')}){
+    push @{$json}, {
+      '{#ES_INDICE_NAME}'   => $_->{index},
+      '{#ES_INDICE_STATUS}' => $_->{status},
+      '{#ES_INDICE_UUID}'   => $_->{uuid}
+    };
+  }
+}
+
+print to_json($json, { pretty => $pretty });
+
+sub make_request {
+  my $path = shift;
+  my $req_url = $url . $path;
+  my $req = GET $req_url;
+  if (defined $user and defined $pass){
+    $req->authorization_basic($user, $pass);
+  }
+  my $resp = $ua->request($req);
+  die "Request to $req_url failed : " . $resp->message . "\n" if $resp->is_error;
+  return from_json($resp->decoded_content);
+}
+

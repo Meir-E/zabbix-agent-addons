@@ -1,0 +1,86 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+use JSON;
+use Getopt::Long;
+use LWP::UserAgent;
+use HTTP::Request::Common;
+use URI;
+use Data::Dumper;
+
+my $user      = undef;
+my $pass      = undef;
+my $url       = 'http://localhost:9200';
+my $certcheck = 1;
+my $cluster   = 0;
+my $node      = undef;
+my $index     = undef;
+my $pretty    = 0;
+
+my $json = {};
+
+GetOptions (
+  'user=s'       => \$user,
+  'password|p=s' => \$pass,
+  'url=s'        => \$url,
+  'cert-check!'  => \$certcheck,
+  'cluster'      => \$cluster,
+  'node=s'       => \$node,
+  'index=s'      => \$index,
+  'pretty'       => \$pretty
+);
+
+# If no option is given, default to fetch the cluster status
+if (not defined $cluster and not defined $node and not defined $index){
+  $cluster = 1;
+}
+
+my $uri = URI->new($url);
+
+if (not defined $uri){
+  die "COuldn't parse $url as a valid url\n";
+}
+
+# If connecting over http or is host is localhost
+# there's no need to check certificate
+if ($uri->scheme eq 'http' or $uri->host =~ m/^localhost|127\.0\.0/){
+  $certcheck = 0;
+}
+
+my $resp;
+my $sslopts = {};
+if (not $certcheck){
+  $sslopts = {
+    verify_hostname => 0,
+    SSL_verify_mode => 0
+  }
+}
+
+my $ua = LWP::UserAgent->new(
+  ssl_opts   => $sslopts
+);
+
+if ($cluster){
+  $json = make_request('/_cluster/stats');
+} elsif (defined $node){
+  $json = make_request('/_nodes/' . $node);
+} elsif (defined $index){
+  $json = make_request('/_cluster/health/' . $index . '?level=indices')->{'indices'}->{$index};
+}
+
+print to_json($json, { pretty => $pretty });
+
+sub make_request {
+  my $path = shift;
+  my $req_url = $url . $path;
+  my $req = GET $req_url;
+  if (defined $user and defined $pass){
+    $req->authorization_basic($user, $pass);
+  }
+  my $resp = $ua->request($req);
+  die "Request to $req_url failed : " . $resp->message . "\n" if $resp->is_error;
+  return from_json($resp->decoded_content);
+}
+
