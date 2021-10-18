@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.150
+Version: 0.2.151
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -106,6 +106,10 @@ fi
 %endif
 
 %changelog
+* Mon Oct 18 2021 Daniel Berteaud <daniel@firewall-services.com> 0.2.151-1
+- Add Elasticsearch monitoring scripts (daniel@firewall-services.com)
+- Updates and fixes in Zabbix templates (daniel@firewall-services.com)
+
 * Fri Jul 16 2021 Daniel Berteaud <daniel@firewall-services.com> 0.2.150-1
 - Do not count Unconfigured(good) drives as an error (daniel@firewall-
   services.com)
