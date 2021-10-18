@@ -22,8 +22,8 @@ my $pretty    = 0;
 my $json = {};
 
 GetOptions (
-  'user=s'       => \$user,
-  'password|p=s' => \$pass,
+  'user:s'       => \$user,
+  'password:s'   => \$pass,
   'url=s'        => \$url,
   'cert-check!'  => \$certcheck,
   'cluster'      => \$cluster,
@@ -61,6 +61,7 @@ if (not $certcheck){
 my $ua = LWP::UserAgent->new(
   ssl_opts   => $sslopts
 );
+$ua->env_proxy;
 
 if ($cluster){
   $json = make_request('/_cluster/stats');
@@ -76,7 +77,7 @@ sub make_request {
   my $path = shift;
   my $req_url = $url . $path;
   my $req = GET $req_url;
-  if (defined $user and defined $pass){
+  if (defined $user and $user ne '' and defined $pass and $pass ne ''){
     $req->authorization_basic($user, $pass);
   }
   my $resp = $ua->request($req);
