@@ -4,7 +4,7 @@
 
 Summary: Scripts for Zabbix monitoring
 Name: zabbix-agent-addons
-Version: 0.2.152
+Version: 0.2.153
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 BuildArch: noarch
@@ -106,6 +106,9 @@ fi
 %endif
 
 %changelog
+* Tue Oct 19 2021 Daniel Berteaud <daniel@firewall-services.com> 0.2.153-1
+- Tweak elasticsearch monitoring scripts (daniel@firewall-services.com)
+
 * Mon Oct 18 2021 Daniel Berteaud <daniel@firewall-services.com> 0.2.152-1
 - Small fixes in elasticsearch scripts (daniel@firewall-services.com)
 
