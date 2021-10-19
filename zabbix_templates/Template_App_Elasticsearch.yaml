@@ -1,0 +1,744 @@
+zabbix_export:
+  version: '5.4'
+  date: '2021-10-19T08:26:20Z'
+  groups:
+    -
+      uuid: 7df96b18c230490a9a0a9e2307226338
+      name: Templates
+  templates:
+    -
+      uuid: 3a658cb77f26469a8a114b1bcd4734e9
+      template: Template_App_Elasticsearch
+      name: Template_App_Elasticsearch
+      groups:
+        -
+          name: Templates
+      items:
+        -
+          uuid: 1957d2e7393348f9ae73bfc07c1122a3
+          name: 'ES Cluster informations'
+          key: 'elasticsearch.check[{$ES_URL},{$ES_USER},{$ES_PASS},cluster]'
+          delay: 3m
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          tags:
+            -
+              tag: Application
+              value: Elasticsearch
+        -
+          uuid: fec408ef6d3249a885a3f9842016ccd4
+          name: 'ES: Cluster name'
+          type: DEPENDENT
+          key: 'elasticsearch.cluster[cluster_name]'
+          delay: '0'
+          history: 30d
+          trends: '0'
+          value_type: CHAR
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.cluster_name
+            -
+              type: DISCARD_UNCHANGED
+              parameters:
+                - ''
+          master_item:
+            key: 'elasticsearch.check[{$ES_URL},{$ES_USER},{$ES_PASS},cluster]'
+          tags:
+            -
+              tag: Application
+              value: Elasticsearch
+        -
+          uuid: 286f9eb4d1504704999abd6a98b09a5c
+          name: 'ES: Number of indices'
+          type: DEPENDENT
+          key: 'elasticsearch.cluster[indices.count]'
+          delay: '0'
+          history: 60d
+          trends: 1095d
+          units: '!indice(s)'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.indices.count
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: 'elasticsearch.check[{$ES_URL},{$ES_USER},{$ES_PASS},cluster]'
+          tags:
+            -
+              tag: Application
+              value: Elasticsearch
+          triggers:
+            -
+              uuid: dd7bc1621b994f24917d5beb4c07e17f
+              expression: 'abs(change(/Template_App_Elasticsearch/elasticsearch.cluster[indices.count]))>0'
+              recovery_mode: NONE
+              name: 'Number of indices has changed to {ITEM.LASTVALUE1}'
+              priority: INFO
+              manual_close: 'YES'
+        -
+          uuid: 8b990ab728304cd98d264fdbbe919795
+          name: 'ES: Number of documents'
+          type: DEPENDENT
+          key: 'elasticsearch.cluster[indices.docs.count]'
+          delay: '0'
+          history: 60d
+          trends: 1095d
+          units: '!document(s)'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.indices.docs.count
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: 'elasticsearch.check[{$ES_URL},{$ES_USER},{$ES_PASS},cluster]'
+          tags:
+            -
+              tag: Application
+              value: Elasticsearch
+        -
+          uuid: 4d1b8e4e358749739e3439bf9489b074
+          name: 'ES: Number of deleted documents'
+          type: DEPENDENT
+          key: 'elasticsearch.cluster[indices.docs.deleted]'
+          delay: '0'
+          history: 60d
+          trends: 1095d
+          units: '!document(s)'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.indices.docs.deleted
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: 'elasticsearch.check[{$ES_URL},{$ES_USER},{$ES_PASS},cluster]'
+          tags:
+            -
+              tag: Application
+              value: Elasticsearch
+        -
+          uuid: 0f472265bad44e849866d87de2c50474
+          name: 'ES: Number of primary shards'
+          type: DEPENDENT
+          key: 'elasticsearch.cluster[indices.shards.primaries]'
+          delay: '0'
+          history: 60d
+          trends: 1095d
+          units: '!shard(s)'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.indices.shards.primaries
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: 'elasticsearch.check[{$ES_URL},{$ES_USER},{$ES_PASS},cluster]'
+          tags:
+            -
+              tag: Application
+              value: Elasticsearch
+        -
+          uuid: 7118fffe2a864915947ce19570885993
+          name: 'ES: Number of replication shards'
+          type: DEPENDENT
+          key: 'elasticsearch.cluster[indices.shards.replication]'
+          delay: '0'
+          history: 60d
+          trends: 1095d
+          units: '!shard(s)'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.indices.shards.replication
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: 'elasticsearch.check[{$ES_URL},{$ES_USER},{$ES_PASS},cluster]'
+          tags:
+            -
+              tag: Application
+              value: Elasticsearch
+        -
+          uuid: 019eb7caa2ff45aa8aad4da89b340a54
+          name: 'ES: Number of shards'
+          type: DEPENDENT
+          key: 'elasticsearch.cluster[indices.shards.total]'
+          delay: '0'
+          history: 60d
+          trends: 1095d
+          units: '!shard(s)'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.indices.shards.total
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: 'elasticsearch.check[{$ES_URL},{$ES_USER},{$ES_PASS},cluster]'
+          tags:
+            -
+              tag: Application
+              value: Elasticsearch
+        -
+          uuid: 8f0660a8b80041d987a91986608a43d2
+          name: 'ES: Store size'
+          type: DEPENDENT
+          key: 'elasticsearch.cluster[indices.store.size]'
+          delay: '0'
+          history: 60d
+          trends: 1095d
+          units: B
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.indices.store.size_in_bytes
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: 'elasticsearch.check[{$ES_URL},{$ES_USER},{$ES_PASS},cluster]'
+          tags:
+            -
+              tag: Application
+              value: Elasticsearch
+        -
+          uuid: 854e270d75ef4c6fad22ebd553f6438e
+          name: 'ES: Number of data nodes'
+          type: DEPENDENT
+          key: 'elasticsearch.cluster[nodes.data]'
+          delay: '0'
+          history: 60d
+          trends: 1095d
+          units: '!node(s)'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.nodes.count.data
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: 'elasticsearch.check[{$ES_URL},{$ES_USER},{$ES_PASS},cluster]'
+          tags:
+            -
+              tag: Application
+              value: Elasticsearch
+        -
+          uuid: 52f72a68d734465b8422fb4e3ad084a7
+          name: 'ES: Number of failed nodes'
+          type: DEPENDENT
+          key: 'elasticsearch.cluster[nodes.failed]'
+          delay: '0'
+          history: 60d
+          trends: 1095d
+          units: '!node(s)'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $._nodes.failed
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: 'elasticsearch.check[{$ES_URL},{$ES_USER},{$ES_PASS},cluster]'
+          tags:
+            -
+              tag: Application
+              value: Elasticsearch
+          triggers:
+            -
+              uuid: c188a92cd4444d7f8fe4c635cf35e656
+              expression: 'last(/Template_App_Elasticsearch/elasticsearch.cluster[nodes.failed])>0'
+              name: 'ES cluster has {ITEM.LASTVALUE1} failed node(s)'
+              priority: AVERAGE
+        -
+          uuid: 94de965d25ed41cd8d5ef367e9a22497
+          name: 'ES: Available space'
+          type: DEPENDENT
+          key: 'elasticsearch.cluster[nodes.fs.available_in_bytes]'
+          delay: '0'
+          history: 60d
+          trends: 1095d
+          units: B
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.nodes.fs.available_in_bytes
+          master_item:
+            key: 'elasticsearch.check[{$ES_URL},{$ES_USER},{$ES_PASS},cluster]'
+          tags:
+            -
+              tag: Application
+              value: Elasticsearch
+        -
+          uuid: 376c2cd6bcfa4a21867411af6d84f5d1
+          name: 'ES: Total space'
+          type: DEPENDENT
+          key: 'elasticsearch.cluster[nodes.fs.total_in_bytes]'
+          delay: '0'
+          history: 60d
+          trends: 1095d
+          units: B
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.nodes.fs.total_in_bytes
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: 'elasticsearch.check[{$ES_URL},{$ES_USER},{$ES_PASS},cluster]'
+          tags:
+            -
+              tag: Application
+              value: Elasticsearch
+        -
+          uuid: 20a0526ae5054c808a95c4cc9b3356eb
+          name: 'ES: Number of master nodes'
+          type: DEPENDENT
+          key: 'elasticsearch.cluster[nodes.master]'
+          delay: '0'
+          history: 60d
+          trends: 1095d
+          units: '!node(s)'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.nodes.count.master
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: 'elasticsearch.check[{$ES_URL},{$ES_USER},{$ES_PASS},cluster]'
+          tags:
+            -
+              tag: Application
+              value: Elasticsearch
+        -
+          uuid: 0acd45bc9952407ab582689b0b483149
+          name: 'ES: Number of working nodes'
+          type: DEPENDENT
+          key: 'elasticsearch.cluster[nodes.successfull]'
+          delay: '0'
+          history: 60d
+          trends: 1095d
+          units: '!node(s)'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $._nodes.successful
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: 'elasticsearch.check[{$ES_URL},{$ES_USER},{$ES_PASS},cluster]'
+          tags:
+            -
+              tag: Application
+              value: Elasticsearch
+        -
+          uuid: 8ef89bc0bcde44ed89a361a9541f7b85
+          name: 'ES: Number of nodes'
+          type: DEPENDENT
+          key: 'elasticsearch.cluster[nodes.total]'
+          delay: '0'
+          history: 60d
+          trends: 1095d
+          units: '!node(s)'
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $._nodes.total
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: 'elasticsearch.check[{$ES_URL},{$ES_USER},{$ES_PASS},cluster]'
+          tags:
+            -
+              tag: Application
+              value: Elasticsearch
+          triggers:
+            -
+              uuid: 82cad93d736248e8b520d25e09cc0fd9
+              expression: 'abs(change(/Template_App_Elasticsearch/elasticsearch.cluster[nodes.total]))>0'
+              recovery_mode: NONE
+              name: 'Number of nodes has changed to {ITEM.LASTVALUE1}'
+              priority: INFO
+              manual_close: 'YES'
+        -
+          uuid: 4782a3f38fb14c16ba2066c3504727da
+          name: 'ES: Cluster status'
+          type: DEPENDENT
+          key: 'elasticsearch.cluster[status]'
+          delay: '0'
+          history: 30d
+          trends: '0'
+          value_type: CHAR
+          preprocessing:
+            -
+              type: JSONPATH
+              parameters:
+                - $.status
+            -
+              type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
+          master_item:
+            key: 'elasticsearch.check[{$ES_URL},{$ES_USER},{$ES_PASS},cluster]'
+          tags:
+            -
+              tag: Application
+              value: Elasticsearch
+          triggers:
+            -
+              uuid: b86396f5fcca4dfe825f8ae022ef8edf
+              expression: 'find(/Template_App_Elasticsearch/elasticsearch.cluster[status],,"like","red")=1'
+              name: 'ES cluster in red status'
+              priority: HIGH
+            -
+              uuid: 275c27ab25874666a1cfd8f36df549d0
+              expression: 'find(/Template_App_Elasticsearch/elasticsearch.cluster[status],,"like","green")=0'
+              name: 'ES cluster is in {ITEM.LASTVALUE1} status'
+              priority: WARNING
+              manual_close: 'YES'
+              dependencies:
+                -
+                  name: 'ES cluster in red status'
+                  expression: 'find(/Template_App_Elasticsearch/elasticsearch.cluster[status],,"like","red")=1'
+      discovery_rules:
+        -
+          uuid: bf3408829ed946a99e0c9640698a2eed
+          name: 'Indices discovery'
+          key: 'elasticsearch.discovery[{$ES_URL},{$ES_USER},{$ES_PASS},indices]'
+          delay: 30m
+          lifetime: 7d
+          item_prototypes:
+            -
+              uuid: 67125ce8f0924ee0a124f06d40715005
+              name: 'ES: Index: {#ES_INDEX_NAME}: Info'
+              key: 'elasticsearch.check[{$ES_URL},{$ES_USER},{$ES_PASS},index,{#ES_INDEX_NAME}]'
+              delay: 3m
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              tags:
+                -
+                  tag: Application
+                  value: Elasticsearch
+            -
+              uuid: d457ef885ca442c58fb3c336f2dd8f1d
+              name: 'ES: Index: {#ES_INDEX_NAME}: Number of active primary shards'
+              type: DEPENDENT
+              key: 'elasticsearch.index[{#ES_INDEX_NAME},active_primary_shards]'
+              delay: '0'
+              history: 60d
+              trends: 1095d
+              units: '!shard(s)'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.active_primary_shards
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'elasticsearch.check[{$ES_URL},{$ES_USER},{$ES_PASS},index,{#ES_INDEX_NAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: Elasticsearch
+            -
+              uuid: 465dbc25a40948f392287f784aea1bbe
+              name: 'ES: Index: {#ES_INDEX_NAME}: Number of active shards'
+              type: DEPENDENT
+              key: 'elasticsearch.index[{#ES_INDEX_NAME},active_shards]'
+              delay: '0'
+              history: 60d
+              trends: 1095d
+              units: '!shard(s)'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.active_shards
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'elasticsearch.check[{$ES_URL},{$ES_USER},{$ES_PASS},index,{#ES_INDEX_NAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: Elasticsearch
+            -
+              uuid: 58c0a433f7494045a1aac59586893415
+              name: 'ES: Index: {#ES_INDEX_NAME}: Number of replicas'
+              type: DEPENDENT
+              key: 'elasticsearch.index[{#ES_INDEX_NAME},number_of_replicas]'
+              delay: '0'
+              history: 60d
+              trends: 1095d
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.number_of_replicas
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'elasticsearch.check[{$ES_URL},{$ES_USER},{$ES_PASS},index,{#ES_INDEX_NAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: Elasticsearch
+            -
+              uuid: 03c1b057648c4e96937191731206b1ac
+              name: 'ES: Index: {#ES_INDEX_NAME}: Number of shards'
+              type: DEPENDENT
+              key: 'elasticsearch.index[{#ES_INDEX_NAME},number_of_shards]'
+              delay: '0'
+              history: 60d
+              trends: 1095d
+              units: '!shard(s)'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.number_of_shards
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'elasticsearch.check[{$ES_URL},{$ES_USER},{$ES_PASS},index,{#ES_INDEX_NAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: Elasticsearch
+            -
+              uuid: a13865f166344478ae5e3ea02962b8e2
+              name: 'ES: Index: {#ES_INDEX_NAME}: Number of relocating shards'
+              type: DEPENDENT
+              key: 'elasticsearch.index[{#ES_INDEX_NAME},relocating_shards]'
+              delay: '0'
+              history: 60d
+              trends: 1095d
+              units: '!shard(s)'
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.relocating_shards
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'elasticsearch.check[{$ES_URL},{$ES_USER},{$ES_PASS},index,{#ES_INDEX_NAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: Elasticsearch
+            -
+              uuid: ba3dda72f4144a989e276b0d13c38536
+              name: 'ES: Index: {#ES_INDEX_NAME}: Status'
+              type: DEPENDENT
+              key: 'elasticsearch.index[{#ES_INDEX_NAME},status]'
+              delay: '0'
+              history: 30d
+              trends: '0'
+              value_type: CHAR
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.status
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'elasticsearch.check[{$ES_URL},{$ES_USER},{$ES_PASS},index,{#ES_INDEX_NAME}]'
+              tags:
+                -
+                  tag: Application
+                  value: Elasticsearch
+              trigger_prototypes:
+                -
+                  uuid: baeff34841114b31883f0b7e017357a0
+                  expression: 'find(/Template_App_Elasticsearch/elasticsearch.index[{#ES_INDEX_NAME},status],,"like","red")=1'
+                  name: 'ES index {#ES_INDEX_NAME} is in red status'
+                  priority: HIGH
+                  manual_close: 'YES'
+                -
+                  uuid: 91d45c74b96049158644dc2c4bdc418e
+                  expression: 'find(/Template_App_Elasticsearch/elasticsearch.index[{#ES_INDEX_NAME},status],,"like","green")=0'
+                  name: 'ES index {#ES_INDEX_NAME} is in {ITEM.LASTVALUE1} status'
+                  priority: WARNING
+                  manual_close: 'YES'
+                  dependencies:
+                    -
+                      name: 'ES index {#ES_INDEX_NAME} is in red status'
+                      expression: 'find(/Template_App_Elasticsearch/elasticsearch.index[{#ES_INDEX_NAME},status],,"like","red")=1'
+        -
+          uuid: 9912e675734d42e7b3810db51a9c13de
+          name: 'Nodes discovery'
+          key: 'elasticsearch.discovery[{$ES_URL},{$ES_USER},{$ES_PASS},nodes]'
+          delay: 2h
+          lifetime: 7d
+          item_prototypes:
+            -
+              uuid: 70e411ebd3de4f79936ec65ad4b3e41a
+              name: 'ES: Node {#ES_NODE_NAME} ({#ES_NODE_ID}): Info'
+              key: 'elasticsearch.check[{$ES_URL},{$ES_USER},{$ES_PASS},node,{#ES_NODE_ID}]'
+              delay: 5m
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              tags:
+                -
+                  tag: Application
+                  value: Elasticsearch
+            -
+              uuid: 0b7eed934ccf4e90b95daced49c7ccde
+              name: 'ES: Node {#ES_NODE_NAME} ({#ES_NODE_ID}): Uptime'
+              type: DEPENDENT
+              key: 'elasticsearch.node[{#ES_NODE_ID},jvm.start_time_in_millis]'
+              delay: '0'
+              history: 30d
+              trends: 1095d
+              units: ms
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.jvm.start_time_in_millis
+              master_item:
+                key: 'elasticsearch.check[{$ES_URL},{$ES_USER},{$ES_PASS},node,{#ES_NODE_ID}]'
+              tags:
+                -
+                  tag: Application
+                  value: Elasticsearch
+              trigger_prototypes:
+                -
+                  uuid: e2b5fac004e240e1b381a0f3ce17db4f
+                  expression: 'last(/Template_App_Elasticsearch/elasticsearch.node[{#ES_NODE_ID},jvm.start_time_in_millis])<600000'
+                  name: 'ES restarted recently'
+                  priority: INFO
+                  manual_close: 'YES'
+            -
+              uuid: c335b6ee20d8497393125f9b1a4f7157
+              name: 'ES: Node {#ES_NODE_NAME} ({#ES_NODE_ID}): ES version'
+              type: DEPENDENT
+              key: 'elasticsearch.node[{#ES_NODE_ID},version]'
+              delay: '0'
+              history: 30d
+              trends: '0'
+              value_type: CHAR
+              preprocessing:
+                -
+                  type: JSONPATH
+                  parameters:
+                    - $.version
+                -
+                  type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: 'elasticsearch.check[{$ES_URL},{$ES_USER},{$ES_PASS},node,{#ES_NODE_ID}]'
+              tags:
+                -
+                  tag: Application
+                  value: Elasticsearch
+              trigger_prototypes:
+                -
+                  uuid: 15b5d7f22ca2422f9f79f6ee0196d38e
+                  expression: 'last(/Template_App_Elasticsearch/elasticsearch.node[{#ES_NODE_ID},version],#1)<>last(/Template_App_Elasticsearch/elasticsearch.node[{#ES_NODE_ID},version],#2)'
+                  recovery_mode: NONE
+                  name: 'ES version changed to {ITEM.LASTVALUE1} on node {#ES_NODE_NAME} ({#ES_NODE_ID})'
+                  priority: INFO
+                  manual_close: 'YES'
+      macros:
+        -
+          macro: '{$ES_PASS}'
+        -
+          macro: '{$ES_SPACE_PCT_CRIT}'
+          value: '88'
+        -
+          macro: '{$ES_SPACE_PCT_WARN}'
+          value: '78'
+        -
+          macro: '{$ES_URL}'
+          value: 'http://localhost:9200'
+        -
+          macro: '{$ES_USER}'
+  triggers:
+    -
+      uuid: e5ff617704b047e2814469075a1a9e38
+      expression: '(100*last(/Template_App_Elasticsearch/elasticsearch.cluster[nodes.fs.available_in_bytes])/last(/Template_App_Elasticsearch/elasticsearch.cluster[nodes.fs.total_in_bytes]))<(100-{$ES_SPACE_PCT_WARN})'
+      name: 'Low free disk space'
+      priority: WARNING
+      dependencies:
+        -
+          name: 'Very low free disk space'
+          expression: '(100*last(/Template_App_Elasticsearch/elasticsearch.cluster[nodes.fs.available_in_bytes])/last(/Template_App_Elasticsearch/elasticsearch.cluster[nodes.fs.total_in_bytes]))<(100-{$ES_SPACE_PCT_CRIT})'
+    -
+      uuid: c6dbde1d2a844e338bb05dee6f59b114
+      expression: '(100*last(/Template_App_Elasticsearch/elasticsearch.cluster[nodes.fs.available_in_bytes])/last(/Template_App_Elasticsearch/elasticsearch.cluster[nodes.fs.total_in_bytes]))<(100-{$ES_SPACE_PCT_CRIT})'
+      name: 'Very low free disk space'
+      priority: HIGH
+  graphs:
+    -
+      uuid: 83738984fe6f4ab1b5a71e150c248ae4
+      name: 'ES: Storage size'
+      graph_items:
+        -
+          drawtype: GRADIENT_LINE
+          color: 1A7C11
+          item:
+            host: Template_App_Elasticsearch
+            key: 'elasticsearch.cluster[indices.store.size]'
