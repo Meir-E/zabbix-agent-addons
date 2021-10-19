@@ -66,7 +66,14 @@ $ua->env_proxy;
 if ($cluster){
   $json = make_request('/_cluster/stats');
 } elsif (defined $node){
-  $json = make_request('/_nodes/' . $node);
+  my $resp = make_request('/_nodes/' . $node)->{'nodes'};
+  # We can specify node by ID, name or IP
+  if (defined $resp->{$node}){
+    $json = $resp->{$node};
+  } else {
+    my $node_id = (keys %{$resp})[0];
+    $json = $resp->{$node_id};
+  }
 } elsif (defined $index){
   $json = make_request('/_cluster/health/' . $index . '?level=indices')->{'indices'}->{$index};
 }

@@ -60,18 +60,21 @@ my $ua = LWP::UserAgent->new(
 $ua->env_proxy;
 
 if ($nodes){
-  foreach (@{make_request('/_cat/nodes?format=json')}){
+  foreach (@{make_request('/_cat/nodes?format=json&full_id&h=ip,role,master,name,id,version')}){
     push @{$json}, {
-      '{#ES_NODE_NAME}' => $_->{name},
-      '{#ES_NODE_ROLE}' => $_->{'node.role'}
+      '{#ES_NODE_NAME}'    => $_->{name},
+      '{#ES_NODE_ROLE}'    => $_->{role},
+      '{#ES_NODE_ID}'      => $_->{id},
+      '{#ES_NODE_VERSION}' => $_->{version},
+      '{#ES_NODE_MASTER}'  => $_->{master}
     };
   }
 } elsif ($indices){
   foreach (@{make_request('/_cat/indices?format=json')}){
     push @{$json}, {
-      '{#ES_INDICE_NAME}'   => $_->{index},
-      '{#ES_INDICE_STATUS}' => $_->{status},
-      '{#ES_INDICE_UUID}'   => $_->{uuid}
+      '{#ES_INDEX_NAME}'   => $_->{index},
+      '{#ES_INDEX_STATUS}' => $_->{status},
+      '{#ES_INDEX_UUID}'   => $_->{uuid}
     };
   }
 }
