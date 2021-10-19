@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-10-19T08:26:20Z'
+  date: '2021-10-19T12:29:52Z'
   groups:
     -
       uuid: 7df96b18c230490a9a0a9e2307226338
@@ -421,7 +421,7 @@ zabbix_export:
             -
               type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 6h
+                - 10m
           master_item:
             key: 'elasticsearch.check[{$ES_URL},{$ES_USER},{$ES_PASS},cluster]'
           tags:
@@ -444,6 +444,11 @@ zabbix_export:
                 -
                   name: 'ES cluster in red status'
                   expression: 'find(/Template_App_Elasticsearch/elasticsearch.cluster[status],,"like","red")=1'
+            -
+              uuid: c54941e310124d4881bcbb76912a72c9
+              expression: 'nodata(/Template_App_Elasticsearch/elasticsearch.cluster[status],30m)=1'
+              name: 'No data for Elasticsearch cluster monitoring since 10m'
+              priority: WARNING
       discovery_rules:
         -
           uuid: bf3408829ed946a99e0c9640698a2eed
@@ -600,7 +605,7 @@ zabbix_export:
                 -
                   type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 6h
+                    - 10m
               master_item:
                 key: 'elasticsearch.check[{$ES_URL},{$ES_USER},{$ES_PASS},index,{#ES_INDEX_NAME}]'
               tags:
@@ -624,6 +629,16 @@ zabbix_export:
                     -
                       name: 'ES index {#ES_INDEX_NAME} is in red status'
                       expression: 'find(/Template_App_Elasticsearch/elasticsearch.index[{#ES_INDEX_NAME},status],,"like","red")=1'
+                -
+                  uuid: 421078e2f66f4fe787a710c10eb45419
+                  expression: 'nodata(/Template_App_Elasticsearch/elasticsearch.index[{#ES_INDEX_NAME},status],30m)=1'
+                  name: 'No data for Elasticsearch index {#ES_INDEX_NAME} monitoring since 10m'
+                  priority: WARNING
+                  manual_close: 'YES'
+                  dependencies:
+                    -
+                      name: 'No data for Elasticsearch cluster monitoring since 10m'
+                      expression: 'nodata(/Template_App_Elasticsearch/elasticsearch.cluster[status],30m)=1'
         -
           uuid: 9912e675734d42e7b3810db51a9c13de
           name: 'Nodes discovery'
