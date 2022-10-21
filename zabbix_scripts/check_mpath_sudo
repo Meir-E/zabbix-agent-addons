@@ -90,7 +90,7 @@ if ($? != 0){
 shift @res;
 foreach (@res){
   chomp;
-  next if $_ !~ /^$mpath\|/;
+  next if $_ !~ /^$mpath[\s]*\|/;
   my (undef, $dev, $dm_st, $dev_st, $chk_st, $failures, $serial) = split(/\s*\|\s*/, $_);
   push @{$json->{paths_details}}, {
     dev      => $dev,
