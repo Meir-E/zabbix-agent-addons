@@ -1,1 +1,7 @@
-A collection of scripts to discover and monitor GNU/Linux hosts with Zabbix
+I am working on updating this collection of scripts for Zabbix. This is currently just a copy from this GIT reposity.
+
+https://git.fws.fr/fws/zabbix-agent-addons
+
+I am currently working on updatinng the multipath checks discovery and checks. I'll be working on other scripts as I put them in place.
+
+
