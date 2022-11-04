@@ -77,6 +77,7 @@ foreach (@res){
   } elsif ($unit eq 'P'){
     $json->{size} *= 1024 * 1024 * 1024 * 1024 * 1024;
   }
+  $json->{size} = int($json->{size});
   # No need to process the other mpath here
   last;
 }
